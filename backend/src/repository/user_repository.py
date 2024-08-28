@@ -6,6 +6,7 @@ from backend.src.database import models, shema
 from backend.src.database.database import get_db
 
 from backend.src.helpers import password_helper
+from backend.src.helpers.jwt_helper import create_access_token
 
 
 def sign_up(request: shema.User, response, db):
@@ -16,7 +17,7 @@ def sign_up(request: shema.User, response, db):
         response.status_code = status.HTTP_409_CONFLICT
 
         return {
-            'message': "User already exist",
+            'message': "Email already exist",
             'status_code': 409,
             'error': "CONFLICT"
         }
@@ -37,7 +38,7 @@ def sign_up(request: shema.User, response, db):
     db.refresh(new_user)
 
     return {
-        'message': "success",
+        'message': "Register successfully",
         'status_code': 201,
         'status': "success",
         'data': {
@@ -66,6 +67,11 @@ def login(request: shema.User, response, db):
             'error': "FORBIDDEN"
         }
 
+    # Creating access token #
+    access_token = create_access_token({"sub": str(user.id)})
+    # Write access token in cookie #
+    response.set_cookie(key="user_access_token", value=access_token, httponly=True)
+
     return {
         'message': "Success",
         'status_code': 200,
@@ -74,6 +80,7 @@ def login(request: shema.User, response, db):
             'name': user.name,
             'id': user.id
         },
+        'access_token': access_token
     }
 
 

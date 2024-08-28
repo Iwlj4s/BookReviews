@@ -12,6 +12,7 @@ router = APIRouter(
 )
 
 
+# TODO: Create change user function and delete user function
 @router.post("/sign_up", status_code=201, tags=["users"])
 async def sign_up(user_name: str,
                   user_email: str,
