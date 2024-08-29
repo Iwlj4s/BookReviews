@@ -1,14 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.src.database.database import engine
-from backend.src.router import router
-
-from backend.src.database import models
 from backend.src.database.database import engine, Base
 
+from backend.src.routes.users_router import users_router
 
 app = FastAPI()
+
+
+@app.get("/")
+async def home_page():
+    return {"Hello there!"}
 
 origins = [
     "http://localhost:5173",
@@ -25,14 +27,13 @@ app.add_middleware(
 
 
 async def create_tables():
-    async with engine.begin() as conn:  # Используйте асинхронный контекстный менеджер
-        await conn.run_sync(Base.metadata.create_all)  # Создайте все таблицы
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
 @app.on_event("startup")
 async def startup_event():
-    await create_tables()  # Запустите асинхронную функцию при старте приложения
+    await create_tables()
 
-# Подключите маршрутизатор
-from backend.src.router import router
-app.include_router(router)
+
+app.include_router(users_router)

@@ -4,13 +4,15 @@ from jose import jwt, JWTError
 from datetime import datetime, timezone
 
 from fastapi import Depends, HTTPException
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession  
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from starlette import status
 
 from backend.config import get_auth_data
-from backend.src.database import models, shema
 from backend.src.database.database import get_db
+from backend.src.database import models, shema
 
 from backend.src.helpers import password_helper
 from backend.src.helpers.jwt_helper import create_access_token
