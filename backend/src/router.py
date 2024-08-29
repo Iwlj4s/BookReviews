@@ -1,5 +1,6 @@
 from fastapi import Depends, APIRouter, Response
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.database import shema
 from backend.src.database.database import get_db
 from backend.src.database.shema import User
@@ -19,29 +20,29 @@ async def sign_up(user_name: str,
                   user_email: str,
                   user_password: str,
                   response: Response,
-                  db: Session = Depends(get_db)):
+                  db: AsyncSession = Depends(get_db)):
     request = shema.User(name=user_name,
                          email=user_email,
                          password=user_password)
-    return user_repository.sign_up(request, response, db)
+    return await user_repository.sign_up(request, response, db)
 
 
 @router.post("/sign_in", status_code=200, tags=["users"])
 async def sign_in(user_email: str,
                   user_password: str,
                   response: Response,
-                  db: Session = Depends(get_db)):
+                  db: AsyncSession = Depends(get_db)):
     request = shema.User(email=user_email,
                          password=user_password)
-    return user_repository.login(request, response, db)
+    return await user_repository.login(request, response, db)
 
 
 @router.get("/{user_id}", status_code=200)
 async def get_user(user_id: int,
                    response: Response,
-                   db: Session = Depends(get_db)):
+                   db: AsyncSession = Depends(get_db)):
 
-    return user_repository.get_user(user_id, response, db)
+    return await user_repository.get_user(user_id, response, db)
 
 
 @router.get("/me/")

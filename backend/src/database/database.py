@@ -1,7 +1,5 @@
-import os
-from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from dotenv import load_dotenv
 
 from backend.config import settings
@@ -10,17 +8,15 @@ load_dotenv()
 
 SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})  # Добавьте аргумент для многопоточности
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
 
-def get_db():
-    db = SessionLocal()
-
-    try:
-        yield db
-
-    finally:
-        db.close()
+async def get_db():
+    async with SessionLocal() as db:  # Используйте асинхронный контекстный менеджер
+        try:
+            yield db
+        finally:
+            await db.close()  # Используйте await для закрытия

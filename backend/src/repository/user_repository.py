@@ -4,7 +4,8 @@ from jose import jwt, JWTError
 from datetime import datetime, timezone
 
 from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession  
 from starlette import status
 
 from backend.config import get_auth_data
@@ -16,9 +17,12 @@ from backend.src.helpers.jwt_helper import create_access_token
 from backend.src.helpers.token_helper import get_token
 
 
-def sign_up(request: shema.User, response, db):
-    email = db.query(models.User).filter(models.User.email == request.email).first()
-    name = db.query(models.User).filter(models.User.name == request.name).first()
+async def sign_up(request: shema.User, response, db: AsyncSession):
+    result_email = await db.execute(select(models.User).filter(models.User.email == request.email))
+    email = result_email.scalars().first()
+
+    result_name = await db.execute(select(models.User).filter(models.User.name == request.name))
+    name = result_name.scalars().first()
 
     if email:
         response.status_code = status.HTTP_409_CONFLICT
@@ -41,8 +45,9 @@ def sign_up(request: shema.User, response, db):
     hash_password = password_helper.hash_password(request.password)
     new_user = models.User(name=request.name, email=request.email, password=hash_password)
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+
+    await db.commit()
+    await db.refresh(new_user)
 
     return {
         'message': "Register successfully",
@@ -56,8 +61,9 @@ def sign_up(request: shema.User, response, db):
     }
 
 
-def login(request: shema.User, response, db):
-    user: models.User = db.query(models.User).filter(models.User.email == request.email).first()
+async def login(request: shema.User, response, db: AsyncSession):
+    result_user = await db.execute(select(models.User).filter(models.User.email == request.email))
+    user: models.User = result_user.scalars().first()
     if not user:
         response.status_code = status.HTTP_403_FORBIDDEN
         return {
@@ -91,9 +97,9 @@ def login(request: shema.User, response, db):
     }
 
 
-def get_user(user_id, response, db):
-    user: models.User = db.query(models.User).filter(models.User.id == user_id).first()
-
+async def get_user(user_id, response, db: AsyncSession):
+    result_user = await db.execute(select(models.User).filter(models.User.id == user_id))
+    user: models.User = result_user.scalars().first()
     if not user:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {
@@ -109,7 +115,7 @@ def get_user(user_id, response, db):
     }
 
 
-async def get_current_user(db: Session = Depends(get_db), token: str = Depends(get_token)):
+async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depends(get_token)):
     try:
         auth_data = get_auth_data()
         payload = jwt.decode(token, auth_data['secret_key'], auth_data['algorithm'])
@@ -126,7 +132,8 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(g
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Не найден ID пользователя')
 
-    user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+    result_user = await db.execute(select(models.User).filter(models.User.id == user_id))
+    user: models.User = result_user.scalars().first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
 
