@@ -1,17 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.src.database.database import engine
-from backend.src.router import router
+from backend.src.database.database import engine, Base
 
-from backend.src.database import models
-
+from backend.src.routes.users_router import users_router
 
 app = FastAPI()
 
-app.include_router(router)
 
-models.Base.metadata.create_all(engine)
+@app.get("/")
+async def home_page():
+    return {"Hello there!"}
 
 origins = [
     "http://localhost:5173",
@@ -25,3 +24,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+@app.on_event("startup")
+async def startup_event():
+    await create_tables()
+
+
+app.include_router(users_router)
