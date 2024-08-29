@@ -6,7 +6,7 @@ from backend.src.database.database import get_db
 from backend.src.database.shema import User
 from backend.src.database import shema
 
-from backend.src.repository.user_repository import get_current_user
+from backend.src.repository.user_repository import get_current_user, delete_current_user
 from backend.src.repository import user_repository
 
 users_router = APIRouter(
@@ -46,9 +46,16 @@ async def get_user(user_id: int,
     return await user_repository.get_user(user_id, response, db)
 
 
-@users_router.get("/me/")
+@users_router.get("/me/", status_code=200)
 async def get_me(response: Response,
                  user_data: User = Depends(get_current_user)):
+
+    return user_data
+
+
+@users_router.get("/delete_me/", status_code=200)
+async def get_me(response: Response,
+                 user_data: User = Depends(delete_current_user)):
 
     return user_data
 
