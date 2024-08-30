@@ -1,4 +1,5 @@
-from sqlalchemy import select
+from sqlalchemy import select, update, delete, and_, func
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.database.models import User
@@ -32,3 +33,14 @@ class UserDAO:
         name = await db.execute(query)
 
         return name.scalars().first()
+
+    @classmethod
+    async def change_user(cls, db: AsyncSession, user_id: int, data: dict):
+        query = update(User).where(User.id == int(user_id)).values(
+            name=data["name"],
+            email=data["email"],
+            password=data["password"]
+        )
+
+        await db.execute(query)
+        await db.commit()

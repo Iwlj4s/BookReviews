@@ -2,11 +2,14 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from typing import Optional
+
 from backend.src.database.database import get_db
 from backend.src.database.shema import User
 from backend.src.database import shema
+from backend.src.helpers.token_helper import get_token
 
-from backend.src.repository.user_repository import get_current_user, delete_current_user
+from backend.src.repository.user_repository import get_current_user, delete_current_user, change_current_user
 from backend.src.repository import user_repository
 
 users_router = APIRouter(
@@ -15,7 +18,6 @@ users_router = APIRouter(
 )
 
 
-# TODO: Create change user function and delete user function
 @users_router.post("/sign_up", status_code=201, tags=["users"])
 async def sign_up(user_name: str,
                   user_email: str,
@@ -58,6 +60,21 @@ async def get_me(response: Response,
                  user_data: User = Depends(delete_current_user)):
 
     return user_data
+
+
+@users_router.post("/change_me/")
+async def change_me(response: Response,
+                    new_user_name: Optional[str] = None,
+                    new_user_email: Optional[str] = None,
+                    new_user_password: Optional[str] = None,
+                    db: AsyncSession = Depends(get_db),
+                    token: str = Depends(get_token)):
+
+    request = shema.User(name=new_user_name,
+                         email=new_user_email,
+                         password=new_user_password)
+
+    return await user_repository.change_current_user(request, db, token)
 
 
 @users_router.post("/logout")
