@@ -18,6 +18,7 @@ users_router = APIRouter(
 )
 
 
+# TODO: Add (All by user): add review, delete review, change review
 @users_router.post("/sign_up", status_code=201, tags=["users"])
 async def sign_up(user_name: str,
                   user_email: str,
@@ -74,7 +75,7 @@ async def change_me(response: Response,
                          email=new_user_email,
                          password=new_user_password)
 
-    return await user_repository.change_current_user(request, db, token)
+    return await user_repository.change_current_user(request, db, response, token)
 
 
 @users_router.post("/logout")

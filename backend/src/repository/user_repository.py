@@ -3,6 +3,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlette import status
+from starlette.responses import Response
 
 from backend.src.database.database import get_db
 from backend.src.database import models, shema
@@ -12,7 +13,7 @@ from backend.src.helpers.jwt_helper import create_access_token
 from backend.src.helpers.token_helper import get_token, verify_token
 
 from backend.src.DAO.users_dao import UserDAO
-from backend.src.helpers.user_helper import verify_user
+from backend.src.helpers.user_helper import verify_user, check_data_for_change_user
 
 
 async def sign_up(request: shema.User, response, db: AsyncSession):
@@ -141,41 +142,26 @@ async def delete_current_user(db: AsyncSession = Depends(get_db), token: str = D
     }
 
 
-async def change_current_user(request: shema.User, db: AsyncSession, token: str):
-
+async def change_current_user(request: shema.User, db: AsyncSession, response: Response, token: str):
     user_id = verify_token(token=token)
 
     user = await verify_user(db, user_id=user_id)
 
-    data = {}
+    new_data = check_data_for_change_user(request=request, user=user)
 
-    # TODO: Refactor this !
-    if request.name is None:
-        data.update({"name": user.name})
-    else:
-        data.update({"name": request.name})
-
-    if request.email is None:
-        data.update({"email": user.email})
-    else:
-        data.update({"email": request.email})
-
-    if request.password is None:
-        data.update({"password": user.password})
-    else:
-        hash_password = password_helper.hash_password(request.password)
-        data.update({"password": hash_password})
+    if new_data.get("password") != user.password:
+        response.delete_cookie(key='user_access_token')
 
     await UserDAO.change_user(db=db,
                               user_id=user_id,
-                              data=data)
+                              data=new_data)
 
     return {
         'message': "User updated successfully",
         'status_code': 200,
         'data': {
             'id': user_id,
-            'name': data.get("name"),
-            'email': data.get("email")
+            'name': new_data.get("name"),
+            'email': new_data.get("email")
         }
     }
