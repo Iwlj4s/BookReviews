@@ -39,7 +39,15 @@ async def create_review(response: Response,
     return await reviews_repository.create_review(request=request, response=response, token=token, db=db)
 
 
-@reviews_router.get("/reviews/{review_id}")
+@reviews_router.delete("/delete_review/{review_id}")
+async def delete_review(review_id: int,
+                        db: AsyncSession = Depends(get_db),
+                        token: str = Depends(get_token)):
+
+    return await reviews_repository.delete_review(review_id=review_id, db=db, token=token)
+
+
+@reviews_router.get("/{review_id}")
 async def get_review(review_id: int, response: Response, db: AsyncSession = Depends(get_db)):
     return await fetch_review(review_id=review_id, response=response, db=db)
 

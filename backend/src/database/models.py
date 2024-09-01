@@ -42,6 +42,7 @@ class Author(Base):
     books: Mapped[List["Book"]] = relationship("Book", back_populates="author")
 
 
+# TODO: Think about parse https://www.litres.ru/search/ for take book cover img
 class Book(Base):
     __tablename__ = 'books'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)

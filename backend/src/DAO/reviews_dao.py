@@ -22,22 +22,6 @@ class ReviewDAO:
         return review.scalars().first()
 
     @classmethod
-    async def get_reviews_book_name(cls, db: AsyncSession, review_book_name: str):
-        query = select(Review).where(Review.reviewed_book_name == str(review_book_name))
-
-        reviews = await db.execute(query)
-
-        return reviews.scalars().all()
-
-    @classmethod
-    async def get_reviews_book_author_name(cls, db: AsyncSession, review_book_author_name: str):
-        query = select(Review).where(Review.reviewed_book_name == str(review_book_author_name))
-
-        reviews = await db.execute(query)
-
-        return reviews.scalars().all()
-
-    @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,
                                    book_name: str | None = None,
                                    author_name: str | None = None):
@@ -50,3 +34,9 @@ class ReviewDAO:
 
         reviews = await db.execute(query)
         return reviews.scalars().all()
+
+    @classmethod
+    async def delete_review(cls, db: AsyncSession, review_id: int):
+        query = delete(Review).where(Review.id == int(review_id))
+        await db.execute(query)
+        await db.commit()
