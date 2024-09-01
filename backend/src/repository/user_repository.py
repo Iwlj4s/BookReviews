@@ -92,7 +92,7 @@ async def login(request: shema.User, response, db: AsyncSession):
     }
 
 
-async def get_user(user_id, response, db: AsyncSession):
+async def fetch_user(user_id, response, db: AsyncSession = Depends(get_db)):
     user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
     if not user:
         response.status_code = status.HTTP_404_NOT_FOUND

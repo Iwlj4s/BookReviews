@@ -1,18 +1,35 @@
 from fastapi import Query
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field
 from typing import Union
 
 
 class User(BaseModel):
-    name: Union[str, None] = Query(default=Field, min_length=3, title="Имя пользователя")
-    email: Union[str, None] = Query(default=Field, title="Эл.почта пользователя")
-    password: Union[str, None] = Query(default=Field, min_length=4, title="Пароль пользователя")
+    name: Union[str, None] = Field(default=None, min_length=3, title="Имя пользователя")
+    email: Union[str, None] = Field(default=None, title="Эл.почта пользователя")
+    password: Union[str, None] = Field(default=None, min_length=4, title="Пароль пользователя")
+
+
+class Review(BaseModel):
+    created_by: Union[int] = Field(default=None, title="id пользователя, создавшего обзор")
+    reviewed_book_id: Union[int] = Field(default=None, title="id книги, на которую написан обзор")
+
+    review_title: Union[str] = Field(default=None, min_length=5, title="Заголовок обзора")
+    review_body: Union[str] = Field(default=None, min_length=5, title="Обзор")
+
+
+class FilteredReview(BaseModel):
+    reviewed_book_name: Union[str, None] = Field(default=None, title="Название книги")
+    reviewed_author_name: Union[str, None] = Field(default=None, title="Имя автора")
+
+
+class Author(BaseModel):
+    name: Union[str, None] = Field(default=None, title="Имя автора")
 
 
 class Book(BaseModel):
-    book_name: Union[str, None] = Query(default=Field)
-    book_author: Union[str, None] = Query(default=Field)
-    book_description: Union[str, None] = Query(default=Field)
+    book_name: Union[str, None] = Field(default=None, title="Название книги")
+    author_id: Union[int, None] = Field(default=None, title="ID автора")
+    book_description: Union[str, None] = Field(default=None, title="Описание книги")
 
 
 class Token(BaseModel):
