@@ -10,8 +10,8 @@ class User(BaseModel):
 
 
 class Review(BaseModel):
-    created_by: Union[int] = Field(default=None, title="id пользователя, создавшего обзор")
-    reviewed_book_id: Union[int] = Field(default=None, title="id книги, на которую написан обзор")
+    reviewed_book_name: Union[str] = Field(default=None, title="Название книги, на которую написан обзор")
+    reviewed_book_author_name: Union[str] = Field(default=None, title="Имя автора книги, на которую написан обзор")
 
     review_title: Union[str] = Field(default=None, min_length=5, title="Заголовок обзора")
     review_body: Union[str] = Field(default=None, min_length=5, title="Обзор")

@@ -55,7 +55,7 @@ async def get_me(response: Response,
     return user_data
 
 
-@users_router.get("/delete_me/", status_code=200)
+@users_router.delete("/delete_me/", status_code=200)
 async def delete_me(response: Response,
                     user_data: User = Depends(delete_current_user)):
     return user_data

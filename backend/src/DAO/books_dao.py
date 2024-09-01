@@ -15,10 +15,9 @@ class BookDAO:
 
     @classmethod
     async def get_book_by_name(cls, db: AsyncSession, book_name: str):
-        query = select(Book).where(Book.id == book_name)
+        query = select(Book).where(Book.book_name == book_name)
         book = await db.execute(query)
-
-        return book
+        return book.scalars().first()
 
     @classmethod
     async def get_book_by_author(cls, db: AsyncSession, book_author: str):
