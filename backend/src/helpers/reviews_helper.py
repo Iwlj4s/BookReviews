@@ -26,3 +26,23 @@ async def check_data_for_add_review(request: shema.Review, db: AsyncSession):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Имя автора не соответствует книге")
 
     return book, author
+
+
+def check_data_for_change_review(request: shema.ChangeReview, review):
+    data = {}
+    data.update({"created_by": review.created_by})
+    data.update({"reviewed_book_id": review.reviewed_book_id})
+    data.update({"reviewed_book_name": review.reviewed_book_name})
+    data.update({"reviewed_book_author_name": review.reviewed_book_author_name})
+
+    if request.review_title is None:
+        data.update({"review_title": review.review_title})
+    else:
+        data.update({"review_title": request.review_title})
+
+    if request.review_body is None:
+        data.update({"review_body": review.review_body})
+    else:
+        data.update({"review_body": request.review_body})
+
+    return data

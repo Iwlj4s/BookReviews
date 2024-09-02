@@ -95,7 +95,7 @@ async def login(request: shema.User, response, db: AsyncSession):
 
 async def fetch_user(user_id, response, db: AsyncSession = Depends(get_db)):
     user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
-    user = await CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
+    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
 
     return {
         'message': "success",
@@ -109,7 +109,7 @@ async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depe
     user_id = verify_token(token=token)
 
     user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
-    user = await CheckHTTP401Unauthorized(founding_item=user, text="Пользователь не найден")
+    CheckHTTP401Unauthorized(founding_item=user, text="Пользователь не найден")
 
     return {
         'message': "success",
@@ -123,7 +123,7 @@ async def delete_current_user(db: AsyncSession = Depends(get_db), token: str = D
     user_id = verify_token(token=token)
 
     user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
-    user = await CheckHTTP401Unauthorized(founding_item=user, text="Пользователь не найден")
+    CheckHTTP401Unauthorized(founding_item=user, text="Пользователь не найден")
 
     await db.delete(user)
     await db.commit()

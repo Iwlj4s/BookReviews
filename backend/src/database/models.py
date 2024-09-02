@@ -17,6 +17,8 @@ class User(Base):
     is_user: Mapped[bool] = mapped_column(default=True, server_default=text("True"), nullable=False)
     is_admin: Mapped[bool] = mapped_column(default=False, server_default=text("False"), nullable=False)
 
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="user", lazy="selectin")
+
 
 class Review(Base):
     __tablename__ = 'reviews'
@@ -33,13 +35,15 @@ class Review(Base):
     created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
     updated: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
 
+    user: Mapped["User"] = relationship("User", back_populates="reviews", lazy="selectin")
+
 
 class Author(Base):
     __tablename__ = 'authors'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     name: Mapped[str] = mapped_column(String, nullable=False, index=True)
 
-    books: Mapped[List["Book"]] = relationship("Book", back_populates="author")
+    books: Mapped[List["Book"]] = relationship("Book", back_populates="author", lazy="selectin")
 
 
 # TODO: Think about parse https://www.litres.ru/search/ for take book cover img
@@ -50,4 +54,4 @@ class Book(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False, index=True)
     book_description: Mapped[str] = mapped_column(Text, nullable=False, index=True)
 
-    author: Mapped["Author"] = relationship("Author", back_populates="books")
+    author: Mapped["Author"] = relationship("Author", back_populates="books", lazy="selectin")

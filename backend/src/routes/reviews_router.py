@@ -39,6 +39,23 @@ async def create_review(response: Response,
     return await reviews_repository.create_review(request=request, response=response, token=token, db=db)
 
 
+@reviews_router.put("/change_review/{review_id}")
+async def change_review(review_id: int,
+                        new_review_title: str | None = None,
+                        new_review_body: str | None = None,
+                        db: AsyncSession = Depends(get_db),
+                        token: str = Depends(get_token)):
+
+    request = shema.ChangeReview(
+        review_title=new_review_title,
+        review_body=new_review_body)
+
+    return await reviews_repository.change_review(review_id=int(review_id),
+                                                  request=request,
+                                                  db=db,
+                                                  token=token)
+
+
 @reviews_router.delete("/delete_review/{review_id}")
 async def delete_review(review_id: int,
                         db: AsyncSession = Depends(get_db),
