@@ -2,12 +2,12 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from typing import Optional
-
 from backend.src.database.database import get_db
 from backend.src.database.shema import User
 from backend.src.database import shema
-from backend.src.helpers.token_helper import get_token
+
+
+from backend.src.repository.user_repository import get_current_user
 from backend.src.repository import reviews_repository
 from backend.src.repository.reviews_repository import get_all_reviews, fetch_review, fetch_filtered_review
 
@@ -29,14 +29,14 @@ async def create_review(response: Response,
                         review_title: str,
                         review_body: str,
                         db: AsyncSession = Depends(get_db),
-                        token: str = Depends(get_token)):
+                        user: User = Depends(get_current_user)):
 
     request = shema.Review(reviewed_book_name=book_name,
                            reviewed_book_author_name=book_author_name,
                            review_title=review_title,
                            review_body=review_body)
 
-    return await reviews_repository.create_review(request=request, response=response, token=token, db=db)
+    return await reviews_repository.create_review(request=request, response=response, user=user, db=db)
 
 
 @reviews_router.put("/change_review/{review_id}")
@@ -44,7 +44,7 @@ async def change_review(review_id: int,
                         new_review_title: str | None = None,
                         new_review_body: str | None = None,
                         db: AsyncSession = Depends(get_db),
-                        token: str = Depends(get_token)):
+                        user: User = Depends(get_current_user)):
 
     request = shema.ChangeReview(
         review_title=new_review_title,
@@ -53,15 +53,15 @@ async def change_review(review_id: int,
     return await reviews_repository.change_review(review_id=int(review_id),
                                                   request=request,
                                                   db=db,
-                                                  token=token)
+                                                  user=user)
 
 
 @reviews_router.delete("/delete_review/{review_id}")
 async def delete_review(review_id: int,
                         db: AsyncSession = Depends(get_db),
-                        token: str = Depends(get_token)):
+                        user: User = Depends(get_current_user)):
 
-    return await reviews_repository.delete_review(review_id=review_id, db=db, token=token)
+    return await reviews_repository.delete_review(review_id=review_id, db=db, user=user)
 
 
 @reviews_router.get("/{review_id}")

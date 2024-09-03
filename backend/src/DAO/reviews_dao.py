@@ -1,8 +1,13 @@
+from fastapi import HTTPException
 from sqlalchemy import select, update, delete, and_, func
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from starlette import status
 
+from backend.src.DAO.authors_dao import AuthorDAO
+from backend.src.DAO.books_dao import BookDAO
+from backend.src.database import shema, models
 from backend.src.database.models import Review
 
 
@@ -53,3 +58,31 @@ class ReviewDAO:
 
         await db.execute(query)
         await db.commit()
+
+    @classmethod
+    async def get_book_and_author(cls, request: shema.Review, db: AsyncSession):
+        book = await BookDAO.get_book_by_book_name_for_review(request=request, db=db)
+        author = await AuthorDAO.get_author_by_name_for_review(request=request, db=db)
+
+        if book.author_id != author.id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Имя автора не соответствует книге")
+
+        return book, author
+
+    @classmethod
+    async def create_review(cls, request: shema.Review, user, book, author, db: AsyncSession):
+        new_review = models.Review(
+            created_by=user.id,
+            reviewed_book_id=book.id,
+            reviewed_book_name=book.book_name,
+            reviewed_book_author_name=author.name,
+            review_title=request.review_title,
+            review_body=request.review_body
+        )
+
+        print(new_review)
+
+        db.add(new_review)
+        await db.commit()
+
+        return new_review
