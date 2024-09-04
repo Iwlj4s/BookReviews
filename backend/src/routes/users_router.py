@@ -18,8 +18,6 @@ users_router = APIRouter(
 )
 
 
-# TODO: Create /reviews for check all reviews by user
-# TODO: Add (All by user): add review, delete review, change review
 @users_router.post("/sign_up", status_code=201, tags=["users"])
 async def sign_up(user_name: str,
                   user_email: str,
@@ -74,6 +72,13 @@ async def change_me(response: Response,
                          password=new_user_password)
 
     return await user_repository.change_current_user(request, db, response, user_data)
+
+
+@users_router.get("/my_reviews/")
+async def get_my_reviews(response: Response,
+                         user_data: shema.User = Depends(get_current_user)):
+
+    return user_data.reviews
 
 
 @users_router.post("/logout")
