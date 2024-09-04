@@ -7,8 +7,10 @@ from starlette.responses import Response
 
 from backend.src.database.database import get_db
 from backend.src.database import models, shema
+from backend.src.database.models import User
 
 from backend.src.helpers import password_helper
+from backend.src.helpers.general_helper import CheckHTTP404NotFound, CheckHTTP401Unauthorized
 from backend.src.helpers.jwt_helper import create_access_token
 from backend.src.helpers.token_helper import get_token, verify_token
 
@@ -92,29 +94,9 @@ async def login(request: shema.User, response, db: AsyncSession):
     }
 
 
-async def get_user(user_id, response, db: AsyncSession):
+async def fetch_user(user_id, response, db: AsyncSession = Depends(get_db)):
     user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
-    if not user:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {
-            'message': "Not found",
-            'status_code': 404,
-            'error': 'NOT FOUND'
-        }
-    return {
-        'message': "success",
-        'status_code': 200,
-        'status': 'Success',
-        'data': user
-    }
-
-
-async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depends(get_token)):
-    user_id = verify_token(token=token)
-
-    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
+    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
 
     return {
         'message': "success",
@@ -124,12 +106,18 @@ async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depe
     }
 
 
-async def delete_current_user(db: AsyncSession = Depends(get_db), token: str = Depends(get_token)):
+async def get_current_user(db: AsyncSession = Depends(get_db),
+                           token: str = Depends(get_token)):
     user_id = verify_token(token=token)
 
     user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
+    CheckHTTP401Unauthorized(founding_item=user, text="Пользователь не найден")
+
+    return user
+
+
+async def delete_current_user(user: shema.User,
+                              db: AsyncSession = Depends(get_db)):
 
     await db.delete(user)
     await db.commit()
@@ -142,10 +130,10 @@ async def delete_current_user(db: AsyncSession = Depends(get_db), token: str = D
     }
 
 
-async def change_current_user(request: shema.User, db: AsyncSession, response: Response, token: str):
-    user_id = verify_token(token=token)
-
-    user = await verify_user(db, user_id=user_id)
+async def change_current_user(request: shema.User,
+                              db: AsyncSession,
+                              response: Response,
+                              user: shema.User):
 
     new_data = check_data_for_change_user(request=request, user=user)
 
@@ -153,14 +141,16 @@ async def change_current_user(request: shema.User, db: AsyncSession, response: R
         response.delete_cookie(key='user_access_token')
 
     await UserDAO.change_user(db=db,
-                              user_id=user_id,
+                              user_id=user.id,
                               data=new_data)
+
+    await db.refresh(user)
 
     return {
         'message': "User updated successfully",
         'status_code': 200,
         'data': {
-            'id': user_id,
+            'id': user.id,
             'name': new_data.get("name"),
             'email': new_data.get("email")
         }

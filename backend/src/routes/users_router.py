@@ -18,7 +18,6 @@ users_router = APIRouter(
 )
 
 
-# TODO: Add (All by user): add review, delete review, change review
 @users_router.post("/sign_up", status_code=201, tags=["users"])
 async def sign_up(user_name: str,
                   user_email: str,
@@ -45,37 +44,41 @@ async def sign_in(user_email: str,
 async def get_user(user_id: int,
                    response: Response,
                    db: AsyncSession = Depends(get_db)):
-
-    return await user_repository.get_user(user_id, response, db)
+    return await user_repository.fetch_user(user_id, response, db)
 
 
 @users_router.get("/me/", status_code=200)
 async def get_me(response: Response,
                  user_data: User = Depends(get_current_user)):
-
     return user_data
 
 
-@users_router.get("/delete_me/", status_code=200)
-async def get_me(response: Response,
-                 user_data: User = Depends(delete_current_user)):
+@users_router.delete("/delete_me/", status_code=200)
+async def delete_me(response: Response,
+                    user_data: User = Depends(get_current_user),
+                    db: AsyncSession = Depends(get_db)):
+    return await delete_current_user(user=user_data, db=db)
 
-    return user_data
 
-
-@users_router.post("/change_me/")
+@users_router.put("/change_me/")
 async def change_me(response: Response,
-                    new_user_name: Optional[str] = None,
-                    new_user_email: Optional[str] = None,
-                    new_user_password: Optional[str] = None,
+                    new_user_name: str | None = None,
+                    new_user_email: str | None = None,
+                    new_user_password: str | None = None,
                     db: AsyncSession = Depends(get_db),
-                    token: str = Depends(get_token)):
-
+                    user_data: User = Depends(get_current_user)):
     request = shema.User(name=new_user_name,
                          email=new_user_email,
                          password=new_user_password)
 
-    return await user_repository.change_current_user(request, db, response, token)
+    return await user_repository.change_current_user(request, db, response, user_data)
+
+
+@users_router.get("/my_reviews/")
+async def get_my_reviews(response: Response,
+                         user_data: shema.User = Depends(get_current_user)):
+
+    return user_data.reviews
 
 
 @users_router.post("/logout")

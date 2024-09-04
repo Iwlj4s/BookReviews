@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.src.database.database import engine, Base
 
 from backend.src.routes.users_router import users_router
+from backend.src.routes.reviews_router import reviews_router
 
 app = FastAPI()
 
@@ -37,3 +38,4 @@ async def startup_event():
 
 
 app.include_router(users_router)
+app.include_router(reviews_router)
