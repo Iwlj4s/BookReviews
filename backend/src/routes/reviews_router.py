@@ -17,12 +17,12 @@ reviews_router = APIRouter(
 )
 
 
-@reviews_router.get("/")
+@reviews_router.get("/", tags=["reviews"])
 async def get_reviews(db: AsyncSession = Depends(get_db)):
     return await get_all_reviews(db=db)
 
 
-@reviews_router.post("/create_review/")
+@reviews_router.post("/create_review/", tags=["reviews"])
 async def create_review(response: Response,
                         book_name: str,
                         book_author_name: str,
@@ -39,7 +39,7 @@ async def create_review(response: Response,
     return await reviews_repository.create_review(request=request, response=response, user=user, db=db)
 
 
-@reviews_router.put("/change_review/{review_id}")
+@reviews_router.put("/change_review/{review_id}", tags=["reviews"])
 async def change_review(review_id: int,
                         new_review_title: str | None = None,
                         new_review_body: str | None = None,
@@ -56,7 +56,7 @@ async def change_review(review_id: int,
                                                   user=user)
 
 
-@reviews_router.delete("/delete_review/{review_id}")
+@reviews_router.delete("/delete_review/{review_id}", tags=["reviews"])
 async def delete_review(review_id: int,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user)):
@@ -64,12 +64,12 @@ async def delete_review(review_id: int,
     return await reviews_repository.delete_review(review_id=review_id, db=db, user=user)
 
 
-@reviews_router.get("/{review_id}")
+@reviews_router.get("/{review_id}", tags=["reviews"])
 async def get_review(review_id: int, response: Response, db: AsyncSession = Depends(get_db)):
     return await fetch_review(review_id=review_id, response=response, db=db)
 
 
-@reviews_router.get("/filtered/")
+@reviews_router.get("/filtered/", tags=["reviews"])
 async def get_filtered_review(response: Response,
                               book_name: str | None = None,
                               author_name: str | None = None,

@@ -7,7 +7,6 @@ from starlette.responses import Response
 
 from backend.src.database.database import get_db
 from backend.src.database import models, shema
-from backend.src.database.models import User
 
 from backend.src.helpers import password_helper
 from backend.src.helpers.general_helper import CheckHTTP404NotFound, CheckHTTP401Unauthorized
@@ -59,7 +58,9 @@ async def sign_up(request: shema.User, response, db: AsyncSession):
     }
 
 
-async def login(request: shema.User, response, db: AsyncSession):
+async def login(request: shema.User,
+                response: Response,
+                db: AsyncSession):
     user = await UserDAO.get_user_email(db=db, user_email=str(request.email))
     if not user:
         response.status_code = status.HTTP_403_FORBIDDEN
