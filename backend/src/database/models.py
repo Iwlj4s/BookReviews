@@ -25,6 +25,7 @@ class Review(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     reviewed_book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), nullable=False, index=True)  # FK на Book
+    reviewed_book_author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False, index=True)
 
     reviewed_book_name: Mapped[str] = mapped_column(nullable=False, index=True)
     reviewed_book_author_name: Mapped[str] = mapped_column(nullable=False, index=True)
