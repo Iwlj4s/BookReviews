@@ -28,11 +28,13 @@ async def create_review(request: shema.Review,
                                                db=db)
     await db.refresh(new_review)
     await db.refresh(user)
+    await db.refresh(author)
     return {
         'message': "Обзор добавлен успешно",
         'status_code': 200,
         'data': {
             'id': user.id,
+            'id Автора': author.id,
             'Автор': new_review.reviewed_book_author_name,
             'Книга': new_review.reviewed_book_name,
             'Заголовок': new_review.review_title,

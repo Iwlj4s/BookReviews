@@ -20,6 +20,7 @@ def check_data_for_change_review(request: shema.ChangeReview, review):
     data = {}
     data.update({"created_by": review.created_by})
     data.update({"reviewed_book_id": review.reviewed_book_id})
+    data.update({"reviewed_book_author_id": review.reviewed_book_author_id})
     data.update({"reviewed_book_name": review.reviewed_book_name})
     data.update({"reviewed_book_author_name": review.reviewed_book_author_name})
 

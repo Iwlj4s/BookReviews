@@ -50,6 +50,7 @@ class ReviewDAO:
         query = update(Review).where(Review.id == review_id).values(
             created_by=data["created_by"],
             reviewed_book_id=data["reviewed_book_id"],
+            reviewed_book_author_id=data["reviewed_book_author_id"],
             reviewed_book_name=data["reviewed_book_name"],
             reviewed_book_author_name=data["reviewed_book_author_name"],
             review_title=data["review_title"],
@@ -74,6 +75,7 @@ class ReviewDAO:
         new_review = models.Review(
             created_by=user.id,
             reviewed_book_id=book.id,
+            reviewed_book_author_id=author.id,
             reviewed_book_name=book.book_name,
             reviewed_book_author_name=author.name,
             review_title=request.review_title,
