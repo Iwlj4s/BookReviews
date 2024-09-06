@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
+from backend.src.DAO.admin_helper import check_data_for_change_author
+from backend.src.DAO.reviews_dao import ReviewDAO
 from backend.src.database.database import get_db
 from backend.src.database import models, shema
 from backend.src.database.models import User
@@ -83,4 +85,40 @@ async def add_author(response: Response,
             'Имя': new_author.name
         }
     }
+
+
+async def change_author(response: Response,
+                        author_id: int,
+                        request: shema.Author,
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+
+    author = await AuthorDAO.get_author_by_id(db=db, author_id=int(author_id))
+    print(author.name)
+    if not author:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Автор не найден")
+
+    print("Author name: ", author.name)
+    reviews = await ReviewDAO.get_reviews_by_reviewed_book_author_name(db=db, reviewed_book_author_name=author.name)
+    if not reviews:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Обзор не найден")
+
+    author_data, review_data = check_data_for_change_author(request=request, author=author, reviews=reviews)
+    await AuthorDAO.change_author(db=db, author_id=author_id, data=author_data)
+    for review in reviews:
+        await ReviewDAO.change_reviewed_book_author_name(db=db, review_id=review.id, data=review_data)
+
+    for review in reviews:
+        await db.refresh(review)
+        await db.refresh(author)
+
+    return {
+        'message': "Автор обновлен успешно",
+        'status_code': 200,
+        'data': {
+            'id': author.id,
+            'Имя': author.name
+        }
+    }
+
 

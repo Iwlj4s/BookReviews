@@ -54,4 +54,19 @@ async def get_authors(admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
     return await AuthorDAO.get_all_authors(db=db)
 
+
+@admin_router.post("/change_author", tags=["admins"])
+async def change_author(response: Response,
+                        author_id: int,
+                        new_name: str | None = None,
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+    request = shema.Author(name=new_name)
+
+    return await admin_repository.change_author(response=response,
+                                                author_id=author_id,
+                                                request=request,
+                                                admin=admin,
+                                                db=db)
+
 # TODO: create get get one author by id func, change author func

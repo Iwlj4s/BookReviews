@@ -86,3 +86,24 @@ class ReviewDAO:
         await db.commit()
 
         return new_review
+
+    @classmethod
+    async def get_reviews_by_reviewed_book_author_name(cls, db: AsyncSession, reviewed_book_author_name: str):
+        query = select(Review).where(Review.reviewed_book_author_name == str(reviewed_book_author_name))
+        reviews = await db.execute(query)
+
+        return reviews.scalars().all()
+
+    @classmethod
+    async def change_reviewed_book_author_name(cls, db: AsyncSession, review_id, data: dict):
+        query = update(Review).where(Review.id == review_id).values(
+            created_by=data["created_by"],
+            reviewed_book_id=data["reviewed_book_id"],
+            reviewed_book_name=data["reviewed_book_name"],
+            reviewed_book_author_name=data["reviewed_book_author_name"],
+            review_title=data["review_title"],
+            review_body=data["review_body"]
+        )
+
+        await db.execute(query)
+        await db.commit()

@@ -50,3 +50,13 @@ class AuthorDAO:
         await db.commit()
 
         return new_author
+
+    @classmethod
+    async def change_author(cls, db: AsyncSession, author_id: int, data: dict):
+        query = update(Author).where(Author.id == int(author_id)).values(
+            name=data["name"]
+        )
+
+        await db.execute(query)
+        await db.commit()
+    
