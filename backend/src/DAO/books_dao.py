@@ -17,15 +17,20 @@ class BookDAO:
         return book
 
     @classmethod
-    async def get_book_by_book_name_for_review(cls, request: shema.Review, db: AsyncSession):
-        book = await db.scalar(
-            select(Book).where(Book.book_name == request.reviewed_book_name)
-        )
+    async def get_book_by_name(cls, db: AsyncSession, book_name: str):
+        query = select(Book).where(Book.book_name == book_name)
+        book = await db.execute(query)
+        return book.scalars().first()
 
-        if not book:
+    @classmethod
+    async def get_book_by_book_name_for_review(cls, request: shema.Review, db: AsyncSession):
+        query = select(Book).where(Book.book_name == request.reviewed_book_name)
+        books = await db.execute(query)
+
+        if not books:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Книга не найдена")
 
-        return book
+        return books.scalars().all()
 
     @classmethod
     async def get_book_by_author(cls, db: AsyncSession, book_author: str):
@@ -33,3 +38,10 @@ class BookDAO:
         book = await db.execute(query)
 
         return book
+
+    @classmethod
+    async def get_book_with_author(cls, db: AsyncSession, author):
+        query = select(Book).where(Book.author_id == author.id)
+        book = await db.execute(query)
+
+        return book.scalars().first()

@@ -1,3 +1,5 @@
+import dbm
+
 from fastapi import HTTPException
 from sqlalchemy import select, update, delete, and_, func
 
@@ -30,15 +32,13 @@ class AuthorDAO:
 
     @classmethod
     async def get_author_by_name_for_review(cls, request: shema.Review, db: AsyncSession):
-        author = await db.scalar(
-            select(Author)
-            .filter(Author.name == request.reviewed_book_author_name)
-        )
+        query = select(Author).where(Author.name == request.reviewed_book_author_name)
+        authors = await db.execute(query)
 
-        if not author:
+        if not authors:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Автор не найден")
 
-        return author
+        return authors.scalars().all()
 
     @classmethod
     async def add_author(cls, request: shema.Author, db: AsyncSession):
@@ -59,4 +59,9 @@ class AuthorDAO:
 
         await db.execute(query)
         await db.commit()
-    
+
+    @classmethod
+    async def get_author_with_book_author_name(cls, db: AsyncSession, book):
+        query = select(Author).where(Author.id == book.author_id)
+        author = await db.execute(query)
+        return author.scalars().first()

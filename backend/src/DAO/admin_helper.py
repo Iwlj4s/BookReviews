@@ -15,19 +15,13 @@ def check_data_for_change_author(request: shema.Author, author, reviews):
     review_data = {}
 
     if request.name is None:
-        author_data.update({"name": author.name})
+        author_data.update({"name": author})
     else:
         author_data.update({"name": request.name})
 
     for review in reviews:
         review_data.update({
-            "created_by": review.created_by,
-            "reviewed_book_id": review.reviewed_book_id,
-            "reviewed_book_name": review.reviewed_book_name,
             "reviewed_book_author_name": request.name if request.name else review.reviewed_book_author_name,
-            "review_title": review.review_title,
-            "review_body": review.review_body
-
         })
 
     return author_data, review_data

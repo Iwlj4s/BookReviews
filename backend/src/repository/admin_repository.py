@@ -92,25 +92,25 @@ async def change_author(response: Response,
                         request: shema.Author,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-
     author = await AuthorDAO.get_author_by_id(db=db, author_id=int(author_id))
     print(author.name)
     if not author:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Автор не найден")
 
+    old_author_name = author.name
+
     print("Author name: ", author.name)
-    reviews = await ReviewDAO.get_reviews_by_reviewed_book_author_name(db=db, reviewed_book_author_name=author.name)
+    reviews = await ReviewDAO.get_reviews_by_book_author_id(db=db, review_book_author_id=author.id)
     if not reviews:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Обзор не найден")
 
-    author_data, review_data = check_data_for_change_author(request=request, author=author, reviews=reviews)
+    author_data, review_data = check_data_for_change_author(request=request, author=old_author_name, reviews=reviews)
     await AuthorDAO.change_author(db=db, author_id=author_id, data=author_data)
-    for review in reviews:
-        await ReviewDAO.change_reviewed_book_author_name(db=db, review_id=review.id, data=review_data)
+    await ReviewDAO.change_reviewed_book_author_name(db=db, old_author_name=old_author_name, r_data=review_data)
 
+    await db.refresh(author)
     for review in reviews:
         await db.refresh(review)
-        await db.refresh(author)
 
     return {
         'message': "Автор обновлен успешно",

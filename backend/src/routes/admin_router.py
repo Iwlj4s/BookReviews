@@ -55,7 +55,7 @@ async def get_authors(admin: User = Depends(get_current_admin_user),
     return await AuthorDAO.get_all_authors(db=db)
 
 
-@admin_router.post("/change_author", tags=["admins"])
+@admin_router.put("/change_author", tags=["admins"])
 async def change_author(response: Response,
                         author_id: int,
                         new_name: str | None = None,
@@ -69,4 +69,4 @@ async def change_author(response: Response,
                                                 admin=admin,
                                                 db=db)
 
-# TODO: create get get one author by id func, change author func
+# TODO: create get one author by id func, change author func

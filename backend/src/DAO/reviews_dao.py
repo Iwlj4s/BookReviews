@@ -26,10 +26,17 @@ class ReviewDAO:
         return review.scalars().first()
 
     @classmethod
+    async def get_reviews_by_book_author_id(cls, db: AsyncSession, review_book_author_id: int):
+        query = select(Review).options(selectinload(Review.user)).where(Review.reviewed_book_author_id ==
+                                                                        int(review_book_author_id))
+        review = await db.execute(query)
+        return review.scalars().all()
+
+    @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,
                                    book_name: str | None = None,
                                    author_name: str | None = None):
-        query = select(Review)
+        query = select(Review).options(selectinload(Review.user))
 
         if book_name:
             query = query.where(Review.reviewed_book_name.ilike(f"%{book_name}%"))
@@ -65,7 +72,10 @@ class ReviewDAO:
         book = await BookDAO.get_book_by_book_name_for_review(request=request, db=db)
         author = await AuthorDAO.get_author_by_name_for_review(request=request, db=db)
 
-        if book.author_id != author.id:
+        book_with_author = await BookDAO.get_book_with_author(db=db, author=author)
+        author_with_book = await AuthorDAO.get_author_with_book_author_name(db=db, book=book)
+
+        if book_with_author.author_id != author_with_book.id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Имя автора не соответствует книге")
 
         return book, author
@@ -97,15 +107,11 @@ class ReviewDAO:
         return reviews.scalars().all()
 
     @classmethod
-    async def change_reviewed_book_author_name(cls, db: AsyncSession, review_id, data: dict):
-        query = update(Review).where(Review.id == review_id).values(
-            created_by=data["created_by"],
-            reviewed_book_id=data["reviewed_book_id"],
-            reviewed_book_name=data["reviewed_book_name"],
-            reviewed_book_author_name=data["reviewed_book_author_name"],
-            review_title=data["review_title"],
-            review_body=data["review_body"]
+    async def change_reviewed_book_author_name(cls, db: AsyncSession, old_author_name: str, r_data: dict):
+        review_query = update(Review).options(selectinload(Review.user)).where(Review.reviewed_book_author_name ==
+                                                                               str(old_author_name)).values(
+            reviewed_book_author_name=r_data["reviewed_book_author_name"]
         )
 
-        await db.execute(query)
+        await db.execute(review_query)
         await db.commit()
