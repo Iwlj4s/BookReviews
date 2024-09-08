@@ -122,3 +122,19 @@ async def change_author(response: Response,
     }
 
 
+async def delete_author(author_id: int,
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+
+    author = await AuthorDAO.get_author_by_id(db=db, author_id=author_id)
+    CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
+
+    await AuthorDAO.delete_author(db=db, author_id=int(author_id))
+
+    return {
+        'message': "success delete",
+        'status_code': 200,
+        'data': f"Author id: {author.id}, name: {author.name} deleted!"
+    }
+
+

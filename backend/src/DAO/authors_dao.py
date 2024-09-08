@@ -28,6 +28,7 @@ class AuthorDAO:
     async def get_author_by_id(cls, db: AsyncSession, author_id: id):
         query = select(Author).where(Author.id == int(author_id))
         author = await db.execute(query)
+
         return author.scalars().first()
 
     @classmethod
@@ -65,3 +66,9 @@ class AuthorDAO:
         query = select(Author).where(Author.id == book.author_id)
         author = await db.execute(query)
         return author.scalars().first()
+
+    @classmethod
+    async def delete_author(cls, db: AsyncSession, author_id: int):
+        query = delete(Author).where(Author.id == int(author_id))
+        await db.execute(query)
+        await db.commit()

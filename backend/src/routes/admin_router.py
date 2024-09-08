@@ -36,7 +36,7 @@ async def logout_admin(response: Response):
 
 
 # Authors #
-@admin_router.post("/add_author", tags=["admins"])
+@admin_router.post("/authors/add_author", tags=["admins"])
 async def add_author(response: Response,
                      name: str,
                      admin: User = Depends(get_current_admin_user),
@@ -49,13 +49,13 @@ async def add_author(response: Response,
                                              db=db)
 
 
-@admin_router.get("/get_authors", tags=["admins"])
+@admin_router.get("/authors/get_authors", tags=["admins"])
 async def get_authors(admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
     return await AuthorDAO.get_all_authors(db=db)
 
 
-@admin_router.put("/change_author", tags=["admins"])
+@admin_router.put("/authors/change_author", tags=["admins"])
 async def change_author(response: Response,
                         author_id: int,
                         new_name: str | None = None,
@@ -69,4 +69,19 @@ async def change_author(response: Response,
                                                 admin=admin,
                                                 db=db)
 
-# TODO: create get one author by id func, change author func
+
+@admin_router.delete("/authors/delete_author/{author_id}")
+async def delete_author(author_id: int,
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+
+    return await admin_repository.delete_author(db=db, author_id=author_id, admin=admin)
+
+
+@admin_router.get("/authors/get_author/{author_id}", tags=["admins"])
+async def get_author(author_id: int,
+                     admin: User = Depends(get_current_admin_user),
+                     db: AsyncSession = Depends(get_db)):
+
+    return await AuthorDAO.get_author_by_id(db=db, author_id=author_id)
+
