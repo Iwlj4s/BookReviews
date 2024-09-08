@@ -17,6 +17,7 @@ from backend.src.helpers.jwt_helper import create_access_token
 
 from backend.src.DAO.users_dao import UserDAO
 from backend.src.DAO.authors_dao import AuthorDAO
+from backend.src.helpers.user_helper import check_data_for_change_user
 from backend.src.repository.user_repository import get_current_user
 
 
@@ -70,6 +71,35 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Недостаточно прав!')
 
 
+# Users #
+async def change_user(user_id: int,
+                      request: shema.User,
+                      admin: User = Depends(get_current_admin_user),
+                      db: AsyncSession = Depends(get_db)):
+
+    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
+
+    new_data = check_data_for_change_user(request=request, user=user)
+
+    await UserDAO.change_user(db=db,
+                              user_id=user.id,
+                              data=new_data)
+
+    await db.refresh(user)
+
+    return {
+        'message': "User updated successfully",
+        'status_code': 200,
+        'data': {
+            'id': user.id,
+            'name': new_data.get("name"),
+            'email': new_data.get("email")
+        }
+    }
+
+
+# Authors #
 async def add_author(response: Response,
                      request: shema.Author,
                      admin: User = Depends(get_current_admin_user),

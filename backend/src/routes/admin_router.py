@@ -58,6 +58,25 @@ async def get_user(user_id: int,
     return user
 
 
+@admin_router.put("/users/change_user/{user_id}")
+async def change_user(user_id: int,
+                      new_user_name: str | None = None,
+                      new_user_email: str | None = None,
+                      new_user_password: str | None = None,
+                      admin: User = Depends(get_current_admin_user),
+                      db: AsyncSession = Depends(get_db)):
+    request = shema.User(
+        name=new_user_name,
+        email=new_user_email,
+        password=new_user_password
+    )
+
+    return await admin_repository.change_user(user_id=user_id,
+                                              request=request,
+                                              admin=admin,
+                                              db=db)
+
+
 # Authors #
 @admin_router.post("/authors/add_author", tags=["admin"])
 async def add_author(response: Response,
