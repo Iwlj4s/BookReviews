@@ -168,3 +168,18 @@ async def delete_author(author_id: int,
     }
 
 
+async def delete_user(user_id: int,
+                      admin: User = Depends(get_current_admin_user),
+                      db: AsyncSession = Depends(get_db)):
+
+    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
+
+    await UserDAO.delete_user(db=db, user_id=int(user_id))
+    await ReviewDAO.delete_review_by_user_id(db=db, user_id=int(user_id))
+
+    return {
+        'message': "success delete",
+        'status_code': 200,
+        'data': f"User id: {user.id}, name: {user.name}, email:{user.email} deleted!"
+    }

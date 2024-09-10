@@ -77,6 +77,24 @@ async def change_user(user_id: int,
                                               db=db)
 
 
+@admin_router.delete("/users/delete_user/{user_id}")
+async def delete_user(user_id: int,
+                      admin: User = Depends(get_current_admin_user),
+                      db: AsyncSession = Depends(get_db)):
+    return await admin_repository.delete_user(db=db, user_id=int(user_id))
+
+
+# Reviews #
+@admin_router.delete("/review/delete_review/{review_id}")
+async def delete_review(review_id: int,
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+    return await ReviewDAO.delete_review(db=db, review_id=int(review_id))
+
+
+# TODO: Create funcs for review, change review
+
+
 # Authors #
 @admin_router.post("/authors/add_author", tags=["admin"])
 async def add_author(response: Response,
@@ -116,7 +134,6 @@ async def change_author(response: Response,
 async def delete_author(author_id: int,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-
     return await admin_repository.delete_author(db=db, author_id=author_id, admin=admin)
 
 
@@ -124,5 +141,4 @@ async def delete_author(author_id: int,
 async def get_author(author_id: int,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
-
     return await AuthorDAO.get_author_by_id(db=db, author_id=author_id)

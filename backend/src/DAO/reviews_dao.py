@@ -115,3 +115,9 @@ class ReviewDAO:
 
         await db.execute(review_query)
         await db.commit()
+
+    @classmethod
+    async def delete_review_by_user_id(cls, db: AsyncSession, user_id: int):
+        query = delete(Review).options(selectinload(Review.user)).where(Review.created_by == int(user_id))
+        await db.execute(query)
+        await db.commit()
