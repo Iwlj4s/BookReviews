@@ -17,6 +17,7 @@ from backend.src.helpers.jwt_helper import create_access_token
 
 from backend.src.DAO.users_dao import UserDAO
 from backend.src.DAO.authors_dao import AuthorDAO
+from backend.src.helpers.reviews_helper import check_data_for_change_review
 from backend.src.helpers.user_helper import check_data_for_change_user
 from backend.src.repository.user_repository import get_current_user
 
@@ -168,6 +169,7 @@ async def delete_author(author_id: int,
     }
 
 
+# User #
 async def delete_user(user_id: int,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
@@ -182,4 +184,38 @@ async def delete_user(user_id: int,
         'message': "success delete",
         'status_code': 200,
         'data': f"User id: {user.id}, name: {user.name}, email:{user.email} deleted!"
+    }
+
+
+# Review #
+async def change_review(review_id: int,
+                        request: shema.ChangeReview,
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+
+    review = await ReviewDAO.get_review_by_id(db=db, review_id=int(review_id))
+    CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
+
+    user = await UserDAO.get_user_by_id(db=db, user_id=int(review.created_by))
+    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
+
+    new_data = check_data_for_change_review(request=request, review=review)
+
+    await ReviewDAO.change_review(db=db,
+                                  review_id=review.id,
+                                  data=new_data)
+
+    await db.refresh(review)
+    await db.refresh(user)
+
+    return {
+        'message': "Обзор обновлен успешно",
+        'status_code': 200,
+        'data': {
+            'id': user.id,
+            'Автор': review.reviewed_book_author_name,
+            'Книга': review.reviewed_book_name,
+            'Заголовок': new_data.get("review_title"),
+            'Обзор': new_data.get("review_body")
+        }
     }

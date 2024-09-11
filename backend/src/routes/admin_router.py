@@ -92,8 +92,18 @@ async def delete_review(review_id: int,
     return await ReviewDAO.delete_review(db=db, review_id=int(review_id))
 
 
-# TODO: Create funcs for review, change review
+@admin_router.put("/review/change_review/{review_id}")
+async def admin_change_review(review_id: int,
+                              new_review_title: str | None = None,
+                              new_review_body: str | None = None,
+                              admin: User = Depends(get_current_admin_user),
+                              db: AsyncSession = Depends(get_db)):
+    request = shema.ChangeReview(
+        review_title=new_review_title,
+        review_body=new_review_body)
 
+    return await admin_repository.change_review(review_id=review_id, request=request,
+                                                admin=admin, db=db)
 
 # Authors #
 @admin_router.post("/authors/add_author", tags=["admin"])
