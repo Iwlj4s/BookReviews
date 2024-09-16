@@ -33,6 +33,13 @@ class ReviewDAO:
         return review.scalars().all()
 
     @classmethod
+    async def get_review_by_book_id(cls, db: AsyncSession, book_id: int):
+        query = select(Review).options(selectinload(Review.user)).where(Review.reviewed_book_id == int(book_id))
+        review = await db.execute(query)
+
+        return review.scalars().all()
+
+    @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,
                                    book_name: str | None = None,
                                    author_name: str | None = None):
@@ -111,6 +118,16 @@ class ReviewDAO:
         review_query = update(Review).options(selectinload(Review.user)).where(Review.reviewed_book_author_name ==
                                                                                str(old_author_name)).values(
             reviewed_book_author_name=r_data["reviewed_book_author_name"]
+        )
+
+        await db.execute(review_query)
+        await db.commit()
+
+    @classmethod
+    async def change_reviewed_book_name(cls, db: AsyncSession, old_book_name: str, r_data: dict):
+        review_query = update(Review).options(selectinload(Review.user)).where(Review.reviewed_book_name ==
+                                                                               str(old_book_name)).values(
+            reviewed_book_name=r_data["book_name"]
         )
 
         await db.execute(review_query)

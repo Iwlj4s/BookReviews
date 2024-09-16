@@ -3,6 +3,7 @@ from fastapi import Depends, APIRouter, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.DAO.authors_dao import AuthorDAO
+from backend.src.DAO.books_dao import BookDAO
 from backend.src.DAO.users_dao import UserDAO
 from backend.src.DAO.reviews_dao import ReviewDAO
 from backend.src.database.database import get_db
@@ -105,6 +106,7 @@ async def admin_change_review(review_id: int,
     return await admin_repository.change_review(review_id=review_id, request=request,
                                                 admin=admin, db=db)
 
+
 # Authors #
 @admin_router.post("/authors/add_author", tags=["admin"])
 async def add_author(response: Response,
@@ -152,3 +154,49 @@ async def get_author(author_id: int,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
     return await AuthorDAO.get_author_by_id(db=db, author_id=author_id)
+
+
+@admin_router.post("/books/add_book/", tags=["admin"])
+async def add_book(book_name: str,
+                   book_author_name: str,
+                   book_description: str,
+                   admin: User = Depends(get_current_admin_user),
+                   db: AsyncSession = Depends(get_db)):
+    request = shema.Book(
+        book_name=str(book_name),
+        book_author_name=str(book_author_name),
+        book_description=str(book_description))
+
+    return await admin_repository.add_book(request=request,
+                                           admin=admin,
+                                           db=db)
+
+
+@admin_router.get("/books/get_books/")
+async def get_books(admin: User = Depends(get_current_admin_user),
+                    db: AsyncSession = Depends(get_db)):
+    books = await BookDAO.get_all_books(db=db)
+
+    return books
+
+
+@admin_router.delete("/books/delete_book/{book_id}")
+async def delete_book(book_id: int,
+                      admin: User = Depends(get_current_admin_user),
+                      db: AsyncSession = Depends(get_db)):
+    return await admin_repository.delete_book(db=db, book_id=int(book_id))
+
+
+@admin_router.put("/book/change_book/{book_id}")
+async def change_book(book_id: int,
+                      new_book_name: str | None = None,
+                      new_book_description: str | None = None,
+                      admin: User = Depends(get_current_admin_user),
+                      db: AsyncSession = Depends(get_db)):
+
+    request = shema.Book(
+        book_name=new_book_name,
+        book_description=new_book_description
+    )
+
+    return await admin_repository.change_book(db=db, book_id=int(book_id), request=request, admin=admin)

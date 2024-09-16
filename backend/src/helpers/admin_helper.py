@@ -26,3 +26,22 @@ def check_data_for_change_author(request: shema.Author, author, reviews):
 
     return author_data, review_data
 
+
+def check_data_for_change_book(request: shema.Book, book, author, reviews):
+    book_data = {}
+    review_data = {}
+
+    if request.book_description is None:
+        book_data.update({"book_description": book.book_description})
+    else:
+        book_data.update({"book_description": request.book_description})
+
+    for review in reviews:
+        review_data.update({
+            "book_name": request.book_name if request.book_name else review.reviewed_book_name,
+        })
+        book_data.update({
+            "book_name": request.book_name if request.book_name else review.reviewed_book_name,
+        })
+
+    return book_data, review_data
