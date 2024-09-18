@@ -33,7 +33,7 @@ async def create_review(request: shema.Review,
         'message': "Обзор добавлен успешно",
         'status_code': 200,
         'data': {
-            'id': user.id,
+            'Created by': user.id,
             'id Автора': author.id,
             'Автор': new_review.reviewed_book_author_name,
             'Книга': new_review.reviewed_book_name,

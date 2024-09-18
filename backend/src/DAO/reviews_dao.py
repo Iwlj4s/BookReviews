@@ -26,10 +26,24 @@ class ReviewDAO:
         return review.scalars().first()
 
     @classmethod
+    async def get_reviews_by_book_author_id(cls, db: AsyncSession, review_book_author_id: int):
+        query = select(Review).options(selectinload(Review.user)).where(Review.reviewed_book_author_id ==
+                                                                        int(review_book_author_id))
+        review = await db.execute(query)
+        return review.scalars().all()
+
+    @classmethod
+    async def get_review_by_book_id(cls, db: AsyncSession, book_id: int):
+        query = select(Review).options(selectinload(Review.user)).where(Review.reviewed_book_id == int(book_id))
+        review = await db.execute(query)
+
+        return review.scalars().all()
+
+    @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,
                                    book_name: str | None = None,
                                    author_name: str | None = None):
-        query = select(Review)
+        query = select(Review).options(selectinload(Review.user))
 
         if book_name:
             query = query.where(Review.reviewed_book_name.ilike(f"%{book_name}%"))
@@ -65,7 +79,10 @@ class ReviewDAO:
         book = await BookDAO.get_book_by_book_name_for_review(request=request, db=db)
         author = await AuthorDAO.get_author_by_name_for_review(request=request, db=db)
 
-        if book.author_id != author.id:
+        book_with_author = await BookDAO.get_book_with_author(db=db, author=author)
+        author_with_book = await AuthorDAO.get_author_with_book_author_name(db=db, book=book)
+
+        if book_with_author.author_id != author_with_book.id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Имя автора не соответствует книге")
 
         return book, author
@@ -88,3 +105,36 @@ class ReviewDAO:
         await db.commit()
 
         return new_review
+
+    @classmethod
+    async def get_reviews_by_reviewed_book_author_name(cls, db: AsyncSession, reviewed_book_author_name: str):
+        query = select(Review).where(Review.reviewed_book_author_name == str(reviewed_book_author_name))
+        reviews = await db.execute(query)
+
+        return reviews.scalars().all()
+
+    @classmethod
+    async def change_reviewed_book_author_name(cls, db: AsyncSession, old_author_name: str, r_data: dict):
+        review_query = update(Review).options(selectinload(Review.user)).where(Review.reviewed_book_author_name ==
+                                                                               str(old_author_name)).values(
+            reviewed_book_author_name=r_data["reviewed_book_author_name"]
+        )
+
+        await db.execute(review_query)
+        await db.commit()
+
+    @classmethod
+    async def change_reviewed_book_name(cls, db: AsyncSession, old_book_name: str, r_data: dict):
+        review_query = update(Review).options(selectinload(Review.user)).where(Review.reviewed_book_name ==
+                                                                               str(old_book_name)).values(
+            reviewed_book_name=r_data["book_name"]
+        )
+
+        await db.execute(review_query)
+        await db.commit()
+
+    @classmethod
+    async def delete_review_by_user_id(cls, db: AsyncSession, user_id: int):
+        query = delete(Review).options(selectinload(Review.user)).where(Review.created_by == int(user_id))
+        await db.execute(query)
+        await db.commit()

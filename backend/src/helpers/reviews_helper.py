@@ -11,9 +11,15 @@ from backend.src.DAO.authors_dao import AuthorDAO
 
 
 async def check_data_for_add_review(request: shema.Review, db: AsyncSession):
-    book, author = await ReviewDAO.get_book_and_author(request=request, db=db)
+    books = await BookDAO.get_book_by_book_name_for_review(request=request, db=db)
+    authors = await AuthorDAO.get_author_by_name_for_review(request=request, db=db)
 
-    return book, author
+    for book in books:
+        for author in authors:
+            if book.author_id == author.id:
+                return book, author
+
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Имя автора не соответствует книге")
 
 
 def check_data_for_change_review(request: shema.ChangeReview, review):

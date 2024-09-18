@@ -2,12 +2,9 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from typing import Optional
-
 from backend.src.database.database import get_db
 from backend.src.database.shema import User
 from backend.src.database import shema
-from backend.src.helpers.token_helper import get_token
 
 from backend.src.repository.user_repository import get_current_user, delete_current_user, change_current_user
 from backend.src.repository import user_repository
@@ -40,27 +37,27 @@ async def sign_in(user_email: str,
     return await user_repository.login(request, response, db)
 
 
-@users_router.get("/{user_id}", status_code=200)
+@users_router.get("/{user_id}", status_code=200, tags=["users"])
 async def get_user(user_id: int,
                    response: Response,
                    db: AsyncSession = Depends(get_db)):
     return await user_repository.fetch_user(user_id, response, db)
 
 
-@users_router.get("/me/", status_code=200)
+@users_router.get("/me/", status_code=200, tags=["users"])
 async def get_me(response: Response,
                  user_data: User = Depends(get_current_user)):
     return user_data
 
 
-@users_router.delete("/delete_me/", status_code=200)
+@users_router.delete("/delete_me/", status_code=200, tags=["users"])
 async def delete_me(response: Response,
                     user_data: User = Depends(get_current_user),
                     db: AsyncSession = Depends(get_db)):
     return await delete_current_user(user=user_data, db=db)
 
 
-@users_router.put("/change_me/")
+@users_router.put("/change_me/", tags=["users"])
 async def change_me(response: Response,
                     new_user_name: str | None = None,
                     new_user_email: str | None = None,
@@ -74,14 +71,14 @@ async def change_me(response: Response,
     return await user_repository.change_current_user(request, db, response, user_data)
 
 
-@users_router.get("/my_reviews/")
+@users_router.get("/my_reviews/", tags=["users"])
 async def get_my_reviews(response: Response,
                          user_data: shema.User = Depends(get_current_user)):
 
     return user_data.reviews
 
 
-@users_router.post("/logout")
+@users_router.post("/logout", tags=["users"])
 async def logout(response: Response):
     response.delete_cookie(key='user_access_token')
     return {'message': 'Пользователь успешно вышел из системы'}

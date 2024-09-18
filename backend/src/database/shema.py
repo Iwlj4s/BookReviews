@@ -37,7 +37,7 @@ class Author(BaseModel):
 # Book #
 class Book(BaseModel):
     book_name: Union[str, None] = Field(default=None, title="Название книги")
-    author_id: Union[int, None] = Field(default=None, title="ID автора")
+    book_author_name: Union[str, None] = Field(default=None, title="Имя автора")
     book_description: Union[str, None] = Field(default=None, title="Описание книги")
 
 
