@@ -1,13 +1,4 @@
-from fastapi import Depends, HTTPException
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from starlette import status
-
 from backend.src.database import shema
-from backend.src.DAO.reviews_dao import ReviewDAO
-from backend.src.DAO.books_dao import BookDAO
-from backend.src.DAO.authors_dao import AuthorDAO
 
 
 def check_data_for_change_author(request: shema.Author, author, reviews):
@@ -27,7 +18,7 @@ def check_data_for_change_author(request: shema.Author, author, reviews):
     return author_data, review_data
 
 
-def check_data_for_change_book(request: shema.Book, book, author, reviews):
+def check_data_for_change_book(request: shema.Book, book, reviews):
     book_data = {}
     review_data = {}
 
