@@ -12,6 +12,7 @@ from backend.src.helpers import password_helper, user_helper
 from backend.src.helpers.general_helper import CheckHTTP404NotFound, CheckHTTP401Unauthorized
 from backend.src.helpers.token_helper import get_token, verify_token
 
+from backend.src.DAO.general_dao import GeneralDAO
 from backend.src.DAO.users_dao import UserDAO
 from backend.src.helpers.user_helper import check_data_for_change_user
 
@@ -68,7 +69,7 @@ async def login(request: shema.User,
 
 
 async def fetch_user(user_id, response, db: AsyncSession = Depends(get_db)):
-    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
 
     return {
@@ -83,7 +84,7 @@ async def get_current_user(db: AsyncSession = Depends(get_db),
                            token: str = Depends(get_token)):
     user_id = verify_token(token=token)
 
-    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP401Unauthorized(founding_item=user, text="Пользователь не найден")
 
     return user

@@ -10,23 +10,10 @@ from backend.src.database.models import Book
 
 class BookDAO:
     @classmethod
-    async def get_all_books(cls, db: AsyncSession):
-        query = select(Book)
-        books = await db.execute(query)
-
-        return books.scalars().all()
-
-    @classmethod
     async def get_book_by_id(cls, db: AsyncSession, book_id: int):
         query = select(Book).where(Book.id == book_id)
         book = await db.execute(query)
 
-        return book.scalars().first()
-
-    @classmethod
-    async def get_book_by_name(cls, db: AsyncSession, book_name: str):
-        query = select(Book).where(Book.book_name == book_name)
-        book = await db.execute(query)
         return book.scalars().first()
 
     @classmethod
@@ -40,20 +27,6 @@ class BookDAO:
         return books.scalars().all()
 
     @classmethod
-    async def get_book_by_author(cls, db: AsyncSession, book_author: str):
-        query = select(Book).where(Book.id == book_author)
-        book = await db.execute(query)
-
-        return book
-
-    @classmethod
-    async def get_book_with_author(cls, db: AsyncSession, author):
-        query = select(Book).where(Book.author_id == author.id)
-        book = await db.execute(query)
-
-        return book.scalars().first()
-
-    @classmethod
     async def add_book(cls, request: shema.Book, author, db: AsyncSession):
         new_book = models.Book(
             book_name=request.book_name,
@@ -65,13 +38,6 @@ class BookDAO:
         await db.commit()
 
         return new_book
-
-    @classmethod
-    async def delete_book(cls, book_id: int, db: AsyncSession):
-        query = delete(Book).where(Book.id == int(book_id))
-
-        await db.execute(query)
-        await db.commit()
 
     @classmethod
     async def change_book(cls, book_id: int, new_data, db: AsyncSession):

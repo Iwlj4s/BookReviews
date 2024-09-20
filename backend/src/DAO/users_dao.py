@@ -1,25 +1,11 @@
 from sqlalchemy import select, update, delete, and_, func
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from backend.src.database.models import User
 
 
 class UserDAO:
-    @classmethod
-    async def get_all_users(cls, db: AsyncSession):
-        query = select(User)
-        users = await db.execute(query)
-
-        return users.scalars().all()
-
-    @classmethod
-    async def get_user_by_id(cls, db: AsyncSession, user_id: int):
-        query = select(User).options(selectinload(User.reviews)).where(User.id == int(user_id))
-        user = await db.execute(query)
-        return user.scalars().first()
-
     @classmethod
     async def get_user_email(cls, db: AsyncSession, user_email: str):
         query = select(User).where(User.email == str(user_email))
@@ -41,13 +27,6 @@ class UserDAO:
             email=data["email"],
             password=data["password"]
         )
-
-        await db.execute(query)
-        await db.commit()
-
-    @classmethod
-    async def delete_user(cls, db: AsyncSession, user_id: int):
-        query = delete(User).where(User.id == int(user_id))
 
         await db.execute(query)
         await db.commit()

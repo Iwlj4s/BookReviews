@@ -2,17 +2,18 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.DAO.authors_dao import AuthorDAO
-from backend.src.DAO.books_dao import BookDAO
-from backend.src.DAO.users_dao import UserDAO
-from backend.src.DAO.reviews_dao import ReviewDAO
+from backend.src.DAO.general_dao import GeneralDAO
+
 from backend.src.database.database import get_db
-from backend.src.database.models import Author
-from backend.src.database.shema import User
-from backend.src.database import shema
-from backend.src.helpers.general_helper import CheckHTTP404NotFound
+
 from backend.src.repository import admin_repository
 from backend.src.repository.admin_repository import get_current_admin_user
+
+from backend.src.database.shema import User
+
+from backend.src.database import models, shema
+
+from backend.src.helpers.general_helper import CheckHTTP404NotFound
 
 admin_router = APIRouter(
     prefix="/book_reviews/admin",
@@ -43,7 +44,7 @@ async def logout_admin(response: Response):
 @admin_router.get("/users/get_users", tags=["admin"])
 async def get_users(admin: User = Depends(get_current_admin_user),
                     db: AsyncSession = Depends(get_db)):
-    users = await UserDAO.get_all_users(db=db)
+    users = await GeneralDAO.get_all_items(db=db, item=models.User)
     CheckHTTP404NotFound(founding_item=users, text="Пользователи не найден")
 
     return users
@@ -53,7 +54,7 @@ async def get_users(admin: User = Depends(get_current_admin_user),
 async def get_user(user_id: int,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
-    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
 
     return user
@@ -90,7 +91,7 @@ async def delete_user(user_id: int,
 async def delete_review(review_id: int,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    return await ReviewDAO.delete_review(db=db, review_id=int(review_id))
+    return await GeneralDAO.delete_item(db=db, item=models.Review, item_id=int(review_id))
 
 
 @admin_router.put("/review/change_review/{review_id}")
@@ -124,7 +125,14 @@ async def add_author(response: Response,
 @admin_router.get("/authors/get_authors", tags=["admin"])
 async def get_authors(admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
-    return await AuthorDAO.get_all_authors(db=db)
+    return await GeneralDAO.get_all_items(db=db, item=models.Author)
+
+
+@admin_router.get("/authors/get_author/{author_id}", tags=["admin"])
+async def get_author(author_id: int,
+                     admin: User = Depends(get_current_admin_user),
+                     db: AsyncSession = Depends(get_db)):
+    return await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=author_id)
 
 
 @admin_router.put("/authors/change_author", tags=["admin"])
@@ -149,13 +157,7 @@ async def delete_author(author_id: int,
     return await admin_repository.delete_author(db=db, author_id=author_id, admin=admin)
 
 
-@admin_router.get("/authors/get_author/{author_id}", tags=["admin"])
-async def get_author(author_id: int,
-                     admin: User = Depends(get_current_admin_user),
-                     db: AsyncSession = Depends(get_db)):
-    return await AuthorDAO.get_author_by_id(db=db, author_id=author_id)
-
-
+# Books #
 @admin_router.post("/books/add_book/", tags=["admin"])
 async def add_book(book_name: str,
                    book_author_name: str,
@@ -175,7 +177,7 @@ async def add_book(book_name: str,
 @admin_router.get("/books/get_books/")
 async def get_books(admin: User = Depends(get_current_admin_user),
                     db: AsyncSession = Depends(get_db)):
-    books = await BookDAO.get_all_books(db=db)
+    books = await GeneralDAO.get_all_items(db=db, item=models.Book)
 
     return books
 
@@ -193,7 +195,6 @@ async def change_book(book_id: int,
                       new_book_description: str | None = None,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
-
     request = shema.Book(
         book_name=new_book_name,
         book_description=new_book_description
