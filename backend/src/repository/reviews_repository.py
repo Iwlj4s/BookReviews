@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
+from backend.src.DAO.general_dao import GeneralDAO
 from backend.src.DAO.reviews_dao import ReviewDAO
 
 from backend.src.database.database import get_db
@@ -48,7 +49,7 @@ async def change_review(review_id: int,
                         user: shema.User,
                         db: AsyncSession = Depends(get_db)):
 
-    review = await ReviewDAO.get_review_by_id(db=db, review_id=int(review_id))
+    review = await GeneralDAO.get_item_by_id(db=db, item=models.Review, item_id=int(review_id))
     CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
 
     print("Review created by: ", review.created_by)
@@ -80,13 +81,13 @@ async def change_review(review_id: int,
 async def delete_review(review_id: int,
                         user: shema.User,
                         db: AsyncSession = Depends(get_db)):
-    review = await ReviewDAO.get_review_by_id(db=db, review_id=review_id)
+    review = await GeneralDAO.get_item_by_id(db=db, item=models.Review, item_id=review_id)
     CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
 
     if review.created_by != user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="У вас нет прав для удаления этого обзора")
 
-    await ReviewDAO.delete_review(db=db, review_id=review_id)
+    await GeneralDAO.delete_item(db=db, item=models.Review, item_id=int(review_id))
 
     return {
         'message': "success",
@@ -97,7 +98,7 @@ async def delete_review(review_id: int,
 
 
 async def get_all_reviews(db: AsyncSession = Depends(get_db)):
-    reviews = await ReviewDAO.get_all_reviews(db=db)
+    reviews = await GeneralDAO.get_all_items(db=db, item=models.Review)
 
     CheckHTTP404NotFound(founding_item=reviews, text="Обзоры не найден")
 
@@ -105,7 +106,7 @@ async def get_all_reviews(db: AsyncSession = Depends(get_db)):
 
 
 async def fetch_review(review_id: int, response: Response, db: AsyncSession = Depends(get_db)):
-    review = await ReviewDAO.get_review_by_id(db=db, review_id=review_id)
+    review = await GeneralDAO.get_item_by_id(db=db, item=models.Review, item_id=int(review_id))
 
     CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
 

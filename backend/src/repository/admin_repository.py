@@ -6,17 +6,19 @@ from starlette import status
 from starlette.responses import Response
 
 from backend.src.helpers.admin_helper import check_data_for_change_author, check_data_for_change_book
-from backend.src.DAO.reviews_dao import ReviewDAO
 from backend.src.database.database import get_db
-from backend.src.database import shema
+from backend.src.database import shema, models
 from backend.src.database.models import User
 
 from backend.src.helpers import user_helper
 from backend.src.helpers.general_helper import CheckHTTP404NotFound
 
+from backend.src.DAO.general_dao import GeneralDAO
+from backend.src.DAO.reviews_dao import ReviewDAO
 from backend.src.DAO.users_dao import UserDAO
 from backend.src.DAO.authors_dao import AuthorDAO
 from backend.src.DAO.books_dao import BookDAO
+
 from backend.src.helpers.reviews_helper import check_data_for_change_review
 from backend.src.helpers.user_helper import check_data_for_change_user
 from backend.src.repository.user_repository import get_current_user
@@ -42,7 +44,7 @@ async def change_user(user_id: int,
                       request: shema.User,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
-    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
 
     new_data = check_data_for_change_user(request=request, user=user)
@@ -86,7 +88,7 @@ async def change_author(response: Response,
                         request: shema.Author,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    author = await AuthorDAO.get_author_by_id(db=db, author_id=int(author_id))
+    author = await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=int(author_id))
     print(author.name)
     if not author:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Автор не найден")
@@ -119,10 +121,10 @@ async def change_author(response: Response,
 async def delete_author(author_id: int,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    author = await AuthorDAO.get_author_by_id(db=db, author_id=author_id)
+    author = await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=int(author_id))
     CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
 
-    await AuthorDAO.delete_author(db=db, author_id=int(author_id))
+    await GeneralDAO.delete_item(db=db, item=models.Author, item_id=int(author_id))
 
     return {
         'message': "success delete",
@@ -135,10 +137,10 @@ async def delete_author(author_id: int,
 async def delete_user(user_id: int,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
-    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
 
-    await UserDAO.delete_user(db=db, user_id=int(user_id))
+    await GeneralDAO.delete_item(db=db, item=models.User, item_id=int(user_id))
     await ReviewDAO.delete_review_by_user_id(db=db, user_id=int(user_id))
 
     return {
@@ -153,10 +155,10 @@ async def change_review(review_id: int,
                         request: shema.ChangeReview,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    review = await ReviewDAO.get_review_by_id(db=db, review_id=int(review_id))
+    review = await GeneralDAO.get_item_by_id(db=db, item=models.Review, item_id=int(review_id))
     CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
 
-    user = await UserDAO.get_user_by_id(db=db, user_id=int(review.created_by))
+    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(review.created_by))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
 
     new_data = check_data_for_change_review(request=request, review=review)
@@ -214,7 +216,7 @@ async def delete_book(book_id: int,
     book = await BookDAO.get_book_by_id(db=db, book_id=int(book_id))
     CheckHTTP404NotFound(founding_item=book, text="Книга не найдена")
 
-    await BookDAO.delete_book(db=db, book_id=int(book_id))
+    await GeneralDAO.delete_item(db=db, item=models.Book, item_id=int(book_id))
 
     return {
         'message': "success delete",
@@ -232,7 +234,7 @@ async def change_book(book_id: int,
 
     old_book_name = book.book_name
 
-    author = await AuthorDAO.get_author_by_id(db=db, author_id=book.author_id)
+    author = await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=int(book.author_id))
     CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
 
     reviews = await ReviewDAO.get_review_by_book_id(db=db, book_id=int(book.id))

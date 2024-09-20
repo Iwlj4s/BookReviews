@@ -1,5 +1,3 @@
-import dbm
-
 from fastapi import HTTPException
 from sqlalchemy import select, update, delete, and_, func
 
@@ -12,23 +10,9 @@ from backend.src.database.models import Author
 
 class AuthorDAO:
     @classmethod
-    async def get_all_authors(cls, db: AsyncSession):
-        query = select(Author)
-        authors = await db.execute(query)
-
-        return authors.scalars().all()
-
-    @classmethod
     async def get_author_by_name(cls, db: AsyncSession, author_name: str):
         query = select(Author).where(Author.name == author_name)
         author = await db.execute(query)
-        return author.scalars().first()
-
-    @classmethod
-    async def get_author_by_id(cls, db: AsyncSession, author_id: id):
-        query = select(Author).where(Author.id == int(author_id))
-        author = await db.execute(query)
-
         return author.scalars().first()
 
     @classmethod
@@ -66,9 +50,3 @@ class AuthorDAO:
         query = select(Author).where(Author.id == book.author_id)
         author = await db.execute(query)
         return author.scalars().first()
-
-    @classmethod
-    async def delete_author(cls, db: AsyncSession, author_id: int):
-        query = delete(Author).where(Author.id == int(author_id))
-        await db.execute(query)
-        await db.commit()
