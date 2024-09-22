@@ -68,18 +68,6 @@ async def login(request: shema.User,
     return user
 
 
-async def fetch_user(user_id, response, db: AsyncSession = Depends(get_db)):
-    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
-    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
-
-    return {
-        'message': "success",
-        'status_code': 200,
-        'status': 'Success',
-        'data': user
-    }
-
-
 async def get_current_user(db: AsyncSession = Depends(get_db),
                            token: str = Depends(get_token)):
     user_id = verify_token(token=token)
