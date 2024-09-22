@@ -12,8 +12,6 @@ from backend.src.repository import user_repository
 
 from backend.src.DAO.general_dao import GeneralDAO
 
-# TODO: Create funcs for user: check books/book, check other user/users, check author/authors
-
 users_router = APIRouter(
     prefix="/book_reviews/users",
     tags=["users"]
@@ -48,7 +46,7 @@ async def logout(response: Response):
     return {'message': 'Пользователь успешно вышел из системы'}
 
 
-@users_router.get("/me/", status_code=200, tags=["users"])
+@users_router.post("/me/", status_code=200, tags=["users"])
 async def get_me(response: Response,
                  user_data: User = Depends(get_current_user)):
     return user_data
@@ -105,34 +103,3 @@ async def get_users_for_user(db: AsyncSession = Depends(get_db)):
             'reviews': user.reviews
         }
 
-
-# Authors #
-@users_router.get("/authors/{author_id}")
-async def get_author_for_user(author_id: int,
-                              db: AsyncSession = Depends(get_db)):
-    author = await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=int(author_id))
-    CheckHTTP404NotFound(founding_item=author, text="Автор не найдены")
-    return author
-
-
-@users_router.get("/authors")
-async def get_authors_for_user(db: AsyncSession = Depends(get_db)):
-    authors = await GeneralDAO.get_all_items(db=db, item=models.Author)
-    CheckHTTP404NotFound(founding_item=authors, text="Авторы не найдены")
-    return authors
-
-
-# Books #
-@users_router.get("/books")
-async def get_books_for_user(db: AsyncSession = Depends(get_db)):
-    books = await GeneralDAO.get_all_items(db=db, item=models.Book)
-    CheckHTTP404NotFound(founding_item=books, text="Книги не найдены")
-    return books
-
-
-@users_router.get("/books/{book_id}")
-async def get_book_for_user(book_id,
-                            db: AsyncSession = Depends(get_db)):
-    book = await GeneralDAO.get_item_by_id(db=db, item=models.Book, item_id=int(book_id))
-    CheckHTTP404NotFound(founding_item=book, text="Книга не найдены")
-    return book

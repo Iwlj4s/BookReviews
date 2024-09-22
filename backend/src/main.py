@@ -5,6 +5,8 @@ from backend.src.database.database import engine, Base
 
 from backend.src.routes.admin_router import admin_router
 from backend.src.routes.users_router import users_router
+from backend.src.routes.books_router import books_router
+from backend.src.routes.authors_router import authors_router
 from backend.src.routes.reviews_router import reviews_router
 
 app = FastAPI()
@@ -41,3 +43,5 @@ async def startup_event():
 app.include_router(admin_router)
 app.include_router(users_router)
 app.include_router(reviews_router)
+app.include_router(authors_router)
+app.include_router(books_router)
