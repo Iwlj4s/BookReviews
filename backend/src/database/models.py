@@ -20,6 +20,8 @@ class User(Base):
     reviews: Mapped[List["Review"]] = relationship("Review", back_populates="user", lazy="selectin")
 
 
+# TODO: Create book_cover column in reviews and books, in review book_cover must have FK on books
+
 class Review(Base):
     __tablename__ = 'reviews'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
@@ -47,7 +49,6 @@ class Author(Base):
     books: Mapped[List["Book"]] = relationship("Book", back_populates="author", lazy="selectin")
 
 
-# TODO: Think about parse https://www.litres.ru/search/ for take book cover img
 class Book(Base):
     __tablename__ = 'books'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class ParsSettings:
     def __init__(self):
-        self.base_url = "https://www.litres.ru"
+        self.base_url = "https://www.bookvoed.ru/"
 
         self.book_name = ""
         self.author_name = ""
@@ -45,13 +45,8 @@ class Driver(GetData, ParsSettings):
     def __init__(self):
         super().__init__()
         self.chrome_options = Options()
-        # self.chrome_options.add_argument('--ignore-certificate-errors')
-        # self.chrome_options.add_argument("--allow-running-insecure-content")
-        # self.chrome_options.add_argument("--allow-insecure-localhost")
-        # self.chrome_options.add_argument("--disable-web-security")
-        # self.chrome_options.add_argument("--incognito")
 
-        # self.chrome_options.add_argument("--headless")  # background start
+        self.chrome_options.add_argument("--headless")  # background start
 
         self.input = None
         self.search_button = None
@@ -82,12 +77,12 @@ class Driver(GetData, ParsSettings):
     # Load components func
     async def load_components(self):
         self.input = WebDriverWait(self.driver, 3).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "SearchForm_input__qDTKP"))
+            EC.presence_of_element_located((By.CLASS_NAME, "search-form__input"))
         )
         logger.info("Successfully find input")
 
         self.search_button = WebDriverWait(self.driver, 3).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "SearchForm_btn__imsGi"))
+            EC.presence_of_element_located((By.CLASS_NAME, "search-form__button-search"))
         )
         logger.info("Successfully find button")
 
@@ -98,7 +93,7 @@ class Driver(GetData, ParsSettings):
             logger.info(f"Try to open URL: {self.base_url}")
             self.driver.get(self.base_url)
 
-            WebDriverWait(self.driver, 30).until(
+            WebDriverWait(self.driver, 20).until(
                 EC.presence_of_element_located((By.TAG_NAME, "body"))
             )
             logger.info("Page successfully load")
@@ -115,11 +110,11 @@ class Driver(GetData, ParsSettings):
     async def enter_data(self, book_name: str, author_name: str):
         try:
             self.input.send_keys(book_name + " " + author_name)
-            time.sleep(2)
+            time.sleep(1)
 
             self.search_button.click()
             logger.info("Button clicked!")
-            time.sleep(2)
+            time.sleep(1)
 
         except Exception as e:
             logger.error(f"Data input error: {e}")
@@ -128,10 +123,10 @@ class Driver(GetData, ParsSettings):
         await self.get_data(book_name=str(book_name), author_name=str(author_name))
 
         await self.open_url()
-        time.sleep(2)
+        time.sleep(1)
 
         await self.load_components()
-        time.sleep(2)
+        time.sleep(1)
 
         try:
             self.response = requests.get(self.base_url)
@@ -147,8 +142,6 @@ class Driver(GetData, ParsSettings):
 
         self.html = self.driver.page_source
         self.soup = BeautifulSoup(self.html, "lxml")
-
-        print(f"HTML CODE: \n {self.html}")
 
         await self.quit_driver()
 
@@ -170,7 +163,7 @@ class GetBookCover(Driver, ParsSettings):
         if self.images:
             self.images_list = list(self.images)  # Create a list from the images
             print(self.images_list)
-            result_image = self.images_list[1]
+            result_image = self.images_list[0]
 
             print(result_image['src'])
             self.book_cover_href = result_image['src']
@@ -198,8 +191,8 @@ class GetBookCover(Driver, ParsSettings):
 
 
 async def main():
-    book_name = "Жажда"
-    author_name = "Трейси Вульф"
+    book_name = "Превращение"
+    author_name = "Франц Кафка"
     book_cover = GetBookCover()
     data = await book_cover.get_book_cover_href(b_name=str(book_name), a_name=str(author_name))
 
