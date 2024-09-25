@@ -1,8 +1,6 @@
-import requests
+import asyncio
 import logging
 import time
-import sys
-import os
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -20,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class ParsSettings:
     def __init__(self):
-        self.base_url = "https://www.bookvoed.ru/"
+        self.base_url = "https://www.bookvoed.ru"
 
         self.book_name = ""
         self.author_name = ""
@@ -44,9 +42,15 @@ class GetData(ParsSettings):
 class Driver(GetData, ParsSettings):
     def __init__(self):
         super().__init__()
-        self.chrome_options = Options()
+        # self.chrome_options = Options()
+        # self.chrome_options.add_argument('--ignore-certificate-errors')
+        # self.chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        # self.chrome_options.add_argument("--allow-running-insecure-content")
+        # self.chrome_options.add_argument("--allow-insecure-localhost")
+        # self.chrome_options.add_argument("--disable-web-security")
+        # self.chrome_options.add_argument("--incognito")
 
-        self.chrome_options.add_argument("--headless")  # background start
+        # self.chrome_options.add_argument("--headless")  # background start
 
         self.input = None
         self.search_button = None
@@ -58,8 +62,8 @@ class Driver(GetData, ParsSettings):
 
     async def initialize_driver(self):
         try:
-            self.driver = webdriver.Chrome(options=self.chrome_options)
-            self.driver.set_page_load_timeout(30)
+            self.driver = webdriver.Firefox()
+            self.driver.set_page_load_timeout(40)
             logger.info("WebDriver successfully init")
         except Exception as e:
             logger.error(f"Init Error WebDriver: {e}")
@@ -88,62 +92,43 @@ class Driver(GetData, ParsSettings):
 
     async def open_url(self):
         try:
-            if not self.driver:
-                await self.initialize_driver()
             logger.info(f"Try to open URL: {self.base_url}")
             self.driver.get(self.base_url)
-
-            WebDriverWait(self.driver, 20).until(
-                EC.presence_of_element_located((By.TAG_NAME, "body"))
-            )
-            logger.info("Page successfully load")
-        except TimeoutException:
-            logger.error("Time out page / components load")
-            self.driver.quit()
-            return None
 
         except Exception as e:
             logger.error(f"Page load Error: {e}")
             self.driver.quit()
-            return None
 
     async def enter_data(self, book_name: str, author_name: str):
         try:
             self.input.send_keys(book_name + " " + author_name)
-            time.sleep(1)
+            await asyncio.sleep(1)
 
             self.search_button.click()
             logger.info("Button clicked!")
-            time.sleep(1)
+            await asyncio.sleep(1)
 
         except Exception as e:
             logger.error(f"Data input error: {e}")
 
     async def get_html_page_with_book_cover(self, book_name: str, author_name: str):
         await self.get_data(book_name=str(book_name), author_name=str(author_name))
+        await self.initialize_driver()
 
         await self.open_url()
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         await self.load_components()
-        time.sleep(1)
-
-        try:
-            self.response = requests.get(self.base_url)
-            logger.info(f"Successfully request to {self.base_url}")
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Eror request: {e}")
-
-            return None
+        await asyncio.sleep(1)
 
         await self.enter_data(book_name=str(book_name), author_name=str(author_name))
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.html = self.driver.page_source
         self.soup = BeautifulSoup(self.html, "lxml")
 
         await self.quit_driver()
+        self.driver = None
 
         return self.soup
 
@@ -162,7 +147,7 @@ class GetBookCover(Driver, ParsSettings):
 
         if self.images:
             self.images_list = list(self.images)  # Create a list from the images
-            print(self.images_list)
+            print(self.images_list, sep="\n")
             result_image = self.images_list[0]
 
             print(result_image['src'])
@@ -190,16 +175,16 @@ class GetBookCover(Driver, ParsSettings):
             await self.quit_driver()
 
 
-async def main():
-    book_name = "Превращение"
-    author_name = "Франц Кафка"
-    book_cover = GetBookCover()
-    data = await book_cover.get_book_cover_href(b_name=str(book_name), a_name=str(author_name))
-
-    print("Book cover href: ", data["book_cover_href"])
-
-
-if __name__ == '__main__':
-    import asyncio
-
-    asyncio.run(main())
+# async def main():
+#     book_name = "Превращение"
+#     author_name = "Франц Кафка"
+#     book_cover = GetBookCover()
+#     data = await book_cover.get_book_cover_href(b_name=str(book_name), a_name=str(author_name))
+#
+#     print("Book cover href: ", data["book_cover_href"])
+#
+#
+# if __name__ == '__main__':
+#     import asyncio
+#
+#     asyncio.run(main())

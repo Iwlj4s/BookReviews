@@ -14,6 +14,8 @@ from backend.src.helpers.general_helper import CheckHTTP404NotFound
 
 from backend.src.helpers.reviews_helper import check_data_for_add_review, check_data_for_change_review
 
+from backend.parsing.get_data import get_book_cover
+
 
 async def create_review(request: shema.Review,
                         response: Response,
@@ -21,7 +23,6 @@ async def create_review(request: shema.Review,
                         db: AsyncSession = Depends(get_db)):
 
     book, author = await check_data_for_add_review(request=request, db=db)
-
     new_review = await ReviewDAO.create_review(request=request,
                                                user=user,
                                                book=book,
@@ -35,9 +36,10 @@ async def create_review(request: shema.Review,
         'status_code': 200,
         'data': {
             'Created by': user.id,
+            'Обложка': new_review.reviewed_book_cover,
+            'Книга': new_review.reviewed_book_name,
             'id Автора': author.id,
             'Автор': new_review.reviewed_book_author_name,
-            'Книга': new_review.reviewed_book_name,
             'Заголовок': new_review.review_title,
             'Обзор': new_review.review_body
         }

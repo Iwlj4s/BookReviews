@@ -56,6 +56,7 @@ class ReviewDAO:
         new_review = models.Review(
             created_by=user.id,
             reviewed_book_id=book.id,
+            reviewed_book_cover=book.book_cover,
             reviewed_book_author_id=author.id,
             reviewed_book_name=book.book_name,
             reviewed_book_author_name=author.name,

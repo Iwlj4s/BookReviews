@@ -15,7 +15,7 @@ books_router = APIRouter(
 )
 
 
-@books_router.get("/book/{book_id}")
+@books_router.get("/book/{book_id}", tags=["books"])
 async def get_book(book_id,
                    db: AsyncSession = Depends(get_db)):
     book = await GeneralDAO.get_item_by_id(db=db, item=models.Book, item_id=int(book_id))
@@ -23,7 +23,7 @@ async def get_book(book_id,
     return book
 
 
-@books_router.get("/books_list")
+@books_router.get("/books_list", tags=["books"])
 async def get_books(db: AsyncSession = Depends(get_db)):
     books = await GeneralDAO.get_all_items(db=db, item=models.Book)
     CheckHTTP404NotFound(founding_item=books, text="Книги не найдены")

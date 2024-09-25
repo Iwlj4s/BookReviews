@@ -122,19 +122,6 @@ async def add_author(response: Response,
                                              db=db)
 
 
-@admin_router.get("/authors/get_authors", tags=["admin"])
-async def get_authors(admin: User = Depends(get_current_admin_user),
-                      db: AsyncSession = Depends(get_db)):
-    return await GeneralDAO.get_all_items(db=db, item=models.Author)
-
-
-@admin_router.get("/authors/get_author/{author_id}", tags=["admin"])
-async def get_author(author_id: int,
-                     admin: User = Depends(get_current_admin_user),
-                     db: AsyncSession = Depends(get_db)):
-    return await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=author_id)
-
-
 @admin_router.put("/authors/change_author", tags=["admin"])
 async def change_author(response: Response,
                         author_id: int,
@@ -172,15 +159,6 @@ async def add_book(book_name: str,
     return await admin_repository.add_book(request=request,
                                            admin=admin,
                                            db=db)
-
-
-@admin_router.get("/books/get_books/")
-async def get_books(admin: User = Depends(get_current_admin_user),
-                    db: AsyncSession = Depends(get_db)):
-    books = await GeneralDAO.get_all_items(db=db, item=models.Book)
-
-    return books
-
 
 @admin_router.delete("/books/delete_book/{book_id}")
 async def delete_book(book_id: int,

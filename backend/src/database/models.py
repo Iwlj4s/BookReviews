@@ -26,9 +26,10 @@ class Review(Base):
     __tablename__ = 'reviews'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
-    reviewed_book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), nullable=False, index=True)  # FK на Book
+    reviewed_book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), nullable=False, index=True)
     reviewed_book_author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False, index=True)
 
+    reviewed_book_cover: Mapped[str] = mapped_column(ForeignKey("books.book_cover"), nullable=False, index=True)
     reviewed_book_name: Mapped[str] = mapped_column(nullable=False, index=True)
     reviewed_book_author_name: Mapped[str] = mapped_column(nullable=False, index=True)
 
@@ -39,6 +40,7 @@ class Review(Base):
     updated: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
 
     user: Mapped["User"] = relationship("User", back_populates="reviews", lazy="selectin")
+    book: Mapped["Book"] = relationship("Book", foreign_keys=[reviewed_book_id], lazy="selectin")
 
 
 class Author(Base):
@@ -52,6 +54,7 @@ class Author(Base):
 class Book(Base):
     __tablename__ = 'books'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
+    book_cover: Mapped[str] = mapped_column(String, nullable=False, index=True)
     book_name: Mapped[str] = mapped_column(String, nullable=False, index=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False, index=True)
     book_description: Mapped[str] = mapped_column(Text, nullable=False, index=True)

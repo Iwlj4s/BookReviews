@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
+from backend.parsing.get_data import get_book_cover
 from backend.src.helpers.admin_helper import check_data_for_change_author, check_data_for_change_book
 from backend.src.database.database import get_db
 from backend.src.database import shema, models
@@ -190,7 +191,9 @@ async def add_book(request: shema.Book,
     author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name))
     CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
 
+    book_cover = await get_book_cover(book_name=request.book_name, author_name=author.name)
     new_book = await BookDAO.add_book(request=request,
+                                      book_cover=book_cover,
                                       author=author,
                                       db=db)
 
@@ -198,10 +201,11 @@ async def add_book(request: shema.Book,
     await db.refresh(author)
 
     return {
-        'message': "Автор добавлен успешно",
+        'message': "Книга добавлена успешно",
         'status_code': 200,
         'data': {
             'id': new_book.id,
+            'book_cover': new_book.book_cover,
             'book_name': new_book.book_name,
             'book_author_id': new_book.author_id,
             'author_name': author.name,
