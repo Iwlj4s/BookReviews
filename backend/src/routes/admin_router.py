@@ -121,22 +121,6 @@ async def add_author(response: Response,
                                              admin=admin,
                                              db=db)
 
-
-@admin_router.put("/authors/change_author", tags=["admin"])
-async def change_author(response: Response,
-                        author_id: int,
-                        new_name: str | None = None,
-                        admin: User = Depends(get_current_admin_user),
-                        db: AsyncSession = Depends(get_db)):
-    request = shema.Author(name=new_name)
-
-    return await admin_repository.change_author(response=response,
-                                                author_id=author_id,
-                                                request=request,
-                                                admin=admin,
-                                                db=db)
-
-
 @admin_router.delete("/authors/delete_author/{author_id}", tags=["admin"])
 async def delete_author(author_id: int,
                         admin: User = Depends(get_current_admin_user),
@@ -159,6 +143,15 @@ async def add_book(book_name: str,
     return await admin_repository.add_book(request=request,
                                            admin=admin,
                                            db=db)
+
+
+@admin_router.get("/books/get_books/")
+async def get_books(admin: User = Depends(get_current_admin_user),
+                    db: AsyncSession = Depends(get_db)):
+    books = await GeneralDAO.get_all_items(db=db, item=models.Book)
+
+    return books
+
 
 @admin_router.delete("/books/delete_book/{book_id}")
 async def delete_book(book_id: int,

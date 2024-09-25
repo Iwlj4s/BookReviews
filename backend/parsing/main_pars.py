@@ -1,14 +1,6 @@
 import asyncio
 import logging
-import time
-
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
+import aiohttp
 
 from bs4 import BeautifulSoup
 
@@ -16,124 +8,56 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# TODO: Create exceptions for returned data, like if parser doesn't find any data - return response about it
+
 class ParsSettings:
     def __init__(self):
-        self.base_url = "https://www.bookvoed.ru"
 
+        self.base_url = "https://www.bookvoed.ru"
         self.book_name = ""
         self.author_name = ""
+
+        self.search_query = ""
+        self.search_url = ""
 
         self.book_cover = None
         self.book_cover_href = None
 
+        self.response = None
+        self.html = None
+        self.soup = None
         self.data = {}
 
 
 class GetData(ParsSettings):
     async def get_data(self, book_name: str, author_name: str):
         if book_name and author_name:
-            self.book_name = str(book_name),
+            self.book_name = str(book_name)
             self.author_name = str(author_name)
+            self.search_query = f"{self.book_name} {self.author_name}"
+            self.search_url = f"{self.base_url}/search?q={self.search_query}"
 
         else:
             return "No book name and no author name"
 
 
-class Driver(GetData, ParsSettings):
-    def __init__(self):
-        super().__init__()
-        # self.chrome_options = Options()
-        # self.chrome_options.add_argument('--ignore-certificate-errors')
-        # self.chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        # self.chrome_options.add_argument("--allow-running-insecure-content")
-        # self.chrome_options.add_argument("--allow-insecure-localhost")
-        # self.chrome_options.add_argument("--disable-web-security")
-        # self.chrome_options.add_argument("--incognito")
-
-        # self.chrome_options.add_argument("--headless")  # background start
-
-        self.input = None
-        self.search_button = None
-
-        self.driver = None
-        self.response = None
-        self.html = None
-        self.soup = None
-
-    async def initialize_driver(self):
-        try:
-            self.driver = webdriver.Firefox()
-            self.driver.set_page_load_timeout(40)
-            logger.info("WebDriver successfully init")
-        except Exception as e:
-            logger.error(f"Init Error WebDriver: {e}")
-            raise
-
-    async def quit_driver(self):
-        if self.driver:
-            try:
-                self.driver.quit()
-            except Exception as e:
-                logger.warning(f"Close Driver Error: {e}")
-            finally:
-                self.driver = None
-
-    # Load components func
-    async def load_components(self):
-        self.input = WebDriverWait(self.driver, 3).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "search-form__input"))
-        )
-        logger.info("Successfully find input")
-
-        self.search_button = WebDriverWait(self.driver, 3).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "search-form__button-search"))
-        )
-        logger.info("Successfully find button")
-
-    async def open_url(self):
-        try:
-            logger.info(f"Try to open URL: {self.base_url}")
-            self.driver.get(self.base_url)
-
-        except Exception as e:
-            logger.error(f"Page load Error: {e}")
-            self.driver.quit()
-
-    async def enter_data(self, book_name: str, author_name: str):
-        try:
-            self.input.send_keys(book_name + " " + author_name)
-            await asyncio.sleep(1)
-
-            self.search_button.click()
-            logger.info("Button clicked!")
-            await asyncio.sleep(1)
-
-        except Exception as e:
-            logger.error(f"Data input error: {e}")
-
+class Parser(GetData, ParsSettings):
     async def get_html_page_with_book_cover(self, book_name: str, author_name: str):
-        await self.get_data(book_name=str(book_name), author_name=str(author_name))
-        await self.initialize_driver()
+        async with aiohttp.ClientSession() as session:
+            await self.get_data(book_name=book_name, author_name=author_name)
+            print("SEARCH QUERY:", self.search_query)
+            print("SEARCH URL:", self.search_url)
 
-        await self.open_url()
-        await asyncio.sleep(1)
+            async with session.get(self.search_url) as response:
+                self.response = response
+                self.html = await response.text()
+                print("HTML PRINT: \n", self.html)
+                self.soup = BeautifulSoup(self.html, "lxml")
 
-        await self.load_components()
-        await asyncio.sleep(1)
-
-        await self.enter_data(book_name=str(book_name), author_name=str(author_name))
-        await asyncio.sleep(1)
-
-        self.html = self.driver.page_source
-        self.soup = BeautifulSoup(self.html, "lxml")
-
-        await self.quit_driver()
-        self.driver = None
-
-        return self.soup
+                return self.soup
 
 
-class GetBookCover(Driver, ParsSettings):
+class GetBookCover(Parser, ParsSettings):
     def __init__(self):
         super().__init__()
         self.images_list = []
@@ -171,8 +95,6 @@ class GetBookCover(Driver, ParsSettings):
 
         except Exception as e:
             logger.error(f"Error response data: {e}")
-        finally:
-            await self.quit_driver()
 
 
 # async def main():

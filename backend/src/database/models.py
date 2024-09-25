@@ -6,6 +6,8 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from backend.src.database.database import Base
 
 
+# TODO: Create checks for data, like check on already added data and e.t.c.
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -19,8 +21,6 @@ class User(Base):
 
     reviews: Mapped[List["Review"]] = relationship("Review", back_populates="user", lazy="selectin")
 
-
-# TODO: Create book_cover column in reviews and books, in review book_cover must have FK on books
 
 class Review(Base):
     __tablename__ = 'reviews'
