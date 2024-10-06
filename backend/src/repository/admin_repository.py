@@ -61,9 +61,25 @@ async def change_user(user_id: int,
         'status_code': 200,
         'data': {
             'id': user.id,
-            'name': new_data.get("name"),
-            'email': new_data.get("email")
+            'user_name': new_data.get("name"),
+            'user_email': new_data.get("email")
         }
+    }
+
+
+async def delete_user(user_id: int,
+                      admin: User = Depends(get_current_admin_user),
+                      db: AsyncSession = Depends(get_db)):
+    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
+    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
+
+    await GeneralDAO.delete_item(db=db, item=models.User, item_id=int(user_id))
+    await ReviewDAO.delete_review_by_user_id(db=db, user_id=int(user_id))
+
+    return {
+        'message': "success delete",
+        'status_code': 200,
+        'data': f"user_id: {user.id}, user_name: {user.name}, user_email:{user.email} deleted!"
     }
 
 
@@ -79,7 +95,7 @@ async def add_author(response: Response,
         'status_code': 200,
         'data': {
             'id': new_author.id,
-            'Имя': new_author.name
+            'author_name': new_author.name
         }
     }
 
@@ -114,7 +130,7 @@ async def change_author(response: Response,
         'status_code': 200,
         'data': {
             'id': author.id,
-            'Имя': author.name
+            'author_name': author.name
         }
     }
 
@@ -130,24 +146,8 @@ async def delete_author(author_id: int,
     return {
         'message': "success delete",
         'status_code': 200,
-        'data': f"Author id: {author.id}, name: {author.name} deleted!"
-    }
-
-
-# User #
-async def delete_user(user_id: int,
-                      admin: User = Depends(get_current_admin_user),
-                      db: AsyncSession = Depends(get_db)):
-    user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
-    CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
-
-    await GeneralDAO.delete_item(db=db, item=models.User, item_id=int(user_id))
-    await ReviewDAO.delete_review_by_user_id(db=db, user_id=int(user_id))
-
-    return {
-        'message': "success delete",
-        'status_code': 200,
-        'data': f"User id: {user.id}, name: {user.name}, email:{user.email} deleted!"
+        'data': f"author_id: {author.id},"
+                f" author_name: {author.name} deleted!"
     }
 
 
@@ -176,10 +176,10 @@ async def change_review(review_id: int,
         'status_code': 200,
         'data': {
             'id': user.id,
-            'Автор': review.reviewed_book_author_name,
-            'Книга': review.reviewed_book_name,
-            'Заголовок': new_data.get("review_title"),
-            'Обзор': new_data.get("review_body")
+            'author_name': review.reviewed_book_author_name,
+            'book_name': review.reviewed_book_name,
+            'review_title': new_data.get("review_title"),
+            'review_body': new_data.get("review_body")
         }
     }
 
@@ -192,6 +192,10 @@ async def add_book(request: shema.Book,
     CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
 
     book_cover = await get_book_cover(book_name=request.book_name, author_name=author.name)
+    print(book_cover)
+    if book_cover is None:
+        return CheckHTTP404NotFound(book_cover, text="Обложка для книги не найдена,"
+                                                     " попробуйте изменить написание названия книги")
     new_book = await BookDAO.add_book(request=request,
                                       book_cover=book_cover,
                                       author=author,
@@ -225,7 +229,8 @@ async def delete_book(book_id: int,
     return {
         'message': "success delete",
         'status_code': 200,
-        'data': f"Book id: {book.id}, book_name: {book.book_name} deleted!"
+        'data': f"book_id: {book.id},"
+                f" book_name: {book.book_name} deleted!"
     }
 
 
@@ -260,8 +265,8 @@ async def change_book(book_id: int,
         'status_code': 200,
         'data': {
             'id': book.id,
-            'Автор': author.name,
-            'Название книги': book.book_name,
-            'Описание': book.book_description,
+            'author_name': author.name,
+            'book_name': book.book_name,
+            'description': book.book_description,
         }
     }

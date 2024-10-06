@@ -36,12 +36,12 @@ async def create_review(request: shema.Review,
         'status_code': 200,
         'data': {
             'Created by': user.id,
-            'Обложка': new_review.reviewed_book_cover,
-            'Книга': new_review.reviewed_book_name,
-            'id Автора': author.id,
-            'Автор': new_review.reviewed_book_author_name,
-            'Заголовок': new_review.review_title,
-            'Обзор': new_review.review_body
+            'book_cover': new_review.reviewed_book_cover,
+            'book_name': new_review.reviewed_book_name,
+            'author_id': author.id,
+            'author_name': new_review.reviewed_book_author_name,
+            'review_title': new_review.review_title,
+            'review_body': new_review.review_body
         }
     }
 
@@ -72,10 +72,10 @@ async def change_review(review_id: int,
         'status_code': 200,
         'data': {
             'id': user.id,
-            'Автор': review.reviewed_book_author_name,
-            'Книга': review.reviewed_book_name,
-            'Заголовок': new_data.get("review_title"),
-            'Обзор': new_data.get("review_body")
+            'author_name': review.reviewed_book_author_name,
+            'book_name': review.reviewed_book_name,
+            'review_title': new_data.get("review_title"),
+            'review_body': new_data.get("review_body")
         }
     }
 
@@ -95,7 +95,10 @@ async def delete_review(review_id: int,
         'message': "success",
         'status_code': 200,
         'status': 'Success',
-        'data': f"Review id:{review.id} title:{review.review_title} book_name:{review.reviewed_book_name} deleted!"
+        'data': {f"Review id:{review.id}",
+                 f" title:{review.review_title}",
+                 f" book_name:{review.reviewed_book_name} deleted!"
+        }
     }
 
 

@@ -53,7 +53,7 @@ async def sign_up(request: shema.User, response, db: AsyncSession):
         'data': {
             'id': new_user.id,
             'user_name': new_user.name,
-            'email': new_user.email
+            'user_email': new_user.email
         }
     }
 
@@ -87,7 +87,10 @@ async def delete_current_user(user: shema.User,
         'message': "success",
         'status_code': 200,
         'status': 'Success',
-        'data': f"User id:{user.id} name:{user.name} email:{user.email} deleted!"
+        'data': {f"User id:{user.id}",
+                 f" name:{user.name}",
+                 f" email:{user.email} deleted!"
+        }
     }
 
 
@@ -111,7 +114,7 @@ async def change_current_user(request: shema.User,
         'status_code': 200,
         'data': {
             'id': user.id,
-            'name': new_data.get("name"),
-            'email': new_data.get("email")
+            'user_name': new_data.get("name"),
+            'user_email': new_data.get("email")
         }
     }

@@ -8,8 +8,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# TODO: Create exceptions for returned data, like if parser doesn't find any data - return response about it
-
 class ParsSettings:
     def __init__(self):
 
@@ -69,8 +67,11 @@ class GetBookCover(Parser, ParsSettings):
 
         self.images = self.soup.find_all('img', attrs={'alt': self.book_name})
 
-        if self.images:
-            self.images_list = list(self.images)  # Create a list from the images
+        if not self.images:
+            self.book_cover_href = None
+
+        else:
+            self.images_list = list(self.images)
             print(self.images_list, sep="\n")
             result_image = self.images_list[0]
 
@@ -91,14 +92,14 @@ class GetBookCover(Parser, ParsSettings):
                 print(self.data)
                 return self.data
             else:
-                print("SOmethig with soup")
+                print("Something with soup")
 
         except Exception as e:
             logger.error(f"Error response data: {e}")
 
 
 # async def main():
-#     book_name = "Превращение"
+#     book_name = "..."
 #     author_name = "Франц Кафка"
 #     book_cover = GetBookCover()
 #     data = await book_cover.get_book_cover_href(b_name=str(book_name), a_name=str(author_name))
