@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+}
+
+#card {
+    width: 570px;
+    height: auto;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    margin: 10px;
+    word-wrap: break-word;
+    word-break: normal;
+}
+
+
+#card-container {
+    word-wrap: break-word;
+    word-break: normal;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+#title-and-img{
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 3vh;
+    font-size: 13px;
+}
+
+#text {
+    overflow-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+}
+
+.tree-container {
+  position: relative;
+  justify-content: center;
+
+  gap: 10px;
+
+}
+
+#book-info {
+    word-break: break-all;
+    white-space: normal;
+}
+
+#card-content{
+    font-size: 18px;
+}
