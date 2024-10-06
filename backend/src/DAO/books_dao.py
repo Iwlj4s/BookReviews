@@ -27,8 +27,9 @@ class BookDAO:
         return books.scalars().all()
 
     @classmethod
-    async def add_book(cls, request: shema.Book, author, db: AsyncSession):
+    async def add_book(cls, request: shema.Book, book_cover, author, db: AsyncSession):
         new_book = models.Book(
+            book_cover=book_cover,
             book_name=request.book_name,
             author_id=author.id,
             book_description=request.book_description

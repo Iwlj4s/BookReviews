@@ -15,7 +15,7 @@ authors_router = APIRouter(
 )
 
 
-@authors_router.get("/author/{author_id}")
+@authors_router.get("/author/{author_id}", tags=["authors"])
 async def get_author(author_id: int,
                      db: AsyncSession = Depends(get_db)):
     author = await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=int(author_id))
@@ -23,7 +23,7 @@ async def get_author(author_id: int,
     return author
 
 
-@authors_router.get("/authors_list")
+@authors_router.get("/authors_list", tags=["authors"])
 async def get_authors(db: AsyncSession = Depends(get_db)):
     authors = await GeneralDAO.get_all_items(db=db, item=models.Author)
     CheckHTTP404NotFound(founding_item=authors, text="Авторы не найден")

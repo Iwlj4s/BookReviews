@@ -122,17 +122,11 @@ async def add_author(response: Response,
                                              db=db)
 
 
-@admin_router.get("/authors/get_authors", tags=["admin"])
-async def get_authors(admin: User = Depends(get_current_admin_user),
-                      db: AsyncSession = Depends(get_db)):
-    return await GeneralDAO.get_all_items(db=db, item=models.Author)
-
-
-@admin_router.get("/authors/get_author/{author_id}", tags=["admin"])
-async def get_author(author_id: int,
-                     admin: User = Depends(get_current_admin_user),
-                     db: AsyncSession = Depends(get_db)):
-    return await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=author_id)
+@admin_router.delete("/authors/delete_author/{author_id}", tags=["admin"])
+async def delete_author(author_id: int,
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+    return await admin_repository.delete_author(db=db, author_id=author_id, admin=admin)
 
 
 @admin_router.put("/authors/change_author", tags=["admin"])
@@ -148,13 +142,6 @@ async def change_author(response: Response,
                                                 request=request,
                                                 admin=admin,
                                                 db=db)
-
-
-@admin_router.delete("/authors/delete_author/{author_id}", tags=["admin"])
-async def delete_author(author_id: int,
-                        admin: User = Depends(get_current_admin_user),
-                        db: AsyncSession = Depends(get_db)):
-    return await admin_repository.delete_author(db=db, author_id=author_id, admin=admin)
 
 
 # Books #
