@@ -25,7 +25,7 @@ from backend.src.helpers.user_helper import check_data_for_change_user
 from backend.src.repository.user_repository import get_current_user
 
 
-async def login_admin(request: shema.User, response, db: AsyncSession = Depends(get_db)):
+async def login_admin(request: shema.UserSignIn, response, db: AsyncSession = Depends(get_db)):
     user = await user_helper.take_access_token_for_user(db=db,
                                                         response=response,
                                                         request=request,

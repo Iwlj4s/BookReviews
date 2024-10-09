@@ -10,6 +10,11 @@ class User(BaseModel):
     password: Union[str, None] = Field(default=None, min_length=4, title="Пароль пользователя")
 
 
+class UserSignIn(BaseModel):
+    email: Union[str] = Field(default=None, title="Эл.почта пользователя")
+    password: Union[str] = Field(default=None, min_length=4, title="Пароль пользователя")
+
+
 # Review #
 class Review(BaseModel):
     reviewed_book_name: Union[str] = Field(default=None, title="Название книги, на которую написан обзор")

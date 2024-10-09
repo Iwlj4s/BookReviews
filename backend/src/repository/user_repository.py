@@ -58,14 +58,19 @@ async def sign_up(request: shema.User, response, db: AsyncSession):
     }
 
 
-async def login(request: shema.User,
+async def login(request: shema.UserSignIn,
                 response: Response,
                 db: AsyncSession):
     user = await user_helper.take_access_token_for_user(db=db,
                                                         response=response,
                                                         request=request,
                                                         admin_check=False)
-    return user
+    return {
+        "user_access_token": user['user_access_token'],
+        "email": user['email'],
+        "name": user['name'],
+        "id": user['id']
+    }
 
 
 async def get_current_user(db: AsyncSession = Depends(get_db),

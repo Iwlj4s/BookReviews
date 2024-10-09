@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Space, Tree } from 'antd';
 
+function BookCard(props) {
+    const { books } = props;
 
-function ReviewCard(props) {
-    const { reviews, user } = props;
-
-    const bookDescription = reviews.book.book_description
+    const bookDescription = books.book_description
 
     const [treeData, setTreeData] = useState([])
 
@@ -27,17 +26,16 @@ function ReviewCard(props) {
     }, [bookDescription]);
 
     return (
-        <div id='card'>
+        <div id='card-books'>
             <Card
                 title={
                     <div id='card-title'>
                         <div id="title-and-img">
-                            <img src={reviews.reviewed_book_cover} alt='img' width="80" />
-                            <h1 id="text">{reviews.review_title}</h1>
-                            <h3>{reviews.author_name}</h3>
+                            <img src={books.book_cover} alt='img' width="80" />
+                            <h1 id="text">{books.book_name}</h1>
+                            <h1 id="text">{books.author_name}</h1>
                         </div>
                         <div id="book-info">
-                            <h3 id="text">{reviews.reviewed_book_author_name} || {reviews.reviewed_book_name}</h3>
                             <div className="tree-container" id="text">
                               <Tree
                                 treeData={treeData}
@@ -45,17 +43,12 @@ function ReviewCard(props) {
                               />
                             </div>
                         </div>
-                        <p>Автор обзора: {reviews.user?.name || user.name}</p>
-                        <p>Обзор обновлен: {reviews.updated}</p>
                     </div>
                 }
             >
-                <div id='card-content'>
-                    <p>{reviews.review_body}</p>
-                </div>
             </Card>
         </div>
     );
 }
 
-export default ReviewCard;
+export default BookCard;

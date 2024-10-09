@@ -31,12 +31,10 @@ async def sign_up(user_name: str,
 
 
 @users_router.post("/sign_in", status_code=200, tags=["users"])
-async def sign_in(user_email: str,
-                  user_password: str,
+async def sign_in(request: shema.UserSignIn,  # Изменено для получения данных из тела запроса
                   response: Response,
                   db: AsyncSession = Depends(get_db)):
-    request = shema.User(email=user_email,
-                         password=user_password)
+    # request = shema.UserSignIn(email=user_email, password=user_password)
     return await user_repository.login(request, response, db)
 
 
@@ -46,7 +44,7 @@ async def logout(response: Response):
     return {'message': 'Пользователь успешно вышел из системы'}
 
 
-@users_router.post("/me/", status_code=200, tags=["users"])
+@users_router.get("/me/", status_code=200, tags=["users"])
 async def get_me(response: Response,
                  user_data: User = Depends(get_current_user)):
     return user_data

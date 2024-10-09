@@ -1,16 +1,16 @@
-import React from 'react';
-import { Menu, Spin, Input, Space } from 'antd';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Routes } from 'react-router-dom';
 
 import Navigation from "./components/Navigation.jsx";
 import MyRoutes from "./components/MyRoutes.jsx";
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
       <div>
-          <Navigation />
-          <MyRoutes />
+          <Navigation isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+          <MyRoutes setIsLoggedIn={setIsLoggedIn} />
       </div>
   )
 };

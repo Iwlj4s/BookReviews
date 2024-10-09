@@ -61,17 +61,19 @@ li{
     margin: 10px;
     word-wrap: break-word;
     word-break: normal;
-
 }
 
 
-#cards-container {
+#cards-container{
     word-wrap: break-word;
     word-break: normal;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    justify-content: center;
+    align-items: center;
 }
+
 
 #card-container {
     word-wrap: break-word;
@@ -105,9 +107,16 @@ li{
 
 }
 
+#card-books{
+    margin: 10px;
+    width: 500px;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+}
+
 #book-info {
     word-break: break-all;
     white-space: normal;
+    padding: 20px;
 }
 
 #card-content{
@@ -136,4 +145,12 @@ li{
 
 #user-features-item{
     text-align: left
+}
+
+#title{
+    text-align: center;
+}
+
+#user-info{
+    text-align: center;
 }

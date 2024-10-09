@@ -9,7 +9,7 @@ from backend.src.helpers import password_helper
 from backend.src.helpers.jwt_helper import create_access_token
 
 
-async def take_access_token_for_user(db: AsyncSession, response: Response, request: shema.User, admin_check: bool):
+async def take_access_token_for_user(db: AsyncSession, response: Response, request: shema.UserSignIn, admin_check: bool):
     user = await UserDAO.get_user_email(db=db, user_email=str(request.email))
     message = "Вы успешно зашли!"
     if not user:
@@ -43,14 +43,10 @@ async def take_access_token_for_user(db: AsyncSession, response: Response, reque
     response.set_cookie(key="user_access_token", value=access_token, httponly=True)
 
     return {
-        'message': message,
-        'status_code': 200,
-        'data': {
-            'email': user.email,
-            'name': user.name,
-            'id': user.id
-        },
-        'access_token': access_token
+        'user_access_token': access_token,
+        'email': user.email,
+        'name': user.name,
+        'id': user.id
     }
 
 

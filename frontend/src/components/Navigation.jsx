@@ -1,16 +1,36 @@
 import { NavLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-const Navigation = () => (
-    <div id="navbar-container">
-        <nav id="navbar">
-            <ul id="navbar-ul">
-                <li id="navbar-item"><NavLink to='/'>Главная</NavLink></li>
-                <li id="navbar-item"><NavLink to='/reviews'>Обзоры</NavLink></li>
-                <li id="navbar-item"><NavLink to='/books'>Книги</NavLink></li>
-            </ul>
-        </nav>
-    </div>
+const Navigation = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+    useEffect(() => {
+        const token = localStorage.getItem('user_access_token');
+        if (!token){
+            setIsLoggedIn(false)
+            }else{
+                setIsLoggedIn(true)
+                }
+    }, []);
+
+    return (
+        <div id="navbar-container">
+            <nav id="navbar">
+                <ul id="navbar-ul">
+                    <li id="navbar-item"><NavLink to='/'>Главная</NavLink></li>
+                    <li id="navbar-item"><NavLink to='/reviews'>Обзоры</NavLink></li>
+                    <li id="navbar-item"><NavLink to='/books_list'>Книги</NavLink></li>
+                    <div id="right-side-items">
+                        {isLoggedIn ? (
+                            <li id="navbar-item"><NavLink to='/me'>Профиль</NavLink></li>
+                        ) : (
+                            <li id="navbar-item"><NavLink to='/sign_in'>Войти</NavLink></li>
+                        )}
+                    </div>
+                </ul>
+            </nav>
+        </div>
     );
+};
 
 export default Navigation;
