@@ -11,7 +11,6 @@ from backend.src.helpers.jwt_helper import create_access_token
 
 async def take_access_token_for_user(db: AsyncSession, response: Response, request: shema.UserSignIn, admin_check: bool):
     user = await UserDAO.get_user_email(db=db, user_email=str(request.email))
-    message = "Вы успешно зашли!"
     if not user:
         response.status_code = status.HTTP_403_FORBIDDEN
         return {

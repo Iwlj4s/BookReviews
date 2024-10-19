@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+import { Spin } from 'antd';
+
 import '../index.css';
 import BookCard from '../components/BookCard.jsx';
-import axios from 'axios';
 
 function BooksPage (){
     const [books, setBooks] = useState(null);
@@ -15,7 +18,7 @@ function BooksPage (){
     }, []);
 
     if (!books) {
-       return <div>Загрузка...</div>;
+       return <div id="spin"><Spin size="large" /> </div>;
     }
 
     return (

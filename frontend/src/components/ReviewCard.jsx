@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Space, Tree } from 'antd';
+import { Card, Space, Tree, Button } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 
 
 function ReviewCard(props) {
@@ -31,6 +32,16 @@ function ReviewCard(props) {
             <Card
                 title={
                     <div id='card-title'>
+                        {localStorage.getItem('user_access_token') && reviews.created_by === user?.id && (
+                            <div id="card-update">
+                                <Button
+                                    type="link"
+                                    icon={<EditOutlined />}
+                                    onClick={() => console.log('Изменить обзор')}
+                                    size="large"
+                                />
+                            </div>
+                        )}
                         <div id="title-and-img">
                             <img src={reviews.reviewed_book_cover} alt='img' width="80" />
                             <h1 id="text">{reviews.review_title}</h1>

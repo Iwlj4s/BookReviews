@@ -20,14 +20,14 @@ const Navigation = () => {
                     <li id="navbar-item"><NavLink to='/'>Главная</NavLink></li>
                     <li id="navbar-item"><NavLink to='/reviews'>Обзоры</NavLink></li>
                     <li id="navbar-item"><NavLink to='/books_list'>Книги</NavLink></li>
-                    <div id="right-side-items">
-                        {isLoggedIn ? (
-                            <li id="navbar-item"><NavLink to='/me'>Профиль</NavLink></li>
-                        ) : (
-                            <li id="navbar-item"><NavLink to='/sign_in'>Войти</NavLink></li>
-                        )}
-                    </div>
                 </ul>
+                <div id="right-side-items">
+                    {isLoggedIn ? (
+                        <li id="navbar-item"><NavLink to='/me'>Профиль</NavLink></li>
+                    ) : (
+                        <li id="navbar-item"><NavLink to='/sign_in'>Войти</NavLink></li>
+                    )}
+                </div>
             </nav>
         </div>
     );

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+import { Spin } from 'antd';
+
 import '../index.css';
 import ReviewCard from '../components/ReviewCard.jsx';
-import axios from 'axios';
 
 function ReviewsPage(){
     const [reviews, setReviews] = useState(null);
@@ -16,7 +19,7 @@ function ReviewsPage(){
        }, []);
 
     if (!reviews) {
-           return <div>Загрузка...</div>;
+           return <div id="spin"><Spin size="large" /> </div>;
        }
 
        return (

@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +15,8 @@ from backend.src.helpers.token_helper import get_token, verify_token
 from backend.src.DAO.general_dao import GeneralDAO
 from backend.src.DAO.users_dao import UserDAO
 from backend.src.helpers.user_helper import check_data_for_change_user
+
+from backend.src.helpers import password_helper
 
 
 async def sign_up(request: shema.User, response, db: AsyncSession):
@@ -95,7 +97,7 @@ async def delete_current_user(user: shema.User,
         'data': {f"User id:{user.id}",
                  f" name:{user.name}",
                  f" email:{user.email} deleted!"
-        }
+                 }
     }
 
 
@@ -104,8 +106,12 @@ async def change_current_user(request: shema.User,
                               response: Response,
                               user: shema.User):
     new_data = check_data_for_change_user(request=request, user=user)
+    pass_changed = False
 
-    if new_data.get("password") != user.password:
+    if request.password and not password_helper.verify_password(plain_password=request.password, hashed_password=user.password):
+        print("New pass", new_data.get("password"))
+        print(request.password)
+        pass_changed = True
         response.delete_cookie(key='user_access_token')
 
     await UserDAO.change_user(db=db,
@@ -115,8 +121,8 @@ async def change_current_user(request: shema.User,
     await db.refresh(user)
 
     return {
-        'message': "User updated successfully",
-        'status_code': 200,
+        'message': "Пароль изменен, требуется повторный вход." if pass_changed else "User updated successfully",
+        'status_code': 401 if pass_changed else 200,
         'data': {
             'id': user.id,
             'user_name': new_data.get("name"),

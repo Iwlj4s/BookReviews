@@ -1,5 +1,5 @@
 import React from 'react';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Flex } from 'antd';
 
 function SignInForm({ onFinish }){
@@ -18,7 +18,7 @@ function SignInForm({ onFinish }){
         name="email"
         rules={[{ required: true, message: 'Пожалуйста, введите ваш email!' }]}
       >
-        <Input prefix={<UserOutlined />} placeholder="email" />
+        <Input prefix={<MailOutlined />} placeholder="email" />
       </Form.Item>
       <Form.Item
         name="password"

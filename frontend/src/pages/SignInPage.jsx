@@ -34,11 +34,12 @@ const SignInPage = () => {
                     navigate('/me');
                 }
             } catch (error) {
-                console.error('Ошибка при входе:', error.response.data);
-                alert('Ошибка входа: ' + error.response.data.message);
+                console.error('Ошибка при входе:', error.response ? error.response.data : error.message);
+                alert('Ошибка входа: ' + (error.response ? error.response.data.message : 'Неизвестная ошибка'));
             }
         }
     };
+
 
     return (
         <>

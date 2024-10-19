@@ -31,10 +31,9 @@ async def sign_up(user_name: str,
 
 
 @users_router.post("/sign_in", status_code=200, tags=["users"])
-async def sign_in(request: shema.UserSignIn,  # Изменено для получения данных из тела запроса
+async def sign_in(request: shema.UserSignIn,
                   response: Response,
                   db: AsyncSession = Depends(get_db)):
-    # request = shema.UserSignIn(email=user_email, password=user_password)
     return await user_repository.login(request, response, db)
 
 
@@ -52,14 +51,9 @@ async def get_me(response: Response,
 
 @users_router.put("/change_me/", tags=["users"])
 async def change_me(response: Response,
-                    new_user_name: str | None = None,
-                    new_user_email: str | None = None,
-                    new_user_password: str | None = None,
+                    request: shema.User,
                     db: AsyncSession = Depends(get_db),
                     user_data: User = Depends(get_current_user)):
-    request = shema.User(name=new_user_name,
-                         email=new_user_email,
-                         password=new_user_password)
 
     return await user_repository.change_current_user(request, db, response, user_data)
 
