@@ -19,7 +19,7 @@ from backend.src.helpers.user_helper import check_data_for_change_user
 from backend.src.helpers import password_helper
 
 
-async def sign_up(request: shema.User, response, db: AsyncSession):
+async def sign_up(request: shema.UserSignUp, response, db: AsyncSession):
     email = await UserDAO.get_user_email(db=db, user_email=str(request.email))
     name = await UserDAO.get_user_name(db=db, user_name=str(request.name))
 
@@ -54,8 +54,8 @@ async def sign_up(request: shema.User, response, db: AsyncSession):
         'status': "success",
         'data': {
             'id': new_user.id,
-            'user_name': new_user.name,
-            'user_email': new_user.email
+            'name': new_user.name,
+            'email': new_user.email
         }
     }
 
@@ -67,6 +67,14 @@ async def login(request: shema.UserSignIn,
                                                         response=response,
                                                         request=request,
                                                         admin_check=False)
+
+    if response.status_code == status.HTTP_403_FORBIDDEN:
+        return {
+            'message': "Invalid email and/or password",
+            'status_code': 403,
+            'error': "FORBIDDEN"
+        }
+
     return {
         "user_access_token": user['user_access_token'],
         "email": user['email'],

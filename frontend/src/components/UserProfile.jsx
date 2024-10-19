@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Descriptions, Button, Spin, Input } from 'antd';
-import { EditOutlined, MailOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
+import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import '../index.css';
 import ReviewCard from './ReviewCard.jsx';
 
@@ -11,12 +11,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         return <div id="spin"><Spin /> </div>;
     }
 
-    if (!user.reviews || user.reviews.length === 0) {
-        return <div id="spin"><Spin size="large" /> </div>;
-    }
-
     const navigate = useNavigate();
-    const [reviews, setReviews] = useState(null);
+    const [reviews, setReviews] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         name: user?.name || null,
@@ -26,9 +22,6 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        setReviews(user.reviews);
-    }, [user]);
 
     useEffect(() => {
         if (user) {
@@ -37,8 +30,10 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 email: user.email,
                 password: ''
             });
+            setReviews(user.reviews || []);
         }
     }, [user]);
+
 
     const fetchUserData = async () => {
         try {
@@ -63,7 +58,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         setFormData({
             name: user.name,
             email: user.email,
-            password: user.password
+            password: ''
         });
     };
 
@@ -87,6 +82,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
             console.log("Request data: ", requestData)
             console.log("status code: ", response.data.status_code)
+            console.log("Taking data in user profile:", response.data.data)
 
             if (response.data.status_code === 401) {
                 console.log("Navigate to login after pass change")
@@ -107,6 +103,10 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         } finally {
             setLoading(false);
         }
+    };
+
+    const addReview = async () => {
+        console.log("Add review func")
     };
 
     return (
@@ -148,9 +148,9 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                         </div>
                     ) : (
                         <Descriptions layout="vertical">
-                            <Descriptions.Item label="Имя пользователя">{user.name}</Descriptions.Item>
-                            <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
-                            {user?.is_admin && (
+                            <Descriptions.Item label="Имя пользователя">{user.name || 'Не указано'}</Descriptions.Item>
+                            <Descriptions.Item label="Email">{user.email || 'Не указано'}</Descriptions.Item>
+                            {user.is_admin && (
                                 <Descriptions.Item label="Администратор">Да</Descriptions.Item>
                             )}
                         </Descriptions>
@@ -158,11 +158,23 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 </div>
             </div>
 
-            <div id="title"><h1>Мои обзоры</h1></div>
+            <div id="title">
+                <h1>Мои обзоры</h1>
+                <Button
+                    type="link"
+                    icon={<PlusCircleOutlined />}
+                    onClick={addReview}
+                    size="large"
+                />
+            </div>
             <div id="cards-container">
-                {user.reviews.map((userReviews, index) => (
-                    <ReviewCard key={index} reviews={userReviews} user={user} />
-                ))}
+                {reviews.length > 0 ? (
+                    reviews.map((userReviews, index) => (
+                        <ReviewCard key={index} reviews={userReviews} user={user} />
+                    ))
+                ) : (
+                    "Пока что обзоров нет"
+                )}
             </div>
         </>
     );

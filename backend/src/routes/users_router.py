@@ -19,14 +19,10 @@ users_router = APIRouter(
 
 
 @users_router.post("/sign_up", status_code=201, tags=["users"])
-async def sign_up(user_name: str,
-                  user_email: str,
-                  user_password: str,
+async def sign_up(request: shema.UserSignUp,
                   response: Response,
                   db: AsyncSession = Depends(get_db)):
-    request = shema.User(name=user_name,
-                         email=user_email,
-                         password=user_password)
+
     return await user_repository.sign_up(request, response, db)
 
 

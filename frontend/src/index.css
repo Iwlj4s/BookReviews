@@ -170,6 +170,10 @@ li{
 
 #title{
     text-align: center;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 #user-info-container {
@@ -224,6 +228,14 @@ li{
         margin: 3px;
     }
 }
+#sign-in-form-error-alert{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 350px;
+    height: auto;
+
+}
 
 #sign-in-form-container{
     width: 400px;
@@ -236,6 +248,7 @@ li{
 
 }
 
+
 #sign-in-form{
     padding: 10px;
 }
@@ -243,4 +256,33 @@ li{
 #register-now-link{
     display: flex;
     padding-top: 15px;
+}
+
+#sign-up-form-container{
+    width: 400px;
+    height: auto;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 10%;
+
+}
+
+
+#sign-up-form{
+    padding: 10px;
+}
+
+#log-in-now-link{
+    display: flex;
+    padding-top: 15px;
+}
+
+#sign-up-form-error-alert{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 350px;
+    height: auto;
 }
