@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Card, Descriptions, Button, Spin, Input } from 'antd';
+import { Card, Descriptions, Button, Spin, Input, message } from 'antd';
 import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import '../index.css';
 import ReviewCard from './ReviewCard.jsx';
 
 function UserProfile({ user, onLogout, onUpdateUserData }) {
     if (!user) {
+        console.log("can't get user in UserProfile");
         return <div id="spin"><Spin /> </div>;
     }
 
@@ -34,6 +35,19 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         }
     }, [user]);
 
+    const updateReview = (reviewId, updatedData) => {
+        if (Object.keys(updatedData).length === 0) {
+            // Удаление обзора из списка
+            setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
+        } else {
+            // Обновление обзора в списке
+            setReviews((prevReviews) =>
+                prevReviews.map((review) =>
+                    review.id === reviewId ? { ...review, ...updatedData } : review
+                )
+            );
+        }
+    };
 
     const fetchUserData = async () => {
         try {
@@ -42,10 +56,20 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                 }
             });
+            if (response.status === 401) { // Изменено с response.data.status_code на response.status
+                message.error('Токен недействителен');
+                navigate("/sign_in");
+                return;
+            }
             return response.data;
         } catch (error) {
-            console.error('Ошибка при получении данных пользователя:', error.response ? error.response.data : error.message);
-            throw error;
+            if (error.response && error.response.status === 401) { // Добавлена проверка на 401
+                message.error('Токен недействителен');
+                navigate("/sign_in");
+            } else {
+                console.error('Ошибка при получении данных пользователя:', error.response ? error.response.data : error.message);
+                throw error;
+            }
         }
     };
 
@@ -86,6 +110,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
             if (response.data.status_code === 401) {
                 console.log("Navigate to login after pass change")
+                message.success('Данные обновлены успешно!');
                 const updatedUser = await fetchUserData();
                 onUpdateUserData(updatedUser);
 
@@ -94,6 +119,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
             } else {
                 console.log("Data changed")
+                message.success('Данные обновлены успешно!');
                 const updatedUser = await fetchUserData();
                 onUpdateUserData(updatedUser);
             }
@@ -170,7 +196,11 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
             <div id="cards-container">
                 {reviews.length > 0 ? (
                     reviews.map((userReviews, index) => (
-                        <ReviewCard key={index} reviews={userReviews} user={user} />
+                        <ReviewCard key={index}
+                                    reviews={userReviews}
+                                    user={user}
+                                    isProfilePage={true}
+                                    onUpdateReview={updateReview}/>
                     ))
                 ) : (
                     "Пока что обзоров нет"

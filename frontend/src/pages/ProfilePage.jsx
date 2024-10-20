@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import '../index.css';
 import UserProfile from '../components/UserProfile.jsx';
@@ -28,14 +28,26 @@ const ProfilePage = () => {
                         'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                     }
                 });
+                console.log("Status code profile page", response.status_code);
+                if (response.status === 401) {
+                    message.error('Токен недействителен');
+                    navigate("/sign_in");
+                    return;
+                }
                 console.log("Полные данные пользователя:", response.data);
                 console.log("Тип данных пользователя:", typeof response.data);
                 console.log("Имя пользователя:", response.data.name);
                 console.log("Email пользователя:", response.data.email);
                 setUser(response.data);
+
             } catch (err) {
+            if (err.response && err.response.status === 401) { // Добавлена проверка на 401
+                message.error('Токен недействителен');
+                navigate("/sign_in");
+            } else {
                 console.error("Error fetching user data:", err);
                 setError("Ошибка при загрузке данных пользователя");
+            }
             } finally {
                 setLoading(false);
             }

@@ -32,6 +32,7 @@ const SignUpPage = () => {
             console.log("Status code: ", response.data.status_code);
             if (response.data.status_code === 201) {
                 console.log("Account created!");
+                message.success('Аккаунт создан успешно!');
                 navigate('/sign_in');
             }
         } catch (error) {

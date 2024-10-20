@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Space, Tree, Button } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { Card, Space, Tree, Button, Input, message, Modal } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 
 function ReviewCard(props) {
-    const { reviews, user } = props;
+    const { reviews, user, isProfilePage, onUpdateReview } = props;
 
     const bookDescription = reviews.book.book_description
 
     const [treeData, setTreeData] = useState([])
 
+    const [isEditing, setIsEditing] = useState(false);
+
+    const [formData, setFormData] = useState({
+        reviewTitle: reviews.review_title || null,
+        reviewBody: reviews.review_body || null
+    });
 
      useEffect(() => {
       const data = [
@@ -27,17 +34,84 @@ function ReviewCard(props) {
       setTreeData(data);
     }, [bookDescription]);
 
+    const handleEditClick = () => {
+            setIsEditing(true);
+            console.log("Editing review id: ", reviews.id)
+        };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+        setFormData({
+            reviewTitle: reviews.review_title,
+            reviewBody: reviews.review_body
+        });
+    };
+
+    const handleSave = async () => {
+        const requestData = {
+                review_title: formData.reviewTitle || null,
+                review_body: formData.reviewBody || null
+            }
+        try {
+            const response = await axios.put(`http://127.0.0.1:8000/book_reviews/reviews/change_review/${reviews.id}`, requestData,
+             {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                }
+            });
+            console.log("Requested review data in Review Card: ", requestData)
+            console.log("Rsponse status code in Review Card:", response.data.status_code)
+            if (response.data.status_code === 200) {
+                console.log(response.data)
+                message.success('Обзор успешно обновлен');
+                setIsEditing(false);
+                onUpdateReview(reviews.id, requestData); // Обновление состояния в родительском компоненте
+            }
+        } catch (error) {
+            message.error('Ошибка при обновлении обзора');
+            console.error('Ошибка при обновлении обзора:', error.response ? error.response.data : error.message);
+        }
+    };
+
+    const handleDelete = async () => {
+        Modal.confirm({
+            title: 'Подтверждение удаления',
+            content: 'Вы уверены, что хотите удалить этот обзор?',
+            okText: 'Да',
+            okType: 'danger',
+            cancelText: 'Нет',
+            onOk: async () => {
+                try {
+                    const response = await axios.delete(`http://127.0.0.1:8000/book_reviews/reviews/delete_review/${reviews.id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                        }
+                    });
+
+                    if (response.data.status_code === 200) {
+                        message.success('Обзор успешно удален');
+                        setIsEditing(false);
+                        onUpdateReview(reviews.id, {});
+                    }
+                } catch (error) {
+                    message.error('Ошибка при удалении обзора');
+                    console.error('Ошибка при удалении обзора:', error.response ? error.response.data : error.message);
+                }
+            }
+        });
+    };
+
     return (
         <div id='card'>
             <Card
                 title={
                     <div id='card-title'>
-                        {localStorage.getItem('user_access_token') && reviews.created_by === user?.id && (
+                        {isProfilePage && localStorage.getItem('user_access_token') && reviews.created_by === user?.id && (
                             <div id="card-update">
                                 <Button
                                     type="link"
                                     icon={<EditOutlined />}
-                                    onClick={() => console.log('Изменить обзор')}
+                                    onClick={handleEditClick}
                                     size="large"
                                 />
                             </div>
@@ -50,10 +124,10 @@ function ReviewCard(props) {
                         <div id="book-info">
                             <h3 id="text">{reviews.reviewed_book_author_name} || {reviews.reviewed_book_name}</h3>
                             <div className="tree-container" id="text">
-                              <Tree
-                                treeData={treeData}
-                                className="custom-tree"
-                              />
+                                <Tree
+                                    treeData={treeData}
+                                    className="custom-tree"
+                                />
                             </div>
                         </div>
                         <p>Автор обзора: {reviews.user?.name || user.name}</p>
@@ -62,7 +136,25 @@ function ReviewCard(props) {
                 }
             >
                 <div id='card-content'>
-                    <p>{reviews.review_body}</p>
+                    {isEditing ? (
+                        <div className="edit-review-container">
+                            <Input
+                                placeholder="Заголовок обзора"
+                                value={formData.reviewTitle}
+                                onChange={(e) => setFormData({ ...formData, reviewTitle: e.target.value })}
+                            />
+                            <Input.TextArea
+                                placeholder="Тело обзора"
+                                value={formData.reviewBody}
+                                onChange={(e) => setFormData({ ...formData, reviewBody: e.target.value })}
+                            />
+                            <Button onClick={handleSave}>Сохранить</Button>
+                            <Button onClick={handleCancel}>Отменить</Button>
+                            <Button type="danger" icon={<DeleteOutlined />} onClick={handleDelete}>Удалить</Button>
+                        </div>
+                    ) : (
+                        <p>{reviews.review_body}</p>
+                    )}
                 </div>
             </Card>
         </div>
