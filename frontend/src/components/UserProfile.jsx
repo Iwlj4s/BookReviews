@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Descriptions, Button, Spin, Input, message } from 'antd';
-import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import '../index.css';
 import ReviewCard from './ReviewCard.jsx';
 
@@ -11,7 +11,6 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         console.log("can't get user in UserProfile");
         return <div id="spin"><Spin /> </div>;
     }
-
     const navigate = useNavigate();
     const [reviews, setReviews] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
@@ -20,6 +19,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         email: user?.email || null,
         password: ''
     });
+    const [searchText, setSearchText] = useState('');
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -32,6 +33,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 password: ''
             });
             setReviews(user.reviews || []);
+            console.log("Users Reviews: ", user.reviews)
         }
     }, [user]);
 
@@ -116,12 +118,14 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
                 localStorage.removeItem('user_access_token');
                 navigate('/sign_in');
+                setIsEditing(false);
 
             } else {
                 console.log("Data changed")
                 message.success('Данные обновлены успешно!');
                 const updatedUser = await fetchUserData();
                 onUpdateUserData(updatedUser);
+                setIsEditing(false);
             }
         } catch (err) {
             console.error('Ошибка при сохранении данных:', err.response ? err.response.data : err.message);
@@ -134,6 +138,20 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     const addReview = async () => {
         console.log("Add review func")
     };
+
+    const handleSearchChange = (e) => {
+        setSearchText(e.target.value);
+    };
+
+    const filteredReviews = reviews.filter(review => {
+        if (!searchText) return true;
+        return (
+            (review.reviewed_book_author_name && review.reviewed_book_author_name.toLowerCase().includes(searchText.toLowerCase())) ||
+            (review.reviewed_book_name && review.reviewed_book_name.toLowerCase().includes(searchText.toLowerCase())) ||
+            (review.review_title && review.review_title.toLowerCase().includes(searchText.toLowerCase()))
+        );
+    });
+
 
     return (
         <>
@@ -186,16 +204,28 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
             <div id="title">
                 <h1>Мои обзоры</h1>
-                <Button
-                    type="link"
-                    icon={<PlusCircleOutlined />}
-                    onClick={addReview}
-                    size="large"
+                <div id="new-review-btn">
+                    <Button
+                        type="link"
+                        icon={<PlusCircleOutlined />}
+                        onClick={addReview}
+                        size="large"
+                    />
+                </div>
+            </div>
+            <div id="user-reviews-search">
+                <Input
+                    placeholder="Поиск по обзорам"
+                    value={searchText}
+                    onChange={handleSearchChange}
+                    prefix={<SearchOutlined />}
                 />
             </div>
             <div id="cards-container">
-                {reviews.length > 0 ? (
-                    reviews.map((userReviews, index) => (
+                {reviews.length === 0 ? (
+                    <div>У вас пока нет обзоров</div>
+                ) : filteredReviews.length > 0 ? (
+                    filteredReviews.map((userReviews, index) => (
                         <ReviewCard key={index}
                                     reviews={userReviews}
                                     user={user}
@@ -203,7 +233,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                                     onUpdateReview={updateReview}/>
                     ))
                 ) : (
-                    "Пока что обзоров нет"
+                    <div>По таким фильтрам обзоры не найдены</div> // Сообщение, если обзоры не найдены по фильтру
                 )}
             </div>
         </>

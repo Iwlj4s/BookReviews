@@ -41,7 +41,7 @@ const ProfilePage = () => {
                 setUser(response.data);
 
             } catch (err) {
-            if (err.response && err.response.status === 401) { // Добавлена проверка на 401
+            if (err.response && err.response.status === 401) {
                 message.error('Токен недействителен');
                 navigate("/sign_in");
             } else {

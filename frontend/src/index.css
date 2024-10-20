@@ -174,12 +174,22 @@ li{
     text-align: left
 }
 
-#title{
+#title {
     text-align: center;
     padding: 15px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+}
+
+#user-reviews-search {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #user-info-container {
@@ -209,6 +219,10 @@ li{
 
 #logout_button {
     margin-left: 20px; /* Установите желаемый отступ */
+}
+
+#new-review-btn{
+    margin-left: 20px;
 }
 
 .user-info-header {

@@ -33,9 +33,9 @@ function BookCard(props) {
                         <div id="title-and-img">
                             <img src={books.book_cover} alt='img' width="80" />
                             <h1 id="text">{books.book_name}</h1>
-                            <h1 id="text">{books.author_name}</h1>
                         </div>
                         <div id="book-info">
+                            <h3 id="text">{books.author.name}</h3>
                             <div className="tree-container" id="text">
                               <Tree
                                 treeData={treeData}
