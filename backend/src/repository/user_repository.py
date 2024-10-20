@@ -86,9 +86,12 @@ async def login(request: shema.UserSignIn,
 async def get_current_user(db: AsyncSession = Depends(get_db),
                            token: str = Depends(get_token)):
     user_id = verify_token(token=token)
-
+    if not user_id:
+        return {
+            'message': "Token not found",
+            'status_code': 401,
+        }
     user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
-    CheckHTTP401Unauthorized(founding_item=user, text="Пользователь не найден")
 
     return user
 
