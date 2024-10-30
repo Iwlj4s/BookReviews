@@ -28,9 +28,11 @@ async def create_review(request: shema.Review,
                                                book=book,
                                                author=author,
                                                db=db)
+
     await db.refresh(new_review)
     await db.refresh(user)
     await db.refresh(author)
+    await db.refresh(book)
     return {
         'message': "Обзор добавлен успешно",
         'status_code': 200,
@@ -38,10 +40,11 @@ async def create_review(request: shema.Review,
             'Created by': user.id,
             'book_cover': new_review.reviewed_book_cover,
             'book_name': new_review.reviewed_book_name,
+            'book_description': book.book_description,
             'author_id': author.id,
             'author_name': new_review.reviewed_book_author_name,
             'review_title': new_review.review_title,
-            'review_body': new_review.review_body
+            'review_body': new_review.review_body,
         }
     }
 

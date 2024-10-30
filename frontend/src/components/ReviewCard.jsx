@@ -4,10 +4,11 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 
+// ADD FIXED CARD HEIGHT and opening review body
 function ReviewCard(props) {
     const { reviews, user, isProfilePage, onUpdateReview } = props;
 
-    const bookDescription = reviews.book.book_description
+    const bookDescription = reviews?.book?.book_description || reviews?.book_description || "Описание отсутствует";
 
     const [treeData, setTreeData] = useState([])
 
@@ -117,12 +118,11 @@ function ReviewCard(props) {
                             </div>
                         )}
                         <div id="title-and-img">
-                            <img src={reviews.reviewed_book_cover} alt='img' width="80" />
+                            <img src={reviews.reviewed_book_cover || reviews.book_cover} alt='img' width="80" />
                             <h1 id="text">{reviews.review_title}</h1>
-                            <h3>{reviews.author_name}</h3>
                         </div>
                         <div id="book-info">
-                            <h3 id="text">{reviews.reviewed_book_author_name} || {reviews.reviewed_book_name}</h3>
+                            <h3 id="text">{reviews.reviewed_book_author_name || reviews.author_name} || {reviews.reviewed_book_name || reviews.book_name}</h3>
                             <div className="tree-container" id="text">
                                 <Tree
                                     treeData={treeData}

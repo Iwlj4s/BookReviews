@@ -90,4 +90,3 @@ async def get_users_for_user(db: AsyncSession = Depends(get_db)):
             'user_email': user.email,
             'reviews': user.reviews
         }
-

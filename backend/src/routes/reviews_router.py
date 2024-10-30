@@ -24,18 +24,10 @@ async def get_reviews(db: AsyncSession = Depends(get_db)):
 
 @reviews_router.post("/create_review/", tags=["reviews"])
 async def create_review(response: Response,
-                        book_name: str,
-                        book_author_name: str,
-                        review_title: str,
-                        review_body: str,
+                        request: shema.Review,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user)):
-
-    request = shema.Review(reviewed_book_name=book_name,
-                           reviewed_book_author_name=book_author_name,
-                           review_title=review_title,
-                           review_body=review_body)
-
+    print("Request from back: ", request)
     return await reviews_repository.create_review(request=request, response=response, user=user, db=db)
 
 

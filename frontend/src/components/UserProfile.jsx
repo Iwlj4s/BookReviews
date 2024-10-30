@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Card, Descriptions, Button, Spin, Input, message } from 'antd';
+import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin as AntdSpin, Form } from 'antd';
 import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import '../index.css';
 import ReviewCard from './ReviewCard.jsx';
+
+const { Option } = Select;
 
 function UserProfile({ user, onLogout, onUpdateUserData }) {
     if (!user) {
@@ -12,14 +14,36 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         return <div id="spin"><Spin /> </div>;
     }
     const navigate = useNavigate();
+
     const [reviews, setReviews] = useState([]);
+
     const [isEditing, setIsEditing] = useState(false);
+
     const [formData, setFormData] = useState({
         name: user?.name || null,
         email: user?.email || null,
         password: ''
     });
+
     const [searchText, setSearchText] = useState('');
+
+    const [reviewFormData, setReviewFormData] = useState({
+        reviewTitle: '',
+        author: '',
+        book: '',
+        reviewBody: ''
+    });
+
+    const [books, setBooks] = useState([]);
+    const [authors, setAuthors] = useState([]);
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [reviewForm, setReviewForm] = useState({
+        review_title: '',
+        reviewed_book_name: '',
+        reviewed_book_author_name: '',
+        review_body: ''
+    });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -37,12 +61,28 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         }
     }, [user]);
 
+    useEffect(() => {
+        const fetchBooksAndAuthors = async () => {
+            try {
+                const booksResponse = await axios.get('http://127.0.0.1:8000/book_reviews/books/books_list/');
+                const authorsResponse = await axios.get('http://127.0.0.1:8000/book_reviews/authors/authors_list/');
+                setBooks(booksResponse.data);
+                setAuthors(authorsResponse.data);
+                console.log(booksResponse.data); // Добавьте это для отладки
+            } catch (error) {
+                message.error('Ошибка при загрузке книг и авторов.');
+                console.error(error);
+            }
+        };
+
+        fetchBooksAndAuthors();
+    }, []);
+
+
     const updateReview = (reviewId, updatedData) => {
         if (Object.keys(updatedData).length === 0) {
-            // Удаление обзора из списка
             setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
         } else {
-            // Обновление обзора в списке
             setReviews((prevReviews) =>
                 prevReviews.map((review) =>
                     review.id === reviewId ? { ...review, ...updatedData } : review
@@ -58,14 +98,14 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                 }
             });
-            if (response.status === 401) { // Изменено с response.data.status_code на response.status
+            if (response.status === 401) {
                 message.error('Токен недействителен');
                 navigate("/sign_in");
                 return;
             }
             return response.data;
         } catch (error) {
-            if (error.response && error.response.status === 401) { // Добавлена проверка на 401
+            if (error.response && error.response.status === 401) {
                 message.error('Токен недействителен');
                 navigate("/sign_in");
             } else {
@@ -135,10 +175,6 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         }
     };
 
-    const addReview = async () => {
-        console.log("Add review func")
-    };
-
     const handleSearchChange = (e) => {
         setSearchText(e.target.value);
     };
@@ -151,6 +187,61 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
             (review.review_title && review.review_title.toLowerCase().includes(searchText.toLowerCase()))
         );
     });
+
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCancelModal = () => {
+        setIsModalVisible(false);
+        setReviewForm({
+            review_title: '',
+            reviewed_book_name: '',
+            reviewed_book_author_name: '',
+            review_body: ''
+        });
+    };
+
+    const handleAddReview = async () => {
+        const { review_title, reviewed_book_name, reviewed_book_author_name, review_body } = reviewForm;
+
+        if (!review_title || !reviewed_book_name || !reviewed_book_author_name || !review_body) {
+            message.error('Пожалуйста, заполните все поля.');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/book_reviews/reviews/create_review/', reviewForm, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data.status_code === 200) {
+                console.log("Response: ", response.data)
+                message.success('Обзор добавлен успешно!');
+                const newReview = {
+                    id: response.data.data.id,
+                    book_cover: response.data.data.book_cover,
+                    book_name: response.data.data.book_name,
+                    author_name: response.data.data.author_name,
+                    review_title: response.data.data.review_title,
+                    review_body: response.data.data.review_body,
+                    book_description: response.data.data.book_description,
+                    created_by: response.data.data['Created by'],
+                    updated: new Date().toISOString()
+                };
+
+                setReviews((prev) => [...prev, newReview]);
+                handleCancelModal();
+                handleCancel();
+            }
+        } catch (error) {
+            message.error('Ошибка при добавлении обзора.');
+            console.error(error);
+        }
+    };
 
 
     return (
@@ -208,11 +299,69 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                     <Button
                         type="link"
                         icon={<PlusCircleOutlined />}
-                        onClick={addReview}
+                        onClick={showModal}
                         size="large"
                     />
                 </div>
             </div>
+
+            <div id="add-review-modal">
+                <Modal
+                    title="Добавить обзор"
+                    visible={isModalVisible}
+                    onCancel={handleCancelModal}
+                    footer={[
+                        <Button key="back" onClick={handleCancelModal}>
+                            Отмена
+                        </Button>,
+                        <Button key="submit" type="primary" onClick={handleAddReview}>
+                            Добавить
+                        </Button>,
+                    ]}
+                >
+                    <Form layout="vertical">
+                        <Form.Item label="Заголовок обзора">
+                            <Input
+                                value={reviewForm.review_title}
+                                onChange={(e) => setReviewForm({ ...reviewForm, review_title: e.target.value })}
+                            />
+                        </Form.Item>
+                        <Form.Item label="Выбор книги">
+                            <Select
+                                showSearch
+                                onChange={(value) => setReviewForm({ ...reviewForm, reviewed_book_name: value })}
+                                placeholder="Выберите книгу"
+                            >
+                                {books.map(book => (
+                                    <Select.Option key={book.id} value={book.book_name}>
+                                        {book.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item label="Выбор автора">
+                            <Select
+                                showSearch
+                                onChange={(value) => setReviewForm({ ...reviewForm, reviewed_book_author_name: value })}
+                                placeholder="Выберите автора"
+                            >
+                                {authors.map(author => (
+                                    <Select.Option key={author.id} value={author.name}>
+                                        {author.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item label="Обзор">
+                            <Input.TextArea
+                                value={reviewForm.review_body}
+                                onChange={(e) => setReviewForm({ ...reviewForm, review_body: e.target.value })}
+                            />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            </div>
+
             <div id="user-reviews-search">
                 <Input
                     placeholder="Поиск по обзорам"
@@ -233,7 +382,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                                     onUpdateReview={updateReview}/>
                     ))
                 ) : (
-                    <div>По таким фильтрам обзоры не найдены</div> // Сообщение, если обзоры не найдены по фильтру
+                    <div>По таким фильтрам обзоры не найдены</div>
                 )}
             </div>
         </>
