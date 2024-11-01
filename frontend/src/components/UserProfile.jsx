@@ -36,6 +36,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
     const [books, setBooks] = useState([]);
     const [authors, setAuthors] = useState([]);
+    const [selectedAuthor, setSelectedAuthor] = useState(null);
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [reviewForm, setReviewForm] = useState({
@@ -61,23 +62,20 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         }
     }, [user]);
 
-    useEffect(() => {
-        const fetchBooksAndAuthors = async () => {
-            try {
-                const booksResponse = await axios.get('http://127.0.0.1:8000/book_reviews/books/books_list/');
-                const authorsResponse = await axios.get('http://127.0.0.1:8000/book_reviews/authors/authors_list/');
-                setBooks(booksResponse.data);
-                setAuthors(authorsResponse.data);
-                console.log(booksResponse.data); // Добавьте это для отладки
-            } catch (error) {
-                message.error('Ошибка при загрузке книг и авторов.');
-                console.error(error);
-            }
-        };
+    const fetchBooksAndAuthors = async () => {
+        try {
+            const booksResponse = await axios.get('http://127.0.0.1:8000/book_reviews/books/books_list/');
+            const authorsResponse = await axios.get('http://127.0.0.1:8000/book_reviews/authors/authors_list/');
+            setBooks(booksResponse.data);
+            setAuthors(authorsResponse.data);
+            console.log("Fetched books", booksResponse.data);
+        } catch (error) {
+            message.error('Ошибка при загрузке книг и авторов.');
+            console.error(error);
+        }
+    };
 
-        fetchBooksAndAuthors();
-    }, []);
-
+    const filteredBooks = selectedAuthor ? books.filter(book => book.author.name === selectedAuthor) : books;
 
     const updateReview = (reviewId, updatedData) => {
         if (Object.keys(updatedData).length === 0) {
@@ -188,8 +186,9 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         );
     });
 
-    const showModal = () => {
+    const showModal = async () => {
         setIsModalVisible(true);
+        await fetchBooksAndAuthors();
     };
 
     const handleCancelModal = () => {
@@ -222,6 +221,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 console.log("Response: ", response.data)
                 message.success('Обзор добавлен успешно!');
                 const newReview = {
+                    review_id: response.data.data.review_id,
                     id: response.data.data.id,
                     book_cover: response.data.data.book_cover,
                     book_name: response.data.data.book_name,
@@ -326,32 +326,37 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                                 onChange={(e) => setReviewForm({ ...reviewForm, review_title: e.target.value })}
                             />
                         </Form.Item>
+                        <Form.Item label="Выбор автора">
+                            <Select
+                                showSearch
+                                onChange={(value) => {
+                                    setReviewForm({ ...reviewForm, reviewed_book_author_name: value });
+                                    setSelectedAuthor(value);
+                                }}
+                                placeholder="Выберите автора"
+                            >
+                                {authors.map(author => (
+                                    <Option key={author.id} value={author.name}>
+                                        {author.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+
                         <Form.Item label="Выбор книги">
                             <Select
                                 showSearch
                                 onChange={(value) => setReviewForm({ ...reviewForm, reviewed_book_name: value })}
                                 placeholder="Выберите книгу"
                             >
-                                {books.map(book => (
-                                    <Select.Option key={book.id} value={book.book_name}>
-                                        {book.name}
-                                    </Select.Option>
+                                {filteredBooks.map(book => (
+                                    <Option key={book.id} value={book.book_name}>
+                                        {book.book_name}
+                                    </Option>
                                 ))}
                             </Select>
                         </Form.Item>
-                        <Form.Item label="Выбор автора">
-                            <Select
-                                showSearch
-                                onChange={(value) => setReviewForm({ ...reviewForm, reviewed_book_author_name: value })}
-                                placeholder="Выберите автора"
-                            >
-                                {authors.map(author => (
-                                    <Select.Option key={author.id} value={author.name}>
-                                        {author.name}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+
                         <Form.Item label="Обзор">
                             <Input.TextArea
                                 value={reviewForm.review_body}
