@@ -22,7 +22,7 @@ function ReviewsPage(){
        }, []);
 
     if (!reviews) {
-           return <div id="spin"><Spin size="large" /> </div>;
+           return <div id="spin">Пока что обзоров нет</div>;
        }
 
     const handleSearchChange = (e) => {

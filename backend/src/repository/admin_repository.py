@@ -88,8 +88,15 @@ async def add_author(response: Response,
                      request: shema.Author,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
+    author_already_in_db = await AuthorDAO.author_by_name(db=db, author_name=str(request.name.title()))
+    if author_already_in_db:
+        return {'message': "Автор уже есть в БД!",
+                'status_code': 409
+                }
+
     new_author = await AuthorDAO.add_author(request=request, db=db)
     await db.refresh(new_author)
+
     return {
         'message': "Автор добавлен успешно",
         'status_code': 200,
@@ -185,17 +192,35 @@ async def change_review(review_id: int,
 
 
 # Books #
-async def add_book(request: shema.Book,
+async def add_book(response: Response,
+                   request: shema.Book,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
-    author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name))
-    CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
+    author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name.title()))
+    print(f"Author in back: {author}")
+    if not author:
+        return {
+            'message': "Такой автор не найден",
+            'status_code': 404
+        }
 
-    book_cover = await get_book_cover(book_name=request.book_name, author_name=author.name)
+    if await BookDAO.get_book_by_book_name(book_name=str(request.book_name.capitalize()),
+                                           author_id=int(author.id), db=db):
+        return {
+            'message': "Такая книга уже добавлена",
+            'status_code': 404
+        }
+
+    book_cover = await get_book_cover(book_name=request.book_name.capitalize(), author_name=author.name.title())
     print(book_cover)
+
     if book_cover is None:
-        return CheckHTTP404NotFound(book_cover, text="Обложка для книги не найдена,"
-                                                     " попробуйте изменить написание названия книги")
+        return {
+            'message': "Обложка для книги не найдена,"
+                       "попробуйте изменить написание названия книги",
+            'status_code': 404
+        }
+
     new_book = await BookDAO.add_book(request=request,
                                       book_cover=book_cover,
                                       author=author,

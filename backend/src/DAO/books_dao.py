@@ -27,6 +27,15 @@ class BookDAO:
         return books.scalars().all()
 
     @classmethod
+    async def get_book_by_book_name(cls, book_name: str, author_id: int, db: AsyncSession):
+        query = select(Book).where(
+            (Book.author_id == author_id) & (Book.book_name == book_name.capitalize())
+        )
+        book = await db.execute(query)
+
+        return book.scalars().first()
+
+    @classmethod
     async def add_book(cls, request: shema.Book, book_cover, author, db: AsyncSession):
         new_book = models.Book(
             book_cover=book_cover,

@@ -18,9 +18,6 @@ function HomePage() {
        fetchReviews();
    }, []);
 
-   if (!reviews) {
-       return <div id="spin"><Spin size="large" /> </div>;
-   }
 
    return (
        <>
@@ -42,9 +39,16 @@ function HomePage() {
                <p id="explore-title-subtitle">Мы рады видеть вас в нашем сообществе читателей и надеемся, что вы найдете здесь вдохновение для новых литературных открытий!</p>
            </div>
 
-           <div id="card-container">
-               <ReviewCard reviews={reviews} />
-           </div>
+            {reviews ? (
+               <div id="card-container">
+                   <ReviewCard reviews={reviews} />
+               </div>
+
+                ): (
+                     <div id="card-container">
+                        Пока что обзоров нет
+                     </div>
+            )}
        </>
    );
 }

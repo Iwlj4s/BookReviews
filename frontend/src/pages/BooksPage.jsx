@@ -18,7 +18,7 @@ function BooksPage (){
     }, []);
 
     if (!books) {
-       return <div id="spin"><Spin size="large" /> </div>;
+       return <div id="spin">Пока что книг нет </div>;
     }
 
     const handleSearchChange = (e) => {

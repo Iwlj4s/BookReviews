@@ -314,3 +314,18 @@ li{
     width: 350px;
     height: auto;
 }
+
+#admin-stuff-container{
+    width: auto;
+    height: auto;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 30px;
+    padding: 20px;
+}
+
+#admin-func-title{
+    margin-bottom: 20px;
+}

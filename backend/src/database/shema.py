@@ -1,5 +1,5 @@
 from fastapi import Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Union
 
 
@@ -44,12 +44,24 @@ class ChangeReview(BaseModel):
 class Author(BaseModel):
     name: Union[str, None] = Field(default=None, title="Имя автора")
 
+    @validator('name')
+    def capitalize_name(cls, v):
+        if v:
+            return v.title()
+        return v
+
 
 # Book #
 class Book(BaseModel):
-    book_name: Union[str, None] = Field(default=None, title="Название книги")
     book_author_name: Union[str, None] = Field(default=None, title="Имя автора")
+    book_name: Union[str, None] = Field(default=None, title="Название книги")
     book_description: Union[str, None] = Field(default=None, title="Описание книги")
+
+    @validator('book_name')
+    def capitalize_name(cls, v):
+        if v:
+            return v.capitalize()
+        return v
 
 
 # Token #

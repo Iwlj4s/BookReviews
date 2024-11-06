@@ -5,6 +5,7 @@ import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin a
 import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import '../index.css';
 import ReviewCard from './ReviewCard.jsx';
+import AdminStuff from './AdminStuff.jsx';
 
 const { Option } = Select;
 
@@ -246,6 +247,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
     return (
         <>
+            {/* User Info */}
             <div id="user-info-container">
                 <div id="user-info">
                     <div className="user-info-header">
@@ -257,6 +259,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                             size="large"
                         />
                     </div >
+
+                    {/* Edit User */}
                     {isEditing ? (
                         <div id="change-user-data">
                             <Input
@@ -293,6 +297,16 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 </div>
             </div>
 
+            {/* AdminStuff */}
+            {user.is_admin && (
+                   <div id="admin-stuff-container">
+                        {user.is_admin && (
+                            <AdminStuff user={user}/>
+                        )}
+                    </div>
+                )}
+
+            {/* My Reviews */}
             <div id="title">
                 <h1>Мои обзоры</h1>
                 <div id="new-review-btn">
@@ -305,6 +319,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 </div>
             </div>
 
+            {/* Add Review */}
             <div id="add-review-modal">
                 <Modal
                     title="Добавить обзор"
@@ -367,6 +382,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 </Modal>
             </div>
 
+            {/* Reviews Search */}
             <div id="user-reviews-search">
                 <Input
                     placeholder="Поиск по обзорам"
@@ -375,6 +391,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                     prefix={<SearchOutlined />}
                 />
             </div>
+
+            {/* Reviews Cards */}
             <div id="cards-container">
                 {reviews.length === 0 ? (
                     <div>У вас пока нет обзоров</div>
