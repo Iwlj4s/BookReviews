@@ -61,7 +61,7 @@ async def change_review(review_id: int,
     print("Review created by: ", review.created_by)
     print("User_id: ", user.id)
 
-    if review.created_by != user.id:
+    if (not user.is_admin) and (review.created_by != user.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="У Вас нет прав для изменения этого обзора")
 
     new_data = check_data_for_change_review(request=request, review=review)

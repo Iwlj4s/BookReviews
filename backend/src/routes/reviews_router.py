@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.database.database import get_db
 from backend.src.database.shema import User
 from backend.src.database import shema
-
+from backend.src.repository.admin_repository import get_current_admin_user
 
 from backend.src.repository.user_repository import get_current_user
 from backend.src.repository import reviews_repository
@@ -35,7 +35,7 @@ async def create_review(response: Response,
 async def change_review(review_id: int,
                         request: shema.ChangeReview,
                         db: AsyncSession = Depends(get_db),
-                        user: User = Depends(get_current_user)):
+                        user: User = Depends(get_current_user) or Depends(get_current_admin_user)):
 
     return await reviews_repository.change_review(review_id=int(review_id),
                                                   request=request,

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin as AntdSpin, Form } from 'antd';
 import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import '../index.css';
+import { updateReview } from '../utils/reviewsUtils.jsx'
 import ReviewCard from './ReviewCard.jsx';
 import AdminStuff from './AdminStuff.jsx';
 
@@ -78,17 +79,6 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
     const filteredBooks = selectedAuthor ? books.filter(book => book.author.name === selectedAuthor) : books;
 
-    const updateReview = (reviewId, updatedData) => {
-        if (Object.keys(updatedData).length === 0) {
-            setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
-        } else {
-            setReviews((prevReviews) =>
-                prevReviews.map((review) =>
-                    review.id === reviewId ? { ...review, ...updatedData } : review
-                )
-            );
-        }
-    };
 
     const fetchUserData = async () => {
         try {
@@ -172,6 +162,10 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleUpdateReview = (reviewId, updatedData) => {
+        updateReview(reviews, setReviews, reviewId, updatedData);
     };
 
     const handleSearchChange = (e) => {
@@ -402,7 +396,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                                     reviews={userReviews}
                                     user={user}
                                     isProfilePage={true}
-                                    onUpdateReview={updateReview}/>
+                                    setReviews={setReviews}/>
                     ))
                 ) : (
                     <div>По таким фильтрам обзоры не найдены</div>

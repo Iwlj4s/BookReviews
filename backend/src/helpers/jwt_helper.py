@@ -5,7 +5,7 @@ from backend.config import get_auth_data
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=30)  # TODO: change token's expire after testing
+    expire = datetime.now(timezone.utc) + timedelta(seconds=5)  # TODO: change token's expire after testing
     to_encode.update({"exp": expire})
 
     auth_data = get_auth_data()

@@ -1,14 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Spin, Input } from 'antd';
+import { Spin, Input, message } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import '../index.css';
 import ReviewCard from '../components/ReviewCard.jsx';
 
 
 function ReviewsPage(){
-    const [reviews, setReviews] = useState(null);
     const [searchText, setSearchText] = useState('');
+    const [user, setUser] = useState(null);
+    const [reviews, setReviews] = useState([]);
+
+    const [error, setError] = useState();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const token = localStorage.getItem('user_access_token');
+        if (!token) {
+            message.warning('Вы не зашли в аккаунт');
+            setLoading(false);
+            return;
+        }
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.status_code === 401) {
+                    message.warning('Вы не зашли в аккаунт');
+                    return;
+                }
+                setUser (response.data);
+            } catch (err) {
+                if (err.response && err.response.status === 401) {
+                    message.warning('Вы не зашли в аккаунт');
+                } else {
+                    console.error("Error fetching user data:", err);
+                    setError("Ошибка при загрузке данных пользователя");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
            const fetchReviews = async () => {
@@ -20,6 +57,14 @@ function ReviewsPage(){
 
            fetchReviews();
        }, []);
+
+   if (loading) {
+        return <Spin id="spin" />;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     if (!reviews) {
            return <div id="spin">Пока что обзоров нет</div>;
@@ -35,7 +80,7 @@ function ReviewsPage(){
             (review.reviewed_book_author_name && review.reviewed_book_author_name.toLowerCase().includes(searchText.toLowerCase())) ||
             (review.reviewed_book_name && review.reviewed_book_name.toLowerCase().includes(searchText.toLowerCase())) ||
             (review.review_title && review.review_title.toLowerCase().includes(searchText.toLowerCase())) ||
-            (review.user && review.user.name && review.user.name.toLowerCase().includes(searchText.toLowerCase())) // Фильтрация по имени пользователя
+            (review.user && review.user.name && review.user.name.toLowerCase().includes(searchText.toLowerCase()))
         );
     });
 
@@ -55,8 +100,12 @@ function ReviewsPage(){
             </div>
             <div id="cards-container">
                 {filteredReviews.length > 0 ? (
-                    filteredReviews.map((review, index) => (
-                        <ReviewCard key={index} reviews={review} />
+                    filteredReviews.map((userReviews, index) => (
+                        <ReviewCard key={index}
+                                    reviews={userReviews}
+                                    user={user}
+                                    isProfilePage={false}
+                                    setReviews={setReviews}/>
                     ))
                 ) : (
                     <div>По таким фильтрам обзоры не найдены</div>

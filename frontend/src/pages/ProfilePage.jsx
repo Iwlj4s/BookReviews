@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button, message } from 'antd';
+import { Button, message, Spin } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import '../index.css';
 import UserProfile from '../components/UserProfile.jsx';
+import { isAuthenticated, is401Error } from '../utils/authUtils';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -17,32 +18,28 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchUserData = async () => {
 
-            const token = localStorage.getItem('user_access_token');
-            if (!token) {
-                navigate("/sign_in");
-                return;
-            }
             try {
+                if (!isAuthenticated(navigate, "/sign_in")) return;
                 const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                     }
                 });
-                console.log("Status code profile page", response.status_code);
-                if (response.status === 401) {
-                    message.error('Токен недействителен');
-                    navigate("/sign_in");
-                    return;
-                }
+                if (!is401Error(navigate, "/sign_in")) return;
+
                 console.log("Полные данные пользователя:", response.data);
                 console.log("Тип данных пользователя:", typeof response.data);
                 console.log("Имя пользователя:", response.data.name);
                 console.log("Email пользователя:", response.data.email);
                 setUser(response.data);
+                setLoading(false);
+
 
             } catch (err) {
             if (err.response && err.response.status === 401) {
-                message.error('Токен недействителен');
+                console.log("error from err.response.status from profile page")
+                console.log("error response: ", err.response)
+                message.error(err.response.data.detail);
                 navigate("/sign_in");
             } else {
                 console.error("Error fetching user data:", err);
@@ -55,6 +52,10 @@ const ProfilePage = () => {
 
         fetchUserData();
     }, [navigate]);
+
+   if (loading) {
+        return <Spin id="spin" />;
+    }
 
     const handleLogout = async () => {
         try {

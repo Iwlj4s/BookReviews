@@ -1,0 +1,8 @@
+fastapi
+SQLAlchemy
+starlette
+passlib
+pydantic
+python-dotenv
+aiohttp
+beautifulsoup4
