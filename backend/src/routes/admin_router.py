@@ -173,13 +173,8 @@ async def delete_book(book_id: int,
 
 @admin_router.put("/book/change_book/{book_id}")
 async def change_book(book_id: int,
-                      new_book_name: str | None = None,
-                      new_book_description: str | None = None,
+                      request: shema.Book,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
-    request = shema.Book(
-        book_name=new_book_name,
-        book_description=new_book_description
-    )
 
     return await admin_repository.change_book(db=db, book_id=int(book_id), request=request, admin=admin)

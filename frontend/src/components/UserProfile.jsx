@@ -8,6 +8,9 @@ import { updateReview } from '../utils/reviewsUtils.jsx'
 import ReviewCard from './ReviewCard.jsx';
 import AdminStuff from './AdminStuff.jsx';
 
+import { isAuthenticated, is401Error } from '../utils/authUtils';
+
+
 const { Option } = Select;
 
 function UserProfile({ user, onLogout, onUpdateUserData }) {
@@ -82,6 +85,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
     const fetchUserData = async () => {
         try {
+            if (!isAuthenticated(navigate, "/sign_in")) return;
             const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
@@ -105,6 +109,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     };
 
     const handleEditClick = () => {
+        if (!isAuthenticated(navigate, "/sign_in")) return;
         setIsEditing(true);
     };
 
@@ -118,6 +123,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     };
 
     const handleSave = async () => {
+        if (!isAuthenticated(navigate, "/sign_in")) return;
         setLoading(true);
         setError('');
 
@@ -197,6 +203,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     };
 
     const handleAddReview = async () => {
+        if (!isAuthenticated(navigate, "/sign_in")) return;
         const { review_title, reviewed_book_name, reviewed_book_author_name, review_body } = reviewForm;
 
         if (!review_title || !reviewed_book_name || !reviewed_book_author_name || !review_body) {

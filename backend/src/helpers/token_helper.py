@@ -7,11 +7,11 @@ from backend.config import get_auth_data
 
 
 def get_token(request: Request, response: Response):
-    token = request.cookies.get('user_access_token')  # Если вы используете куки
+    token = request.cookies.get('user_access_token')
     if not token:
-        token = request.headers.get('Authorization')  # Попробуйте получить токен из заголовков
+        token = request.headers.get('Authorization')
         if token:
-            token = token.split(" ")[1]  # Извлеките токен из заголовка Authorization
+            token = token.split(" ")[1]
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token not found')
 
