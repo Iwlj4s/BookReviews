@@ -114,15 +114,13 @@ async def change_author(response: Response,
                         db: AsyncSession = Depends(get_db)):
     author = await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=int(author_id))
     print(author.name)
-    if not author:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Автор не найден")
+    CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
 
     old_author_name = author.name
 
     print("Author name: ", author.name)
     reviews = await ReviewDAO.get_reviews_by_book_author_id(db=db, review_book_author_id=author.id)
-    if not reviews:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Обзор не найден")
+    CheckHTTP404NotFound(founding_item=author, text="Обзоры не найдены")
 
     author_data, review_data = check_data_for_change_author(request=request, author=old_author_name, reviews=reviews)
     await AuthorDAO.change_author(db=db, author_id=author_id, data=author_data)

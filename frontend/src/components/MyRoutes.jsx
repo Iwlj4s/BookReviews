@@ -7,6 +7,7 @@ import BooksPage from "../pages/BooksPage.jsx"
 import SignInPage from "../pages/SignInPage.jsx"
 import SignUpPage from "../pages/SignUpPage.jsx"
 import ProfilePage from "../pages/ProfilePage.jsx"
+import AuthorsPage from "../pages/AuthorsPage.jsx"
 
 
 const MyRoutes = () => (
@@ -17,6 +18,7 @@ const MyRoutes = () => (
         <Route path="/sign_in" element={<SignInPage />} />
         <Route path="/sign_up" element={<SignUpPage />} />
         <Route path="/me" element={<ProfilePage />} />
+        <Route path="/authors_list" element={<AuthorsPage />} />
     </Routes>
 );
 

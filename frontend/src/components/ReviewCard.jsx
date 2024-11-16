@@ -42,14 +42,6 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
       setTreeData(data);
     }, [bookDescription]);
 
-     useEffect(() => {
-          const token = localStorage.getItem('user_access_token')
-          if (!token) {
-                message.error('Токен недействителен');
-                navigate("/reviews");
-                return;
-            }
-    });
 
     const handleUpdateReview = (reviewId, updatedData) => {
         updateReview(reviews, setReviews, reviewId, updatedData);

@@ -20,6 +20,7 @@ const Navigation = () => {
                     <li id="navbar-item"><NavLink to='/'>Главная</NavLink></li>
                     <li id="navbar-item"><NavLink to='/reviews'>Обзоры</NavLink></li>
                     <li id="navbar-item"><NavLink to='/books_list'>Книги</NavLink></li>
+                    <li id="navbar-item"><NavLink to='/authors_list'>Авторы</NavLink></li>
                 </ul>
                 <div id="right-side-items">
                     {isLoggedIn ? (

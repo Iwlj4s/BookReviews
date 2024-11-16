@@ -96,7 +96,7 @@ li{
     word-wrap: break-word;
     word-break: normal;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 0fr);
     gap: 10px;
     justify-content: center;
     align-items: center;
@@ -328,4 +328,21 @@ li{
 
 #admin-func-title{
     margin-bottom: 20px;
+}
+
+#card-authors{
+    margin: 10px;
+    width: 300px;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+}
+
+#cards-authors-container{
+    display: grid;
+    grid-template-columns: repeat(5, 0fr);
+
+    justify-content: center;
+    align-items: center;
+
+    margin-left: 0;
+    margin-right: 0;
 }

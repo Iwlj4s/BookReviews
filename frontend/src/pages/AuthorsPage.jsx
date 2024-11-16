@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Spin, Input, message } from 'antd';
+import { Spin, message, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import '../index.css';
-import ReviewCard from '../components/ReviewCard.jsx';
+import AuthorCard from '../components/AuthorCard.jsx';
 import { isAuthenticated, is401Error } from '../utils/authUtils';
 
-
-function ReviewsPage(){
+function AuthorsPage() {
     const navigate = useNavigate();
-    const [searchText, setSearchText] = useState('');
-    const [user, setUser] = useState(null);
-    const [reviews, setReviews] = useState([]);
 
-    const [error, setError] = useState();
+    const [searchText, setSearchText] = useState('');
+    const [user, setUser ] = useState(null);
+    const [authors, setAuthors] = useState([]);
+    const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-       if (!is401Error(navigate, "/reviews")) return;
         const token = localStorage.getItem('user_access_token');
+        if (!token) {
+            setLoading(false);
+            return;
+        }
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
@@ -47,71 +49,78 @@ function ReviewsPage(){
     }, []);
 
     useEffect(() => {
-           const fetchReviews = async () => {
-               const response = await axios.get('http://127.0.0.1:8000/book_reviews/reviews/');
-               setReviews(response.data);
+        if (!is401Error(navigate, "/authors_list")) return;
+    }, [navigate]);
 
-               console.log("Reviews: ", response.data)
-           };
+    useEffect(() => {
+        const fetchAuthors = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/book_reviews/authors/authors_list');
+                console.log("Authors: ", response.data)
+                setAuthors(response.data);
+                setLoading(false);
+            } catch (err) {
+                setError(err);
+                message.error("Failed to fetch authors");
+                setLoading(false);
+            }
+        };
+        fetchAuthors();
+    }, []);
 
-           fetchReviews();
-       }, []);
-
-   if (loading) {
-        return <Spin id="spin" />;
+    if (loading) {
+        return <Spin />;
     }
 
     if (error) {
         return <div>{error}</div>;
     }
 
-    if (!reviews) {
-           return <div id="spin">Пока что обзоров нет</div>;
-       }
+    if (!authors) {
+       return <div id="spin">Пока что авторов нет </div>;
+    }
 
     const handleSearchChange = (e) => {
         setSearchText(e.target.value);
     };
 
-    const filteredReviews = reviews.filter(review => {
+    const filteredAuthors = authors.filter(author => {
         if (!searchText) return true;
         return (
-            (review.reviewed_book_author_name && review.reviewed_book_author_name.toLowerCase().includes(searchText.toLowerCase())) ||
-            (review.reviewed_book_name && review.reviewed_book_name.toLowerCase().includes(searchText.toLowerCase())) ||
-            (review.review_title && review.review_title.toLowerCase().includes(searchText.toLowerCase())) ||
-            (review.user && review.user.name && review.user.name.toLowerCase().includes(searchText.toLowerCase()))
+            (author.name && author.name.toLowerCase().includes(searchText.toLowerCase()))
         );
     });
 
     return (
         <>
             <div id="title">
-                <h1>Обзоры пользователей</h1>
+                <h1>Авторы</h1>
             </div>
+
             <div id="user-reviews-search">
                 <Input
-                    placeholder="Поиск по обзорам"
+                    placeholder="Поиск по книгам"
                     value={searchText}
                     onChange={handleSearchChange}
                     prefix={<SearchOutlined />}
                     style={{ marginBottom: '20px', width: '100%' }}
                 />
             </div>
-            <div id="cards-container">
-                {filteredReviews.length > 0 ? (
-                    filteredReviews.map((userReviews, index) => (
-                        <ReviewCard key={index}
-                                    reviews={userReviews}
-                                    user={user}
-                                    isProfilePage={false}
-                                    setReviews={setReviews}/>
+
+             <div id="cards-authors-container">
+                 {filteredAuthors.length > 0 ? (
+                    filteredAuthors.map((author, index) => (
+                        <AuthorCard key={index}
+                        authors={author}
+                        setAuthors={setAuthors}
+                        user={user}/>
                     ))
                 ) : (
-                    <div>По таким фильтрам обзоры не найдены</div>
+                    <div> По таким фильтрам авторы не найдены </div>
                 )}
             </div>
         </>
     );
 }
 
-export default ReviewsPage;
+export default AuthorsPage;

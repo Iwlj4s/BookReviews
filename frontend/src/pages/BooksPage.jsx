@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Spin, Input } from 'antd';
+import { Spin, Input, message } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import '../index.css';
 import BookCard from '../components/BookCard.jsx';
@@ -18,7 +18,6 @@ function BooksPage (){
     useEffect(() => {
         const token = localStorage.getItem('user_access_token');
         if (!token) {
-            message.warning('Вы не зашли в аккаунт');
             setLoading(false);
             return;
         }

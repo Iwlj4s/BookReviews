@@ -128,13 +128,12 @@ async def delete_author(author_id: int,
     return await admin_repository.delete_author(db=db, author_id=author_id, admin=admin)
 
 
-@admin_router.put("/authors/change_author", tags=["admin"])
+@admin_router.put("/authors/change_author/{author_id}", tags=["admin"])
 async def change_author(response: Response,
                         author_id: int,
-                        new_name: str | None = None,
+                        request: shema.Author,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    request = shema.Author(name=new_name)
 
     return await admin_repository.change_author(response=response,
                                                 author_id=author_id,
