@@ -28,20 +28,24 @@ async def create_review(request: shema.Review,
                                                book=book,
                                                author=author,
                                                db=db)
+
     await db.refresh(new_review)
     await db.refresh(user)
     await db.refresh(author)
+    await db.refresh(book)
     return {
         'message': "Обзор добавлен успешно",
         'status_code': 200,
         'data': {
+            'review_id': new_review.id,
             'Created by': user.id,
             'book_cover': new_review.reviewed_book_cover,
             'book_name': new_review.reviewed_book_name,
+            'book_description': book.book_description,
             'author_id': author.id,
             'author_name': new_review.reviewed_book_author_name,
             'review_title': new_review.review_title,
-            'review_body': new_review.review_body
+            'review_body': new_review.review_body,
         }
     }
 
@@ -57,7 +61,7 @@ async def change_review(review_id: int,
     print("Review created by: ", review.created_by)
     print("User_id: ", user.id)
 
-    if review.created_by != user.id:
+    if (not user.is_admin) and (review.created_by != user.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="У Вас нет прав для изменения этого обзора")
 
     new_data = check_data_for_change_review(request=request, review=review)

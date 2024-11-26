@@ -25,7 +25,7 @@ from backend.src.helpers.user_helper import check_data_for_change_user
 from backend.src.repository.user_repository import get_current_user
 
 
-async def login_admin(request: shema.User, response, db: AsyncSession = Depends(get_db)):
+async def login_admin(request: shema.UserSignIn, response, db: AsyncSession = Depends(get_db)):
     user = await user_helper.take_access_token_for_user(db=db,
                                                         response=response,
                                                         request=request,
@@ -88,8 +88,15 @@ async def add_author(response: Response,
                      request: shema.Author,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
+    author_already_in_db = await AuthorDAO.author_by_name(db=db, author_name=str(request.name.title()))
+    if author_already_in_db:
+        return {'message': "Автор уже есть в БД!",
+                'status_code': 409
+                }
+
     new_author = await AuthorDAO.add_author(request=request, db=db)
     await db.refresh(new_author)
+
     return {
         'message': "Автор добавлен успешно",
         'status_code': 200,
@@ -107,15 +114,13 @@ async def change_author(response: Response,
                         db: AsyncSession = Depends(get_db)):
     author = await GeneralDAO.get_item_by_id(db=db, item=models.Author, item_id=int(author_id))
     print(author.name)
-    if not author:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Автор не найден")
+    CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
 
     old_author_name = author.name
 
     print("Author name: ", author.name)
     reviews = await ReviewDAO.get_reviews_by_book_author_id(db=db, review_book_author_id=author.id)
-    if not reviews:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Обзор не найден")
+    CheckHTTP404NotFound(founding_item=author, text="Обзоры не найдены")
 
     author_data, review_data = check_data_for_change_author(request=request, author=old_author_name, reviews=reviews)
     await AuthorDAO.change_author(db=db, author_id=author_id, data=author_data)
@@ -185,17 +190,35 @@ async def change_review(review_id: int,
 
 
 # Books #
-async def add_book(request: shema.Book,
+async def add_book(response: Response,
+                   request: shema.Book,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
-    author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name))
-    CheckHTTP404NotFound(founding_item=author, text="Автор не найден")
+    author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name.title()))
+    print(f"Author in back: {author}")
+    if not author:
+        return {
+            'message': "Такой автор не найден",
+            'status_code': 404
+        }
 
-    book_cover = await get_book_cover(book_name=request.book_name, author_name=author.name)
+    if await BookDAO.get_book_by_book_name(book_name=str(request.book_name.capitalize()),
+                                           author_id=int(author.id), db=db):
+        return {
+            'message': "Такая книга уже добавлена",
+            'status_code': 404
+        }
+
+    book_cover = await get_book_cover(book_name=request.book_name.capitalize(), author_name=author.name.title())
     print(book_cover)
+
     if book_cover is None:
-        return CheckHTTP404NotFound(book_cover, text="Обложка для книги не найдена,"
-                                                     " попробуйте изменить написание названия книги")
+        return {
+            'message': "Обложка для книги не найдена,"
+                       "попробуйте изменить написание названия книги",
+            'status_code': 404
+        }
+
     new_book = await BookDAO.add_book(request=request,
                                       book_cover=book_cover,
                                       author=author,

@@ -50,3 +50,9 @@ class AuthorDAO:
         query = select(Author).where(Author.id == book.author_id)
         author = await db.execute(query)
         return author.scalars().first()
+
+    @classmethod
+    async def author_by_name(cls, db: AsyncSession, author_name: str):
+        query = select(Author).where(Author.name == str(author_name))
+        author = await db.execute(query)
+        return author.scalars().first()

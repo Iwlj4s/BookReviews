@@ -111,10 +111,9 @@ async def admin_change_review(review_id: int,
 # Authors #
 @admin_router.post("/authors/add_author", tags=["admin"])
 async def add_author(response: Response,
-                     name: str,
+                     request: shema.Author,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
-    request = shema.Author(name=name)
 
     return await admin_repository.add_author(response=response,
                                              request=request,
@@ -129,13 +128,12 @@ async def delete_author(author_id: int,
     return await admin_repository.delete_author(db=db, author_id=author_id, admin=admin)
 
 
-@admin_router.put("/authors/change_author", tags=["admin"])
+@admin_router.put("/authors/change_author/{author_id}", tags=["admin"])
 async def change_author(response: Response,
                         author_id: int,
-                        new_name: str | None = None,
+                        request: shema.Author,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    request = shema.Author(name=new_name)
 
     return await admin_repository.change_author(response=response,
                                                 author_id=author_id,
@@ -145,18 +143,14 @@ async def change_author(response: Response,
 
 
 # Books #
-@admin_router.post("/books/add_book/", tags=["admin"])
-async def add_book(book_name: str,
-                   book_author_name: str,
-                   book_description: str,
+@admin_router.post("/books/add_book", tags=["admin"])
+async def add_book(response: Response,
+                   request: shema.Book,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
-    request = shema.Book(
-        book_name=str(book_name),
-        book_author_name=str(book_author_name),
-        book_description=str(book_description))
 
-    return await admin_repository.add_book(request=request,
+    return await admin_repository.add_book(response=response,
+                                           request=request,
                                            admin=admin,
                                            db=db)
 
@@ -178,13 +172,8 @@ async def delete_book(book_id: int,
 
 @admin_router.put("/book/change_book/{book_id}")
 async def change_book(book_id: int,
-                      new_book_name: str | None = None,
-                      new_book_description: str | None = None,
+                      request: shema.Book,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
-    request = shema.Book(
-        book_name=new_book_name,
-        book_description=new_book_description
-    )
 
     return await admin_repository.change_book(db=db, book_id=int(book_id), request=request, admin=admin)

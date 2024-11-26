@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -9,22 +5,122 @@
 
 }
 
-#card {
-    width: 570px;
+::selection {
+    background: #E6F4FF;
+}
+
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#navbar-ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+#right-side-items {
+    display: flex;
+    margin-right: 20px;
+}
+
+li{
+    text-decoration: none;
+    color: black;
+    border-bottom: none;
+}
+
+#navbar-container{
+    display: flex;
+    justify-content: center;
+    width: 100%;
     height: auto;
     box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+}
+
+
+#navbar-item {
+    display: inline;
     margin: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    color: black;
+    transition: border-bottom 0.1s ease;
+}
+
+#navbar-item:hover {
+    border-bottom: 2px solid black;
+}
+
+#navbar-item a {
+    color: black;
+    text-decoration: none;
+}
+
+#spin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+#card {
+    width: auto;
+    height: auto;
+
+    max-width: 570px;
+    min-width: 570px;
+
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+
+    margin: 10px;
+
     word-wrap: break-word;
     word-break: normal;
+}
+
+
+#card-update{
+    display: flex;
+    justify-content: right;
+    padding-top: 5px;
+}
+
+#cards-container{
+    word-wrap: break-word;
+    word-break: normal;
+    display: grid;
+    grid-template-columns: repeat(3, 0fr);
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
 }
 
 
 #card-container {
     word-wrap: break-word;
     word-break: normal;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    display: flex;
+
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}
+
+#card-content{
+    font-size: 18px;
+}
+
+.edit-review-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Устанавливаем отступы между элементами */
 }
 
 #title-and-img{
@@ -49,11 +145,204 @@
 
 }
 
+#card-books{
+    margin: 10px;
+    width: 500px;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+}
+
 #book-info {
     word-break: break-all;
     white-space: normal;
+    padding: 20px;
 }
 
-#card-content{
+
+#last-record-title{
+    text-align: center;
+}
+
+#explore-title{
+    text-align: center;
+}
+
+#explore-title-subtitle{
     font-size: 18px;
+}
+
+#user-features{
+    text-align: center;
+}
+
+#user-features-ul{
+  display: inline-block
+}
+
+#user-features-item{
+    text-align: left
+}
+
+#title {
+    text-align: center;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#user-reviews-search {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#user-info-container {
+    width: 650px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+}
+
+#profile-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#logout_button {
+    margin-left: 20px; /* Установите желаемый отступ */
+}
+
+#new-review-btn{
+    margin-left: 20px;
+}
+
+.user-info-header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info-header h2 {
+    margin: 0;
+    text-align: center;
+
+}
+
+#user-info{
+    text-align: center;
+}
+
+#change-user-data{
+    padding: 5px;
+    * {
+        margin: 3px;
+    }
+}
+#sign-in-form-error-alert{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 350px;
+    height: auto;
+
+}
+
+#sign-in-form-container{
+    width: 400px;
+    height: auto;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 10%;
+
+}
+
+
+#sign-in-form{
+    padding: 10px;
+}
+
+#register-now-link{
+    display: flex;
+    padding-top: 15px;
+}
+
+#sign-up-form-container{
+    width: 400px;
+    height: auto;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 10%;
+
+}
+
+
+#sign-up-form{
+    padding: 10px;
+}
+
+#log-in-now-link{
+    display: flex;
+    padding-top: 15px;
+}
+
+#sign-up-form-error-alert{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 350px;
+    height: auto;
+}
+
+#admin-stuff-container{
+    width: auto;
+    height: auto;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 30px;
+    padding: 20px;
+}
+
+#admin-func-title{
+    margin-bottom: 20px;
+}
+
+#card-authors{
+    margin: 10px;
+    width: 300px;
+    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+}
+
+#cards-authors-container{
+    display: grid;
+    grid-template-columns: repeat(5, 0fr);
+
+    justify-content: center;
+    align-items: center;
+
+    margin-left: 0;
+    margin-right: 0;
 }

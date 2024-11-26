@@ -19,24 +19,17 @@ users_router = APIRouter(
 
 
 @users_router.post("/sign_up", status_code=201, tags=["users"])
-async def sign_up(user_name: str,
-                  user_email: str,
-                  user_password: str,
+async def sign_up(request: shema.UserSignUp,
                   response: Response,
                   db: AsyncSession = Depends(get_db)):
-    request = shema.User(name=user_name,
-                         email=user_email,
-                         password=user_password)
+
     return await user_repository.sign_up(request, response, db)
 
 
 @users_router.post("/sign_in", status_code=200, tags=["users"])
-async def sign_in(user_email: str,
-                  user_password: str,
+async def sign_in(request: shema.UserSignIn,
                   response: Response,
                   db: AsyncSession = Depends(get_db)):
-    request = shema.User(email=user_email,
-                         password=user_password)
     return await user_repository.login(request, response, db)
 
 
@@ -46,7 +39,7 @@ async def logout(response: Response):
     return {'message': 'Пользователь успешно вышел из системы'}
 
 
-@users_router.post("/me/", status_code=200, tags=["users"])
+@users_router.get("/me/", status_code=200, tags=["users"])
 async def get_me(response: Response,
                  user_data: User = Depends(get_current_user)):
     return user_data
@@ -54,14 +47,9 @@ async def get_me(response: Response,
 
 @users_router.put("/change_me/", tags=["users"])
 async def change_me(response: Response,
-                    new_user_name: str | None = None,
-                    new_user_email: str | None = None,
-                    new_user_password: str | None = None,
+                    request: shema.User,
                     db: AsyncSession = Depends(get_db),
                     user_data: User = Depends(get_current_user)):
-    request = shema.User(name=new_user_name,
-                         email=new_user_email,
-                         password=new_user_password)
 
     return await user_repository.change_current_user(request, db, response, user_data)
 
@@ -102,4 +90,3 @@ async def get_users_for_user(db: AsyncSession = Depends(get_db)):
             'user_email': user.email,
             'reviews': user.reviews
         }
-

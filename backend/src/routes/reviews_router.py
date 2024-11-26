@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.database.database import get_db
 from backend.src.database.shema import User
 from backend.src.database import shema
-
+from backend.src.repository.admin_repository import get_current_admin_user
 
 from backend.src.repository.user_repository import get_current_user
 from backend.src.repository import reviews_repository
@@ -24,31 +24,18 @@ async def get_reviews(db: AsyncSession = Depends(get_db)):
 
 @reviews_router.post("/create_review/", tags=["reviews"])
 async def create_review(response: Response,
-                        book_name: str,
-                        book_author_name: str,
-                        review_title: str,
-                        review_body: str,
+                        request: shema.Review,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user)):
-
-    request = shema.Review(reviewed_book_name=book_name,
-                           reviewed_book_author_name=book_author_name,
-                           review_title=review_title,
-                           review_body=review_body)
-
+    print("Request from back: ", request)
     return await reviews_repository.create_review(request=request, response=response, user=user, db=db)
 
 
 @reviews_router.put("/change_review/{review_id}", tags=["reviews"])
 async def change_review(review_id: int,
-                        new_review_title: str | None = None,
-                        new_review_body: str | None = None,
+                        request: shema.ChangeReview,
                         db: AsyncSession = Depends(get_db),
-                        user: User = Depends(get_current_user)):
-
-    request = shema.ChangeReview(
-        review_title=new_review_title,
-        review_body=new_review_body)
+                        user: User = Depends(get_current_user) or Depends(get_current_admin_user)):
 
     return await reviews_repository.change_review(review_id=int(review_id),
                                                   request=request,

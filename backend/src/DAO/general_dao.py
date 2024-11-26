@@ -1,4 +1,4 @@
-from sqlalchemy import select, update, delete, and_, func
+from sqlalchemy import select, update, delete, and_, func, desc
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -43,3 +43,16 @@ class GeneralDAO:
 
         await db.execute(query)
         await db.commit()
+
+    @classmethod
+    async def get_last_record(cls, db: AsyncSession, item):
+        """
+        :param db: database
+        :param item: founding item
+        :return:
+        """
+        query = select(item).order_by(desc(item.id))
+        last_record = await db.execute(query)
+
+        return last_record.scalars().first()
+
