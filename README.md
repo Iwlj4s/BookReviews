@@ -51,66 +51,66 @@ For get book covers I use "bookvoed" (https://www.bookvoed.ru). Users can:
 
 ### Home Page
 
-![img.png](img.png)
+![img.png](git_imgs/img.png)
 
-![img_1.png](img_1.png)
+![img_1.png](git_imgs/img_1.png)
 
-![img_2.png](img_2.png)
+![img_2.png](git_imgs/img_2.png)
 
 ### Reviews page
-![img_4.png](img_4.png)
+![img_4.png](git_imgs/img_4.png)
 
-![img_5.png](img_5.png)
+![img_5.png](git_imgs/img_5.png)
 
 ### Reviews page with admin rights
-![img_6.png](img_6.png)
+![img_6.png](git_imgs/img_6.png)
 
-![img_7.png](img_7.png)
+![img_7.png](git_imgs/img_7.png)
 
-![img_8.png](img_8.png)
+![img_8.png](git_imgs/img_8.png)
 
 ### Books page
-![img_9.png](img_9.png)
+![img_9.png](git_imgs/img_9.png)
 
 ### Books page with admin rights
-![img_10.png](img_10.png)
+![img_10.png](git_imgs/img_10.png)
 
-![img_11.png](img_11.png)
+![img_11.png](git_imgs/img_11.png)
 
 ### Authors page
-![img_12.png](img_12.png)
+![img_12.png](git_imgs/img_12.png)
 
 ### Authors page with admin rights
-![img_13.png](img_13.png)
+![img_13.png](git_imgs/img_13.png)
 
 ### Sign In
-![img_14.png](img_14.png)
+![img_14.png](git_imgs/img_14.png)
 
 ### Sign Up
-![img_15.png](img_15.png)
+![img_15.png](git_imgs/img_15.png)
 
 ### My profile
-![img_16.png](img_16.png)
-![img_17.png](img_17.png)
+![img_16.png](git_imgs/img_16.png)
+![img_17.png](git_imgs/img_17.png)
 
 #### User editing
-![img_18.png](img_18.png)
+![img_18.png](git_imgs/img_18.png)
 
 If user changed password - he'll navigate to Sing In page
-![img_19.png](img_19.png)
-![img_20.png](img_20.png)
+![img_19.png](git_imgs/img_19.png)
+![img_20.png](git_imgs/img_20.png)
 
 #### Add review
-![img_21.png](img_21.png)
+![img_21.png](git_imgs/img_21.png)
 
-![img_22.png](img_22.png)
+![img_22.png](git_imgs/img_22.png)
 
-![img_23.png](img_23.png)
+![img_23.png](git_imgs/img_23.png)
 
-![img_24.png](img_24.png)
+![img_24.png](git_imgs/img_24.png)
 
 #### Review editing
-![img_25.png](img_25.png)
+![img_25.png](git_imgs/img_25.png)
 
 
 ### Other user's profile
