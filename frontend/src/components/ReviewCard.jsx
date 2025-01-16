@@ -102,6 +102,8 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
     };
 
     const handleDelete = async () => {
+
+        const token = localStorage.getItem('user_access_token')
         if (!is401Error(navigate, "/reviews")) return;
         Modal.confirm({
             title: 'Подтверждение удаления',
@@ -119,8 +121,7 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
 
                     if (response.data.status_code === 200) {
                         message.success('Обзор успешно удален');
-                        setIsEditing(false);
-                        onUpdateReview(reviews.id, {});
+                        setReviews((prevReviews) => prevReviews.filter((r) => r.id !== reviews.id));
                     }
                 } catch (error) {
                     message.error('Ошибка при удалении обзора');

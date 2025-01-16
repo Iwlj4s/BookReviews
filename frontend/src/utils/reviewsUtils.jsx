@@ -12,4 +12,3 @@ export const updateReview = (reviews, setReviews, reviewId, updatedData) => {
         );
     }
 };
-
