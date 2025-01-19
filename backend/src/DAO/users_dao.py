@@ -30,3 +30,11 @@ class UserDAO:
 
         await db.execute(query)
         await db.commit()
+
+    @classmethod
+    async def get_user_by_id(cls, db: AsyncSession, user_id: int):
+        query = select(User).where(User.id == user_id)
+        user = await db.execute(query)
+
+        return user
+

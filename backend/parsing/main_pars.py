@@ -4,6 +4,8 @@ import aiohttp
 
 from bs4 import BeautifulSoup
 
+import re
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -31,9 +33,13 @@ class GetData(ParsSettings):
     async def get_data(self, book_name: str, author_name: str):
         if book_name and author_name:
             self.book_name = str(book_name)
+            print(f"Book Name: {book_name}")
             self.author_name = str(author_name)
-            self.search_query = f"{self.book_name} {self.author_name}"
+            print(f"Author Name: {author_name}")
+            self.search_query = f"{self.author_name} {self.book_name}"
+            print(f"Search query PRINT: {self.search_query}")
             self.search_url = f"{self.base_url}/search?q={self.search_query}"
+            print(f"Search URL PRINT: {self.search_url}")
 
         else:
             return "No book name and no author name"
@@ -49,7 +55,6 @@ class Parser(GetData, ParsSettings):
             async with session.get(self.search_url) as response:
                 self.response = response
                 self.html = await response.text()
-                print("HTML PRINT: \n", self.html)
                 self.soup = BeautifulSoup(self.html, "lxml")
 
                 return self.soup
@@ -65,13 +70,14 @@ class GetBookCover(Parser, ParsSettings):
 
     async def get_book_cover(self):
 
-        self.images = self.soup.find_all('img', attrs={'alt': self.book_name})
-
+        self.images = self.soup.find_all('img', attrs={'alt': re.compile(re.escape(self.book_name), re.IGNORECASE)})
+        print(f"images PRINT: {self.images}")
         if not self.images:
             self.book_cover_href = None
 
         else:
             self.images_list = list(self.images)
+            print(f"images LIST PRINT: {self.images_list}")
             print(self.images_list, sep="\n")
             result_image = self.images_list[0]
 

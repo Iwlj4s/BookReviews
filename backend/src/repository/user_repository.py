@@ -97,6 +97,19 @@ async def get_current_user(db: AsyncSession = Depends(get_db),
     return user
 
 
+async def get_other_user(user_id: int,
+                         db: AsyncSession = Depends(get_db)):
+    user = await UserDAO.get_user_by_id(db=db, user_id=user_id)
+
+    if not user:
+        return {
+            'message': 'Problems with get other user',
+            'status code': 404
+        }
+
+    return user
+
+
 async def delete_current_user(user: shema.User,
                               db: AsyncSession = Depends(get_db)):
     await db.delete(user)
@@ -120,7 +133,8 @@ async def change_current_user(request: shema.User,
     new_data = check_data_for_change_user(request=request, user=user)
     pass_changed = False
 
-    if request.password and not password_helper.verify_password(plain_password=request.password, hashed_password=user.password):
+    if request.password and not password_helper.verify_password(plain_password=request.password,
+                                                                hashed_password=user.password):
         print("New pass", new_data.get("password"))
         print(request.password)
         pass_changed = True

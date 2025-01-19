@@ -90,8 +90,9 @@ async def delete_review(review_id: int,
     review = await GeneralDAO.get_item_by_id(db=db, item=models.Review, item_id=review_id)
     CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
 
-    if review.created_by != user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="У вас нет прав для удаления этого обзора")
+    if not user.is_admin:
+        if review.created_by != user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="У вас нет прав для удаления этого обзора")
 
     await GeneralDAO.delete_item(db=db, item=models.Review, item_id=int(review_id))
 
