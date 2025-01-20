@@ -92,14 +92,16 @@ async def get_other_user(user_id: int,
     }
 
 
-@users_router.post("/users_list")
+@users_router.get("/users_list")
 async def get_users_for_user(db: AsyncSession = Depends(get_db)):
     users = await GeneralDAO.get_all_items(db=db, item=models.User)
     CheckHTTP404NotFound(founding_item=users, text="Пользователи не найдены")
+    users_list = []
     for user in users:
-        return {
-            'user_id:': user.id,
-            'user_name:': user.name,
+        users_list.append({
+            'id': user.id,
+            'user_name': user.name,
             'user_email': user.email,
             'reviews': user.reviews
-        }
+        })
+    return users_list

@@ -9,6 +9,7 @@ import SignUpPage from "../pages/SignUpPage.jsx"
 import ProfilePage from "../pages/ProfilePage.jsx"
 import OtherUserProfilePage from "../pages/OtherUserProfilePage.jsx"
 import AuthorsPage from "../pages/AuthorsPage.jsx"
+import UsersPage from "../pages/UsersPage.jsx"
 
 
 const MyRoutes = () => (
@@ -21,6 +22,7 @@ const MyRoutes = () => (
         <Route path="/me" element={<ProfilePage />} />
         <Route path="/user/:userId" element={<OtherUserProfilePage />} />
         <Route path="/authors_list" element={<AuthorsPage />} />
+        <Route path="/users_list" element={<UsersPage />} />
     </Routes>
 );
 

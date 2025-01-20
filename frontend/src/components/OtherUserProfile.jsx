@@ -7,6 +7,9 @@ import '../index.css';
 import { updateReview } from '../utils/reviewsUtils.jsx';
 import ReviewCard from './ReviewCard.jsx';
 
+{/* TODO: Add Other Users link in navigate and page for check them,
+add search by user name and link to navigate in selected user's  */}
+
 function OtherUserProfile({ userId }) {
     const navigate = useNavigate();
     const [user, setUser ] = useState(null);

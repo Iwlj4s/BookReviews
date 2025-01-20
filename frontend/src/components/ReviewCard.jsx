@@ -170,7 +170,15 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                                     />
                                 </div>
                             </div>
-                            <p>Автор обзора: {reviews.user?.name || user.name}</p>
+                            <p>
+                                Автор обзора: <a
+                                    href={`user/${reviews.user?.id || user.id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {reviews.user?.name || user.name}
+                                </a>
+                            </p>
                             <p>Обзор обновлен: {reviews.updated}</p>
                         </div>
                     }
