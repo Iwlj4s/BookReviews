@@ -12,6 +12,9 @@ class Settings:
     SECRET_KEY = os.getenv('SECRET_KEY')
     ALGORITHM = os.getenv('ALGORITHM')
 
+    LOGIN = os.getenv('LOGIN')
+    PASSWORD = os.getenv('PASSWORD')
+
 
 settings = Settings()
 

@@ -155,7 +155,7 @@ function BookCard({ books, user, setBooks }) {
                         <Button onClick={handleCancel}>Отменить</Button>
                     </div>
                 ) : (
-                    <Paragraph>{bookDescription || 'Описание отсутствует'}</Paragraph>
+                    <Paragraph></Paragraph>
                 )}
             </Card>
         </div>

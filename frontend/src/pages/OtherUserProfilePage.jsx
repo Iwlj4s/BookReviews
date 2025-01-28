@@ -21,9 +21,6 @@ const OtherUserProfilePage = () => {
 
     return (
          <div id="user-profile-container">
-            <div className="profile-header">
-                <h1 id="title">Мой профиль</h1>
-            </div>
             <div id="profile-content">
                 <OtherUserProfile userId={userId} />
             </div>

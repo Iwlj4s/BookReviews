@@ -6,6 +6,8 @@ import { SearchOutlined } from '@ant-design/icons';
 import '../index.css';
 import UserCard from '../components/UserCard.jsx';
 
+import { isAuthenticated, is401Error } from '../utils/authUtils';
+
 function UsersPage() {
     const navigate = useNavigate();
 
@@ -14,6 +16,35 @@ function UsersPage() {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+       if (!is401Error(navigate, "/users_list")) return;
+        const token = localStorage.getItem('user_access_token');
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.status_code === 401) {
+                    message.warning('Вы не зашли в аккаунт');
+                    return;
+                }
+                setUser (response.data);
+            } catch (err) {
+                if (err.response && err.response.status === 401) {
+                    message.warning('Вы не зашли в аккаунт');
+                } else {
+                    console.error("Error fetching user data:", err);
+                    setError("Ошибка при загрузке данных пользователя");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
         const fetchUsers= async () => {

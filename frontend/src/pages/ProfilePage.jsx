@@ -39,7 +39,6 @@ const ProfilePage = () => {
             if (err.response && err.response.status === 401) {
                 console.log("error from err.response.status from profile page")
                 console.log("error response: ", err.response)
-                message.error(err.response.data.detail);
                 navigate("/sign_in");
             } else {
                 console.error("Error fetching user data:", err);

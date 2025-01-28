@@ -61,6 +61,9 @@ function OtherUserProfile({ userId }) {
     return (
         <>
             {/* User Info */}
+            <div className="profile-header">
+                <h1 id="title">{user.user_name || 'Не указано'}</h1>
+            </div>
             <div id="user-info-container">
                 <div id="user-info">
                     <div className="user-info-header">
@@ -92,20 +95,22 @@ function OtherUserProfile({ userId }) {
             </div>
 
             {/* Reviews Cards */}
-            <div id="cards-container">
-                {reviews.length === 0 ? (
-                    <div>У пользователя пока нет обзоров</div>
-                ) : filteredReviews.length > 0 ? (
-                    filteredReviews.map((userReviews, index) => (
-                        <ReviewCard key={index}
-                                    reviews={userReviews}
-                                    user={user}
-                                    setReviews={setReviews} />
-                    ))
-                ) : (
-                    <div>По таким фильтрам обзоры не найдены</div>
-                )}
-            </div>
+            {reviews.length === 0 ? (
+                <div id="title"><h3>У пользователя пока нет обзоров</h3></div>
+            ) : (
+                <div id="cards-container">
+                    {filteredReviews.length > 0 ? (
+                        filteredReviews.map((userReviews, index) => (
+                            <ReviewCard key={index}
+                                        reviews={userReviews}
+                                        user={user}
+                                        setReviews={setReviews} />
+                        ))
+                    ) : (
+                        <div>По таким фильтрам обзоры не найдены</div>
+                    )}
+                </div>
+            )}
         </>
     );
 };

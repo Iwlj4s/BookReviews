@@ -30,13 +30,11 @@ function AuthorsPage() {
                     }
                 });
                 if (response.status_code === 401) {
-                    message.warning('Вы не зашли в аккаунт');
                     return;
                 }
                 setUser (response.data);
             } catch (err) {
                 if (err.response && err.response.status === 401) {
-                    message.warning('Вы не зашли в аккаунт');
                 } else {
                     console.error("Error fetching user data:", err);
                     setError("Ошибка при загрузке данных пользователя");

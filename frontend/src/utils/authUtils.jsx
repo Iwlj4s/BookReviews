@@ -5,7 +5,6 @@ import { message} from 'antd';
 export const isAuthenticated = (navigate, navigateTo) => {
     const token = localStorage.getItem('user_access_token');
     if (!token) {
-        message.error('Токен недействителен');
         navigate(navigateTo);
         return false;
     }
@@ -20,16 +19,14 @@ export const is401Error = async (navigate, navigateTo) => {
             }
         });
         if (response.status === 401) {
-            console.log("Eror 401 from is401Error");
-            message.error('Токен недействителен from response.status === 401');
+            console.log("Error 401 from is401Error");
             navigate(navigateTo);
             return true;
         }
     } catch (err) {
 
         if (err.response && err.response.status === 401) {
-            console.log("error from err.response.status")
-            message.error(err.response.data.detail);
+            console.log("error from err.response.status", err.response.data.detail)
             navigate(navigateTo);
         } else {
             console.error("Error fetching user data:", err);
