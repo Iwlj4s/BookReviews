@@ -177,3 +177,13 @@ async def change_book(book_id: int,
                       db: AsyncSession = Depends(get_db)):
 
     return await admin_repository.change_book(db=db, book_id=int(book_id), request=request, admin=admin)
+
+
+@admin_router.get("/send-email")
+async def sending_email(mail_theme: str,
+                        mail_body: str,
+                        receiver_email: str,
+                        db: AsyncSession = Depends(get_db)):
+    return await admin_repository.send_email_func(mail_theme=mail_theme,
+                                                  mail_body=mail_body,
+                                                  receiver_email=receiver_email)

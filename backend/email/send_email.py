@@ -7,7 +7,7 @@ load_dotenv()
 from backend.config import Settings
 
 
-def send_email(mail_body: str, mail_theme: str, receiver_email: str):
+async def send_email(mail_body: str, mail_theme: str, receiver_email: str):
     sender_login = Settings.LOGIN
     password = Settings.PASSWORD
 
@@ -32,6 +32,3 @@ def send_email(mail_body: str, mail_theme: str, receiver_email: str):
     except Exception as e:
         print(f"Error: {e}")
         return str(e)
-
-
-send_email(mail_body='Проверка тело', mail_theme='Проверка тема', receiver_email='elizavetalenn@mail.ru')

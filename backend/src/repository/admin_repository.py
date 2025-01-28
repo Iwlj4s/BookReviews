@@ -24,6 +24,8 @@ from backend.src.helpers.reviews_helper import check_data_for_change_review
 from backend.src.helpers.user_helper import check_data_for_change_user
 from backend.src.repository.user_repository import get_current_user
 
+from backend.email.send_email import send_email
+
 
 async def login_admin(request: shema.UserSignIn, response, db: AsyncSession = Depends(get_db)):
     user = await user_helper.take_access_token_for_user(db=db,
@@ -40,7 +42,7 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Недостаточно прав!')
 
 
-# Users #
+# --- USERS --- #
 async def change_user(user_id: int,
                       request: shema.User,
                       admin: User = Depends(get_current_admin_user),
@@ -83,7 +85,7 @@ async def delete_user(user_id: int,
     }
 
 
-# Authors #
+# --- AUTHORS --- #
 async def add_author(response: Response,
                      request: shema.Author,
                      admin: User = Depends(get_current_admin_user),
@@ -156,7 +158,7 @@ async def delete_author(author_id: int,
     }
 
 
-# Review #
+# --- REVIEWS --- #
 async def change_review(review_id: int,
                         request: shema.ChangeReview,
                         admin: User = Depends(get_current_admin_user),
@@ -189,7 +191,7 @@ async def change_review(review_id: int,
     }
 
 
-# Books #
+# --- BOOKS --- #
 async def add_book(response: Response,
                    request: shema.Book,
                    admin: User = Depends(get_current_admin_user),
@@ -293,3 +295,35 @@ async def change_book(book_id: int,
             'description': book.book_description,
         }
     }
+
+
+# --- SENDING MAIL --- #
+async def send_email_func(mail_theme: str,
+                          mail_body: str,
+                          receiver_email: str,
+                          db: AsyncSession = Depends(get_db)):
+    try:
+        await send_email(mail_body=mail_body,
+                         mail_theme=mail_theme,
+                         receiver_email=receiver_email)
+        return {
+            'message': 'Письмо отправлено!',
+            'status_code': 200,
+            'data': {
+                'mail_theme': mail_theme,
+                'mail_body': mail_body,
+                'mail_receiver': receiver_email
+            }
+        }
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return {
+            'message': 'Произошла ошибка при отправлении письма!',
+            'status_code': 500,
+            'data': {
+                'mail_theme': mail_theme,
+                'mail_body': mail_body,
+                'mail_receiver': receiver_email
+            }
+        }
