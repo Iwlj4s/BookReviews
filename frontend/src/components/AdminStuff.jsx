@@ -141,17 +141,6 @@ function AdminStuff({ user }) {
                         />
                     </Form.Item>
 
-                    <Form.Item
-                        label="Описание книги"
-                        rules={[{ required: true, message: 'Пожалуйста, введите описание книги!' }]}
-                    >
-                        <Input.TextArea
-                            placeholder="Введите описание книги"
-                            value={bookDescription}
-                            onChange={(e) => setBookDescription(e.target.value)}
-                        />
-                    </Form.Item>
-
                     <Form.Item>
                         <Button type="primary" onClick={AddBook} loading={loading}>
                             Добавить книгу

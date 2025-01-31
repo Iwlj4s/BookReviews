@@ -14,7 +14,7 @@ from backend.src.helpers.general_helper import CheckHTTP404NotFound
 
 from backend.src.helpers.reviews_helper import check_data_for_add_review, check_data_for_change_review
 
-from backend.parsing.get_data import get_book_cover
+from backend.parsing.get_data import get_book_info
 
 
 async def create_review(request: shema.Review,

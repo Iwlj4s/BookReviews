@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
-from backend.parsing.get_data import get_book_cover
+from backend.parsing.get_data import get_book_info
 from backend.src.helpers.admin_helper import check_data_for_change_author, check_data_for_change_book
 from backend.src.database.database import get_db
 from backend.src.database import shema, models
@@ -211,7 +211,7 @@ async def add_book(response: Response,
             'status_code': 404
         }
 
-    book_cover = await get_book_cover(book_name=request.book_name.capitalize(), author_name=author.name.title())
+    book_cover, book_desc = await get_book_info(book_name=request.book_name.capitalize(), author_name=author.name.title())
     print(book_cover)
 
     if book_cover is None:
@@ -221,8 +221,12 @@ async def add_book(response: Response,
             'status_code': 404
         }
 
+    if book_desc is None:
+        book_desc = "Описание не добавлено"
+
     new_book = await BookDAO.add_book(request=request,
                                       book_cover=book_cover,
+                                      book_desc=book_desc,
                                       author=author,
                                       db=db)
 
@@ -238,7 +242,7 @@ async def add_book(response: Response,
             'book_name': new_book.book_name,
             'book_author_id': new_book.author_id,
             'author_name': author.name,
-            'book_description': new_book.book_description
+            'book_description': book_desc
         }
     }
 
