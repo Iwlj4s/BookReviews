@@ -19,8 +19,10 @@ class User(Base):
     is_user: Mapped[bool] = mapped_column(default=True, server_default=text("True"), nullable=False)
     is_admin: Mapped[bool] = mapped_column(default=False, server_default=text("False"), nullable=False)
 
-    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="user", lazy="selectin")
+    user_info: Mapped[str] = mapped_column(String, nullable=True)
+    warnings: Mapped[int] = mapped_column(default=False, server_default=text("False"), nullable=False)
 
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="user", lazy="selectin")
 
 class Review(Base):
     __tablename__ = 'reviews'
