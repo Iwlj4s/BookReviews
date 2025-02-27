@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Card, Space, Tree, Button, Input, message, Modal, Typography } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { updateReview } from '../utils/reviewsUtils.jsx'
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import DOMPurify from 'dompurify';
 import '../index.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -139,6 +142,15 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
             <Paragraph key={index} style={{ fontSize: '18px' }}>{line}</Paragraph>
         ));
     };
+    const renderReviewBody = (body) => {
+        if (!body) {
+            return <Paragraph>Обзор отсутствует</Paragraph>;
+        }
+        const cleanHTML = DOMPurify.sanitize(body);
+        return (
+            <div dangerouslySetInnerHTML={{ __html: cleanHTML }} />
+        );
+    };
 
     return (
             <div id='card'>
@@ -191,10 +203,10 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                                     value={formData.reviewTitle}
                                     onChange={(e) => setFormData({ ...formData, reviewTitle: e.target.value })}
                                 />
-                                <Input.TextArea
-                                    placeholder="Тело обзора"
+
+                                <ReactQuill
                                     value={formData.reviewBody}
-                                    onChange={(e) => setFormData({ ...formData, reviewBody: e.target.value })}
+                                    onChange={(value) => setFormData({ ...formData, reviewBody: value })}
                                 />
                                 <Button onClick={handleSave}>Сохранить</Button>
                                 <Button onClick={handleCancel}>Отменить</Button>
@@ -204,9 +216,9 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                             <div>
                                 <div>
                                     {isExpanded ? (
-                                        formatReviewBody(reviews.review_body)
+                                        renderReviewBody(reviews.review_body)
                                     ) : (
-                                        formatReviewBody(reviews.review_body.slice(0, MAX_LENGTH))
+                                        renderReviewBody(reviews.review_body.slice(0, MAX_LENGTH))
                                     )}
                                     {reviews.review_body.length > MAX_LENGTH && (
                                         <Button type="link" onClick={() => setIsExpanded(!isExpanded)}>

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Spin, Input, message } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import '../index.css';
 import ReviewCard from '../components/ReviewCard.jsx';
 import { isAuthenticated, is401Error } from '../utils/authUtils';

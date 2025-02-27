@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin as AntdSpin, Form } from 'antd';
 import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import '../index.css';
 import { updateReview } from '../utils/reviewsUtils.jsx'
 import ReviewCard from './ReviewCard.jsx';
@@ -374,9 +376,9 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                         </Form.Item>
 
                         <Form.Item label="Обзор">
-                            <Input.TextArea
+                           <ReactQuill
                                 value={reviewForm.review_body}
-                                onChange={(e) => setReviewForm({ ...reviewForm, review_body: e.target.value })}
+                                onChange={(value) => setReviewForm({ ...reviewForm, review_body: value })}
                             />
                         </Form.Item>
                     </Form>
