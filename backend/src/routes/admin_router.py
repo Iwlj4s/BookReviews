@@ -114,7 +114,6 @@ async def add_author(response: Response,
                      request: shema.Author,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
-
     return await admin_repository.add_author(response=response,
                                              request=request,
                                              admin=admin,
@@ -134,7 +133,6 @@ async def change_author(response: Response,
                         request: shema.Author,
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-
     return await admin_repository.change_author(response=response,
                                                 author_id=author_id,
                                                 request=request,
@@ -148,14 +146,13 @@ async def add_book(response: Response,
                    request: shema.Book,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
-
     return await admin_repository.add_book(response=response,
                                            request=request,
                                            admin=admin,
                                            db=db)
 
 
-@admin_router.get("/books/get_books/")
+@admin_router.get("/books/get_books/", tags=["admin"])
 async def get_books(admin: User = Depends(get_current_admin_user),
                     db: AsyncSession = Depends(get_db)):
     books = await GeneralDAO.get_all_items(db=db, item=models.Book)
@@ -163,27 +160,33 @@ async def get_books(admin: User = Depends(get_current_admin_user),
     return books
 
 
-@admin_router.delete("/books/delete_book/{book_id}")
+@admin_router.delete("/books/delete_book/{book_id}", tags=["admin"])
 async def delete_book(book_id: int,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
     return await admin_repository.delete_book(db=db, book_id=int(book_id))
 
 
-@admin_router.put("/book/change_book/{book_id}")
+@admin_router.put("/book/change_book/{book_id}", tags=["admin"])
 async def change_book(book_id: int,
                       request: shema.Book,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
-
     return await admin_repository.change_book(db=db, book_id=int(book_id), request=request, admin=admin)
 
 
-@admin_router.get("/send-email")
-async def sending_email(mail_theme: str,
-                        mail_body: str,
-                        receiver_email: str,
-                        db: AsyncSession = Depends(get_db)):
-    return await admin_repository.send_email_func(mail_theme=mail_theme,
-                                                  mail_body=mail_body,
-                                                  receiver_email=receiver_email)
+# @admin_router.get("/mail/send_letter", tags=["admin"])
+# async def sending_letter(user_id: int,
+#                          request: ... ,
+#                          db: AsyncSession = Depends(get_db)):
+#     return await admin_repository.send_email_func(mail_theme=request.mail_theme,
+#                                                   mail_body=request.mail_body,
+#                                                   receiver_email=...)
+
+
+@admin_router.post("/mail/send_newsletter", tags=["admin"])
+async def send_newsletter(request: shema.NewsletterForAllUsers,
+                          admin: User = Depends(get_current_admin_user),
+                          db: AsyncSession = Depends(get_db)):
+    return await admin_repository.send_newsletter_to_all_users(request=request,
+                                                               db=db)

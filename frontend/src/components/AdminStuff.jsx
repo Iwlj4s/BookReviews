@@ -10,10 +10,16 @@ function AdminStuff({ user }) {
     const [form] = Form.useForm();
     const [authors, setAuthors] = useState([]);
     const [loading, setLoading] = useState(false);
+
     const [authorName, setAuthorName] = useState('');
+
     const [bookName, setBookName] = useState('');
     const [bookDescription, setBookDescription] = useState('');
+
     const [selectedAuthor, setSelectedAuthor] = useState('');
+
+    const [mailTheme, setMailTheme] = useState('');
+    const [mailBody, setMailBody] = useState('');
 
     useEffect(() => {
         fetchAuthors();
@@ -83,7 +89,33 @@ function AdminStuff({ user }) {
         }
     };
 
-    const collapseItems = [
+    const sendNewsletter = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/book_reviews/admin/mail/send_newsletter', {
+                mail_theme: mailTheme,
+                mail_body: mailBody
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                }
+            });
+            if (response.data.status_code === 200) {
+                message.success(response.data.message);
+                form.resetFields();
+            }
+        } catch (error) {
+            console.error("Error sending newsletter: ", error);
+            console.log("Mail Theme: ", mail_theme)
+            console.log("Mail Body: ", mail_body)
+            message.error(error.response?.data?.message || 'Произошла ошибка при отправке рассылки');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const adminFuncs = [
         {
             key: '1',
             label: 'Добавить автора',
@@ -148,10 +180,45 @@ function AdminStuff({ user }) {
                     </Form.Item>
                 </Form>
             )
+        },
+        {
+            key: '3',
+            label: 'Отправить рассылку',
+            children: (
+                <Form layout="vertical">
+                    <Form.Item
+                        label="Тема письма"
+                        rules={[{ required: true, message: 'Пожалуйста, введите тему письма!' }]}
+                    >
+                        <Input
+                            placeholder="Введите тему письма"
+                            value={mailTheme}
+                            onChange={(e) => setMailTheme(e.target.value)}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Текст письма"
+                        rules={[{ required: true, message: 'Пожалуйста, введите текст письма!' }]}
+                    >
+                        <Input.TextArea
+                            placeholder="Введите текст письма"
+                            value={mailBody}
+                            onChange={(e) => setMailBody(e.target.value)}
+
+                        />
+
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" onClick={sendNewsletter} loading={loading}>
+                            Отправить рассылку
+                        </Button>
+                    </Form.Item>
+                </Form>
+            )
         }
     ];
 
-    const showInfoModal = () => {
+    const showAdminInfoModal = () => {
         Modal.info({
             title: 'Информация',
             content: (
@@ -176,10 +243,10 @@ function AdminStuff({ user }) {
                         type="link"
                         icon={<QuestionCircleOutlined />}
                         size="large"
-                        onClick={showInfoModal}
+                        onClick={showAdminInfoModal}
                     />
                 </div>
-                <Collapse items={collapseItems} />
+                <Collapse items={adminFuncs} />
             </div>
         </>
     );

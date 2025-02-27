@@ -331,3 +331,28 @@ async def send_email_func(mail_theme: str,
                 'mail_receiver': receiver_email
             }
         }
+
+
+async def send_newsletter_to_all_users(request: shema.NewsletterForAllUsers,
+                                       db: AsyncSession = Depends(get_db)):
+    users = await GeneralDAO.get_all_items(db=db, item=models.User)
+    errors = []
+
+    for user in users:
+        try:
+            print(f'Getting user: {user.email}')
+            await send_email(mail_theme=request.mail_theme, mail_body=request.mail_body, receiver_email=user.email)
+        except Exception as e:
+            print(f"Error sending email to {user.email}: {e}")
+            errors.append(user.email)
+
+    if errors:
+        return {
+            'message': f'Рассылка завершена с ошибками для: {", ".join(errors)}',
+            'status_code': 100
+        }
+
+    return {
+        'message': 'Рассылка отправлена всем пользователям',
+        'status_code': 200
+    }

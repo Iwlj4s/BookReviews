@@ -64,6 +64,12 @@ class Book(BaseModel):
         return v
 
 
+# Newsletter for all users #
+class NewsletterForAllUsers(BaseModel):
+    mail_theme: Union[str, None] = Field(default=None, title="Тема письма")
+    mail_body: Union[str, None] = Field(default=None, title="Тело письма")
+
+
 # Token #
 class Token(BaseModel):
     access_token: str
