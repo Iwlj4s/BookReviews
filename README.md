@@ -5,7 +5,6 @@ This project is a web application for book reviews.
 ## Table of Contents
 - [Important Note](#important-note)
 - [Description](#description)
-- [Main Features](#main-features)
 
 
 ## Important Note
