@@ -24,6 +24,7 @@ class User(Base):
 
     reviews: Mapped[List["Review"]] = relationship("Review", back_populates="user", lazy="selectin")
 
+
 class Review(Base):
     __tablename__ = 'reviews'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
@@ -35,8 +36,8 @@ class Review(Base):
     reviewed_book_name: Mapped[str] = mapped_column(nullable=False, index=True)
     reviewed_book_author_name: Mapped[str] = mapped_column(nullable=False, index=True)
 
-    review_title: Mapped[str] = mapped_column(String, nullable=True, index=True,)
-    review_body: Mapped[str] = mapped_column(Text, nullable=False, index=True,)
+    review_title: Mapped[str] = mapped_column(String, nullable=True, index=True, )
+    review_body: Mapped[str] = mapped_column(Text, nullable=False, index=True, )
 
     created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
     updated: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())

@@ -22,7 +22,6 @@ users_router = APIRouter(
 async def sign_up(request: shema.UserSignUp,
                   response: Response,
                   db: AsyncSession = Depends(get_db)):
-
     return await user_repository.sign_up(request, response, db)
 
 
@@ -35,7 +34,8 @@ async def sign_in(request: shema.UserSignIn,
 
 @users_router.post("/logout", tags=["users"])
 async def logout(response: Response):
-    response.delete_cookie(key='user_access_token')
+    response.delete_cookie(key='user_access_token', secure=True, domain='127.0.0.1', path='/')
+    response.delete_cookie(key='user_access_token', secure=True, domain='localhost', path='/')
     return {'message': 'Пользователь успешно вышел из системы'}
 
 
@@ -50,7 +50,6 @@ async def change_me(response: Response,
                     request: shema.User,
                     db: AsyncSession = Depends(get_db),
                     user_data: User = Depends(get_current_user)):
-
     return await user_repository.change_current_user(request, db, response, user_data)
 
 

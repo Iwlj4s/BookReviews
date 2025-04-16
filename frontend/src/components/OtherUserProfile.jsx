@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Card, Descriptions, Input, message, Spin } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Input, message, Spin, Modal, Button } from 'antd';
+import { SearchOutlined, MailOutlined } from '@ant-design/icons';
 import '../index.css';
 import { updateReview } from '../utils/reviewsUtils.jsx';
 import ReviewCard from './ReviewCard.jsx';
@@ -10,14 +10,22 @@ import ReviewCard from './ReviewCard.jsx';
 {/* TODO: Add Other Users link in navigate and page for check them,
 add search by user name and link to navigate in selected user's  */}
 
-function OtherUserProfile({ userId }) {
+function OtherUserProfile({ userId, currentUser }) {
     const navigate = useNavigate();
     const [user, setUser ] = useState(null);
     const [reviews, setReviews] = useState([]);
+
     const [searchText, setSearchText] = useState('');
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [emailTheme, setEmailTheme] = useState('');
+    const [emailBody, setEmailBody] = useState('');
+
+    console.log('Current user:', currentUser);
+    console.log('Is admin:', currentUser?.is_admin);
    useEffect(() => {
     const fetchUserData = async () => {
         try {
@@ -36,6 +44,42 @@ function OtherUserProfile({ userId }) {
 
     fetchUserData();
     }, [userId]);
+
+    const handleSendEmail = async () => {
+        const emailData = {
+            receiver_email: user.user_email,
+            mail_theme: emailTheme,
+            mail_body: emailBody
+        };
+
+
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/book_reviews/admin/mail/send_letter`, emailData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                }
+            });
+            if (response.data.status_code === 200) {
+                message.success('Письмо успешно отправлено!');
+                setIsModalVisible(false);
+            }
+        } catch (error) {
+            message.error('Ошибка при отправке письма');
+            console.error(error);
+        }
+    };
+
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        setEmailTheme('');
+        setEmailBody('');
+    };
 
 
     const handleUpdateReview = (reviewId, updatedData) => {
@@ -63,6 +107,7 @@ function OtherUserProfile({ userId }) {
             {/* User Info */}
             <div className="profile-header">
                 <h1 id="title">{user.user_name || 'Не указано'}</h1>
+
             </div>
             <div id="user-info-container">
                 <div id="user-info">
@@ -78,6 +123,50 @@ function OtherUserProfile({ userId }) {
                     </Descriptions>
                 </div>
             </div>
+
+            {/* AdminStuff */}
+            {currentUser?.is_admin && (
+                <div id="admin-stuff-container">
+                    {currentUser?.is_admin && (
+                        <Button onClick={showModal} type="primary" icon={<MailOutlined />}>
+                            Отправить письмо
+                        </Button>
+                    )}
+                </div>
+            )}
+        
+            {/* Email Modal */}
+            {/* {currentUser?.is_admin && (
+                <Button onClick={showModal} type="primary" icon={<MailOutlined />}>
+                    Отправить письмо
+                </Button>
+            )} */}
+
+            <Modal
+                title="Отправить письмо пользователю"
+                open={isModalVisible} // Изменено с visible на open
+                onCancel={handleCancel}
+                footer={[
+                    <Button key="back" onClick={handleCancel}>
+                        Отмена
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleSendEmail}>
+                        Отправить
+                    </Button>,
+                ]}
+            >
+                <Input
+                    placeholder="Тема письма"
+                    value={emailTheme}
+                    onChange={(e) => setEmailTheme(e.target.value)}
+                />
+                <Input.TextArea
+                    placeholder="Тело письма"
+                    value={emailBody}
+                    onChange={(e) => setEmailBody(e.target.value)}
+                    rows={4}
+                />
+            </Modal>
 
             {/* My Reviews */}
             <div id="title">

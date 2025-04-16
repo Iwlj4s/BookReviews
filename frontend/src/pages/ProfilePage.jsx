@@ -17,9 +17,13 @@ const ProfilePage = () => {
 
     useEffect(() => {
         const fetchUserData = async () => {
-
             try {
-                if (!isAuthenticated(navigate, "/sign_in")) return;
+                // Проверяем аутентификацию
+               if (!isAuthenticated(navigate, "/sign_in")) {
+                    setUser (null);
+                    return;
+                }
+
                 const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
@@ -28,22 +32,18 @@ const ProfilePage = () => {
                 if (!is401Error(navigate, "/sign_in")) return;
 
                 console.log("Полные данные пользователя:", response.data);
-                console.log("Тип данных пользователя:", typeof response.data);
-                console.log("Имя пользователя:", response.data.name);
-                console.log("Email пользователя:", response.data.email);
                 setUser(response.data);
                 setLoading(false);
-
-
             } catch (err) {
-            if (err.response && err.response.status === 401) {
-                console.log("error from err.response.status from profile page")
-                console.log("error response: ", err.response)
-                navigate("/sign_in");
-            } else {
-                console.error("Error fetching user data:", err);
-                setError("Ошибка при загрузке данных пользователя");
-            }
+                if (err.response && err.response.status === 401) {
+                    console.log("error from err.response.status from profile page");
+                    localStorage.removeItem('user_access_token');
+                    setUser (null);
+                    navigate("/sign_in");
+                } else {
+                    console.error("Error fetching user data:", err);
+                    setError("Ошибка при загрузке данных пользователя");
+                }
             } finally {
                 setLoading(false);
             }
@@ -61,13 +61,13 @@ const ProfilePage = () => {
             await axios.post('http://127.0.0.1:8000/book_reviews/users/logout', {}, {
                 withCredentials: true
             });
-            localStorage.removeItem('user_access_token');
-            navigate('/sign_in');
+            localStorage.removeItem('user_access_token'); // Очищаем localStorage
+            setUser (null); // Сбрасываем состояние пользователя
+            navigate('/sign_in'); // Переходим на страницу входа
         } catch (error) {
             console.error('Ошибка при выходе:', error.response.data);
         }
     };
-
     const updateUserData = (updatedUser) => {
         setUserData(updatedUser);
     };

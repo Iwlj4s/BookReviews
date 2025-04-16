@@ -70,6 +70,12 @@ class NewsletterForAllUsers(BaseModel):
     mail_body: Union[str, None] = Field(default=None, title="Тело письма")
 
 
+class NewsLetterForUser(BaseModel):
+    receiver_email: Union[str, None] = Field(default=None, title="Id пользователя, которому отправляется письмо")
+    mail_theme: Union[str, None] = Field(default=None, title="Тема письма")
+    mail_body: Union[str, None] = Field(default=None, title="Тело письма")
+
+
 # Token #
 class Token(BaseModel):
     access_token: str

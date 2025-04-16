@@ -8,7 +8,4 @@ async def get_book_info(book_name: str, author_name: str):
     book_cover_href = data["book_cover_href"]
     book_desc = data["book_description"]
 
-    print("Book cover href from get data file: ", book_cover_href)
-    print("Book desc from get data file: ", book_desc)
-
     return book_cover_href, book_desc

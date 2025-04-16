@@ -5,6 +5,7 @@ import { message} from 'antd';
 export const isAuthenticated = (navigate, navigateTo) => {
     const token = localStorage.getItem('user_access_token');
     if (!token) {
+        localStorage.removeItem('user_access_token');
         navigate(navigateTo);
         return false;
     }

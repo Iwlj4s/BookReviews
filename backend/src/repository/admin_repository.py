@@ -302,21 +302,20 @@ async def change_book(book_id: int,
 
 
 # --- SENDING MAIL --- #
-async def send_email_func(mail_theme: str,
-                          mail_body: str,
-                          receiver_email: str,
+async def send_email_func(request: shema.NewsLetterForUser,
                           db: AsyncSession = Depends(get_db)):
+ 
     try:
-        await send_email(mail_body=mail_body,
-                         mail_theme=mail_theme,
-                         receiver_email=receiver_email)
+        await send_email(mail_body=request.mail_body,
+                         mail_theme=request.mail_theme,
+                         receiver_email=request.receiver_email)
         return {
             'message': 'Письмо отправлено!',
             'status_code': 200,
             'data': {
-                'mail_theme': mail_theme,
-                'mail_body': mail_body,
-                'mail_receiver': receiver_email
+                'mail_theme': request.mail_theme,
+                'mail_body': request.mail_body,
+                'mail_receiver': request.receiver_email
             }
         }
 
@@ -326,9 +325,9 @@ async def send_email_func(mail_theme: str,
             'message': 'Произошла ошибка при отправлении письма!',
             'status_code': 500,
             'data': {
-                'mail_theme': mail_theme,
-                'mail_body': mail_body,
-                'mail_receiver': receiver_email
+                'mail_theme': request.mail_theme,
+                'mail_body': request.mail_body,
+                'mail_receiver': request.receiver_email
             }
         }
 

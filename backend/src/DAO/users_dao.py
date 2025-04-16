@@ -12,7 +12,7 @@ class UserDAO:
         email = await db.execute(query)
 
         return email.scalars().first()
-
+    
     @classmethod
     async def get_user_name(cls, db: AsyncSession, user_name: str):
         query = select(User).where(User.name == str(user_name))
@@ -37,4 +37,4 @@ class UserDAO:
         user = await db.execute(query)
 
         return user
-
+    

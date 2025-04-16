@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert } from 'antd';
+import { Alert, message } from 'antd';
 import axios from 'axios';
 
 import '../index.css';

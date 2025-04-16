@@ -11,22 +11,46 @@ import OtherUserProfile from '../components/OtherUserProfile.jsx';
 
 const OtherUserProfilePage = () => {
     const { userId } = useParams();
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    if (loading) {
-        return <Spin id="spin" />;
-    }
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const token = localStorage.getItem('user_access_token');
+                if (!token) {
+                    setLoading(false);
+                    return;
+                }
+                
+                const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                setCurrentUser(response.data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCurrentUser();
+    }, []);
+
+    if (loading) return <div>Загрузка...</div>;
+    if (error) return <div>{error}</div>;
 
     return (
-         <div id="user-profile-container">
-            <div id="profile-content">
-                <OtherUserProfile userId={userId} />
-            </div>
-        </div>
-    );
-
+        <div id="user-profile-container">
+           <div id="profile-content">
+                <OtherUserProfile userId={userId} currentUser={currentUser} />  
+           </div>
+       </div>
+   ); 
 };
 
 export default OtherUserProfilePage;

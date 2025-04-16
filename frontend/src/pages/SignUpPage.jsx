@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert } from 'antd';
+import { Alert, message } from 'antd';
 import axios from 'axios';
 
 import '../index.css';
@@ -29,6 +29,7 @@ const SignUpPage = () => {
                     'Content-Type': 'application/json'
                 }
             });
+            console.log("Response: ", response.data.status_code);
             console.log("Status code: ", response.data.status_code);
             if (response.data.status_code === 201) {
                 console.log("Account created!");

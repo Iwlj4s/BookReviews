@@ -74,7 +74,6 @@ async def login(request: shema.UserSignIn,
             'status_code': 403,
             'error': "FORBIDDEN"
         }
-
     return {
         "user_access_token": user['user_access_token'],
         "email": user['email'],

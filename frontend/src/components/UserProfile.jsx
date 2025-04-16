@@ -12,6 +12,7 @@ import AdminStuff from './AdminStuff.jsx';
 
 import { isAuthenticated, is401Error } from '../utils/authUtils';
 
+{/* TODO: Add Icons to add author, send email etc ... */}
 
 const { Option } = Select;
 
@@ -307,7 +308,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                             <AdminStuff user={user}/>
                         )}
                     </div>
-                )}
+            )}
 
             {/* My Reviews */}
             <div id="title">
