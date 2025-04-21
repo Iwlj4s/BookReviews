@@ -7,6 +7,7 @@ from typing import Union
 class User(BaseModel):
     name: Union[str, None] = Field(default=None, min_length=3, title="Имя пользователя")
     email: Union[str, None] = Field(default=None, title="Эл.почта пользователя")
+    bio: Union[str, None] = Field(default=None, title="Биография пользователя")
     password: Union[str, None] = Field(default=None, min_length=4, title="Пароль пользователя")
 
 

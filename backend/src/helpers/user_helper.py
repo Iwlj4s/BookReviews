@@ -62,6 +62,11 @@ def check_data_for_change_user(request: shema.User, user):
     else:
         data.update({"email": request.email})
 
+    if request.bio is None:
+        data.update({"bio": user.bio})
+    else:
+        data.update({"bio": request.bio})
+
     if request.password is None:
         data.update({"password": user.password})
     else:

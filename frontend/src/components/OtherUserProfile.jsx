@@ -111,12 +111,10 @@ function OtherUserProfile({ userId, currentUser }) {
             </div>
             <div id="user-info-container">
                 <div id="user-info">
-                    <div className="user-info-header">
-                        <h2>Информация о пользователе</h2>
-                    </div>
+                      {user.bio && (
+                         <div style={{ textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: user.bio }}></div>
+                    )}
                     <Descriptions layout="vertical">
-                        <Descriptions.Item label="Имя пользователя">{user.user_name || 'Не указано'}</Descriptions.Item>
-                        <Descriptions.Item label="Email">{user.user_email || 'Не указано'}</Descriptions.Item>
                         {user.is_admin && (
                             <Descriptions.Item label="Администратор">Да</Descriptions.Item>
                         )}

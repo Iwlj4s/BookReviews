@@ -74,6 +74,7 @@ async def get_user(user_id: int,
         'user_id:': user.id,
         'user_name:': user.name,
         'user_email': user.email,
+        'bio': user.bio,
         'reviews': user.reviews
     }
 
@@ -87,6 +88,7 @@ async def get_other_user(user_id: int,
         'user_id:': user.id,
         'user_name': user.name,
         'user_email': user.email,
+        'bio': user.bio,
         'reviews': user.reviews
     }
 

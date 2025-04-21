@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin as AntdSpin, Form } from 'antd';
+import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin as AntdSpin, Form, Typography } from 'antd';
 import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -15,6 +15,7 @@ import { isAuthenticated, is401Error } from '../utils/authUtils';
 {/* TODO: Add Icons to add author, send email etc ... */}
 
 const { Option } = Select;
+const { Paragraph } = Typography;
 
 function UserProfile({ user, onLogout, onUpdateUserData }) {
     if (!user) {
@@ -26,10 +27,13 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     const [reviews, setReviews] = useState([]);
 
     const [isEditing, setIsEditing] = useState(false);
+    const [isEditingBio, setIsEditingBio] = useState(false);
+
 
     const [formData, setFormData] = useState({
         name: user?.name || null,
         email: user?.email || null,
+        bio: user?.bio || null,
         password: ''
     });
 
@@ -133,6 +137,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         const requestData = {
             name: formData.name || null,
             email: formData.email || null,
+            bio: formData.bio || null,
             ...(formData.password ? { password: formData.password } : {})
         };
 
@@ -163,7 +168,9 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 message.success('Данные обновлены успешно!');
                 const updatedUser = await fetchUserData();
                 onUpdateUserData(updatedUser);
+                // Закрываем оба режима редактирования
                 setIsEditing(false);
+                setIsEditingBio(false);
             }
         } catch (err) {
             console.error('Ошибка при сохранении данных:', err.response ? err.response.data : err.message);
@@ -248,6 +255,28 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         }
     };
 
+    const handleEditBioClick = () => {
+                if (!isAuthenticated(navigate, "/sign_in")) return;
+                setIsEditingBio(true);
+    };
+
+    const handleCancelBio = () => {
+        setIsEditingBio(false);
+        setFormData({
+            ...formData,
+            bio: user.bio
+        });
+    };
+
+    const renderBioContent = () => {
+        const bioToShow = isEditingBio ? formData.bio : (user.bio || formData.bio);
+
+        if (!bioToShow) {
+            return <Paragraph>Биография не указана</Paragraph>;
+        }
+
+        return <div dangerouslySetInnerHTML={{ __html: bioToShow }} />;
+    };
 
     return (
         <>
@@ -255,7 +284,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
             <div id="user-info-container">
                 <div id="user-info">
                     <div className="user-info-header">
-                        <h2>Информация о пользователе</h2>
+                        <h2>Моя информация</h2>
                         <Button
                             type="link"
                             icon={<EditOutlined />}
@@ -299,7 +328,51 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                         </Descriptions>
                     )}
                 </div>
+
+                {/* Bio Section */}
+                <div id="user-bio" style={{ marginTop: '20px' }}>
+                    <Card
+                        title={
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h2>Моя биография</h2>
+                                <Button
+                                    type="link"
+                                    icon={<EditOutlined />}
+                                    onClick={handleEditBioClick}
+                                    size="large"
+                                />
+                            </div>
+                        }
+                    >
+                        {isEditingBio ? (
+                            <div>
+                                <ReactQuill
+                                    value={formData.bio || user.bio || ''}
+                                    onChange={(value) => setFormData({ ...formData, bio: value })}
+                                    modules={{
+                                        toolbar: [
+                                            [{ 'header': [1, 2, false] }],
+                                            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                            ['link', 'image'],
+                                            ['clean']
+                                        ],
+                                    }}
+                                />
+                                <div style={{ marginTop: '20px' }}>
+                                    <Button onClick={handleSave} loading={loading}>Сохранить</Button>
+                                    <Button onClick={handleCancelBio} style={{ marginLeft: '10px' }}>Отменить</Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{ minHeight: '100px' }}>
+                                {renderBioContent()}
+                            </div>
+                        )}
+                    </Card>
+                </div>
             </div>
+
 
             {/* AdminStuff */}
             {user.is_admin && (

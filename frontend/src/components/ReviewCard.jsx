@@ -11,8 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { isAuthenticated, is401Error } from '../utils/authUtils';
 
 
-
 const { Paragraph } = Typography;
+
 function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
     const navigate = useNavigate();
     const bookDescription = reviews?.book?.book_description || reviews?.book_description || "Описание отсутствует";

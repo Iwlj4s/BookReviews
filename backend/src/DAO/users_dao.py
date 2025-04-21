@@ -25,6 +25,7 @@ class UserDAO:
         query = update(User).where(User.id == int(user_id)).values(
             name=data["name"],
             email=data["email"],
+            bio=data["bio"],
             password=data["password"]
         )
 

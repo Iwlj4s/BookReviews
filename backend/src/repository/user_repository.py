@@ -151,6 +151,7 @@ async def change_current_user(request: shema.User,
         'data': {
             'id': user.id,
             'user_name': new_data.get("name"),
-            'user_email': new_data.get("email")
+            'user_email': new_data.get("email"),
+            'bio': new_data.get("bio"),
         }
     }
