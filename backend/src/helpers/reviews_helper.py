@@ -11,8 +11,8 @@ from backend.src.DAO.authors_dao import AuthorDAO
 
 
 async def check_data_for_add_review(request: shema.Review, db: AsyncSession):
-    books = await BookDAO.get_book_by_book_name_for_review(request=request, db=db)
-    authors = await AuthorDAO.get_author_by_name_for_review(request=request, db=db)
+    books = await BookDAO.get_book_by_id(db=db, book_id=request.reviewed_book_id)
+    authors = await AuthorDAO.get_author_by_id(db=db, author_id=request.reviewed_book_author_id)
 
     for book in books:
         for author in authors:
@@ -24,11 +24,6 @@ async def check_data_for_add_review(request: shema.Review, db: AsyncSession):
 
 def check_data_for_change_review(request: shema.ChangeReview, review):
     data = {}
-    data.update({"created_by": review.created_by})
-    data.update({"reviewed_book_id": review.reviewed_book_id})
-    data.update({"reviewed_book_author_id": review.reviewed_book_author_id})
-    data.update({"reviewed_book_name": review.reviewed_book_name})
-    data.update({"reviewed_book_author_name": review.reviewed_book_author_name})
 
     if request.review_title is None:
         data.update({"review_title": review.review_title})

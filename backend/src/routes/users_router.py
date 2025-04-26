@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,44 +67,37 @@ async def get_my_reviews(user_data: shema.User = Depends(get_current_user)):
     return user_data.reviews
 
 
-@users_router.post("/user/{user_id}", status_code=200, tags=["users"])
-async def get_user(user_id: int,
-                   db: AsyncSession = Depends(get_db)):
+@users_router.post("/user/{user_id}", status_code=200, tags=["users"], response_model=shema.User)
+async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
     user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
-    return {
-        'user_id:': user.id,
-        'user_name:': user.name,
-        'user_email': user.email,
-        'bio': user.bio,
-        'reviews': user.reviews
-    }
+    return user
 
 
-@users_router.get("/user/{user_id}", status_code=200, tags=["users"])
+@users_router.get("/user/{user_id}", status_code=200, tags=["users"], response_model=shema.User)
 async def get_other_user(user_id: int,
                          db: AsyncSession = Depends(get_db)):
     user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
-    return {
-        'user_id:': user.id,
-        'user_name': user.name,
-        'user_email': user.email,
-        'bio': user.bio,
-        'reviews': user.reviews
-    }
+    return user
 
 
-@users_router.get("/users_list")
+@users_router.get("/users_list", status_code=200, tags=["users"], response_model=List[shema.User])
 async def get_users_for_user(db: AsyncSession = Depends(get_db)):
     users = await GeneralDAO.get_all_items(db=db, item=models.User)
     CheckHTTP404NotFound(founding_item=users, text="Пользователи не найдены")
     users_list = []
     for user in users:
         users_list.append({
-            'id': user.id,
-            'user_name': user.name,
-            'user_email': user.email,
-            'reviews': user.reviews
+            'name': user.name,
+            'email': user.email,
+            'bio': user.bio,
+            'profile_picture': user.profile_picture,
+            'registration_date': user.registration_date,
+            'warnings': user.warnings,
+            'is_active': user.is_active,
+            'is_user': user.is_user,
+            'is_admin': user.is_admin,
+
         })
     return users_list

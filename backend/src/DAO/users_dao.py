@@ -38,4 +38,10 @@ class UserDAO:
         user = await db.execute(query)
 
         return user
-    
+
+    @classmethod
+    async def get_all_users(cls, db: AsyncSession):
+        query = select(User)
+        users = await db.execute(query)
+
+        return users.scalars().all()

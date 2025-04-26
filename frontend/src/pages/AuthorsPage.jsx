@@ -75,7 +75,7 @@ function AuthorsPage() {
     }
 
     if (!authors) {
-       return <div id="spin">Пока что авторов нет </div>;
+       return <div >Пока что авторов нет </div>;
     }
 
     const handleSearchChange = (e) => {

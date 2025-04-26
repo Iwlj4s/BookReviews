@@ -14,11 +14,11 @@ class BookDAO:
         query = select(Book).where(Book.id == book_id)
         book = await db.execute(query)
 
-        return book.scalars().first()
+        return book.scalars().all()
 
     @classmethod
     async def get_book_by_book_name_for_review(cls, request: shema.Review, db: AsyncSession):
-        query = select(Book).where(Book.book_name == request.reviewed_book_name)
+        query = select(Book).where(Book.id == request.reviewed_book_id)
         books = await db.execute(query)
 
         if not books:

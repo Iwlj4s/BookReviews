@@ -39,11 +39,6 @@ class ReviewDAO:
     @classmethod
     async def change_review(cls, db: AsyncSession, review_id: int, data: dict):
         query = update(Review).where(Review.id == review_id).values(
-            created_by=data["created_by"],
-            reviewed_book_id=data["reviewed_book_id"],
-            reviewed_book_author_id=data["reviewed_book_author_id"],
-            reviewed_book_name=data["reviewed_book_name"],
-            reviewed_book_author_name=data["reviewed_book_author_name"],
             review_title=data["review_title"],
             review_body=data["review_body"]
         )
@@ -58,10 +53,10 @@ class ReviewDAO:
             reviewed_book_id=book.id,
             reviewed_book_cover=book.book_cover,
             reviewed_book_author_id=author.id,
-            reviewed_book_name=book.book_name,
-            reviewed_book_author_name=author.name,
             review_title=request.review_title,
-            review_body=request.review_body
+            review_body=request.review_body,
+            created=func.now(),
+            updated=func.now()
         )
 
         print(new_review)

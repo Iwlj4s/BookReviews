@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,42 +23,12 @@ admin_router = APIRouter(
 )
 
 
-@admin_router.post("/sign_in", tags=["admin"])
-async def sign_in_admin(user_email: str,
-                        user_password: str,
-                        response: Response,
-                        db: AsyncSession = Depends(get_db)):
-    request = shema.User(email=user_email,
-                         password=user_password)
-
-    return await admin_repository.login_admin(request=request,
-                                              response=response,
-                                              db=db)
-
-
-@admin_router.post("/logout", tags=["admin"])
-async def logout_admin(response: Response):
-    response.delete_cookie(key='user_access_token')
-    return {'message': 'Администратор успешно вышел из системы'}
-
-
-# Users #
-@admin_router.get("/users/get_users", tags=["user"])
-async def get_users(admin: User = Depends(get_current_admin_user),
-                    db: AsyncSession = Depends(get_db)):
-    users = await GeneralDAO.get_all_items(db=db, item=models.User)
-    CheckHTTP404NotFound(founding_item=users, text="Пользователи не найден")
-
-    return users
-
-
-@admin_router.get("/users/get_user/{user_id}", tags=["user"])
+@admin_router.get("/users/get_user/{user_id}", status_code=200, tags=["users"], response_model=shema.User)
 async def get_user(user_id: int,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
     user = await GeneralDAO.get_item_by_id(db=db, item=models.User, item_id=int(user_id))
     CheckHTTP404NotFound(founding_item=user, text="Пользователь не найден")
-
     return user
 
 

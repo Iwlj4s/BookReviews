@@ -1,10 +1,12 @@
+from typing import List
+
 from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.database.database import get_db
 from backend.src.database.shema import User
-from backend.src.database import shema
+from backend.src.database import shema, models
 from backend.src.repository.admin_repository import get_current_admin_user
 
 from backend.src.repository.user_repository import get_current_user
@@ -17,7 +19,7 @@ reviews_router = APIRouter(
 )
 
 
-@reviews_router.get("/", tags=["reviews"])
+@reviews_router.get("/", tags=["reviews"], response_model=List[shema.Review])
 async def get_reviews(db: AsyncSession = Depends(get_db)):
     return await get_all_reviews(db=db)
 

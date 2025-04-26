@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException
+from sqlalchemy import func
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,12 +41,14 @@ async def create_review(request: shema.Review,
             'review_id': new_review.id,
             'Created by': user.id,
             'book_cover': new_review.reviewed_book_cover,
-            'book_name': new_review.reviewed_book_name,
+            'book_name': book.book_name,
+            'book_id': new_review.reviewed_book_id,
             'book_description': book.book_description,
-            'author_id': author.id,
-            'author_name': new_review.reviewed_book_author_name,
+            'author_name': author.name,
+            'author_id': new_review.reviewed_book_author_id,
             'review_title': new_review.review_title,
             'review_body': new_review.review_body,
+            'created': new_review.created,
         }
     }
 
@@ -76,10 +79,9 @@ async def change_review(review_id: int,
         'status_code': 200,
         'data': {
             'id': user.id,
-            'author_name': review.reviewed_book_author_name,
-            'book_name': review.reviewed_book_name,
             'review_title': new_data.get("review_title"),
-            'review_body': new_data.get("review_body")
+            'review_body': new_data.get("review_body"),
+            'updated': str(review.updated)
         }
     }
 
@@ -109,10 +111,26 @@ async def delete_review(review_id: int,
 
 async def get_all_reviews(db: AsyncSession = Depends(get_db)):
     reviews = await GeneralDAO.get_all_items(db=db, item=models.Review)
+    CheckHTTP404NotFound(founding_item=reviews, text="Обзоры не найдены")
 
-    CheckHTTP404NotFound(founding_item=reviews, text="Обзоры не найден")
+    reviews_list = []
+    for review in reviews:
+        book = review.book
+        author = review.author
 
-    return reviews
+        reviews_list.append({
+            'created_by': review.created_by,
+            'reviewed_book_id': review.reviewed_book_id,
+            'reviewed_book_name': book.book_name,
+            'reviewed_book_author_id': review.reviewed_book_author_id,
+            'reviewed_book_author_name': author.name,
+            'reviewed_book_cover': review.reviewed_book_cover,
+            'review_title': review.review_title,
+            'review_body': review.review_body,
+            'created': review.created,
+            'updated': review.updated,
+        })
+    return reviews_list
 
 
 async def fetch_review(review_id: int, response: Response, db: AsyncSession = Depends(get_db)):

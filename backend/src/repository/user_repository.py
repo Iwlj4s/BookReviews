@@ -55,7 +55,8 @@ async def sign_up(request: shema.UserSignUp, response, db: AsyncSession):
         'data': {
             'id': new_user.id,
             'name': new_user.name,
-            'email': new_user.email
+            'email': new_user.email,
+            'registration_date': new_user.registration_date
         }
     }
 

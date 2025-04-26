@@ -10,6 +10,13 @@ from backend.src.database.models import Author
 
 class AuthorDAO:
     @classmethod
+    async def get_author_by_id(cls, db: AsyncSession, author_id: int):
+        query = select(Author).where(Author.id == author_id)
+        author = await db.execute(query)
+
+        return author.scalars().all()
+
+    @classmethod
     async def get_author_by_name(cls, db: AsyncSession, author_name: str):
         query = select(Author).where(Author.name == author_name)
         author = await db.execute(query)
@@ -17,7 +24,7 @@ class AuthorDAO:
 
     @classmethod
     async def get_author_by_name_for_review(cls, request: shema.Review, db: AsyncSession):
-        query = select(Author).where(Author.name == request.reviewed_book_author_name)
+        query = select(Author).where(Author.id == request.reviewed_book_author_id)
         authors = await db.execute(query)
 
         if not authors:
