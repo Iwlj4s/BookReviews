@@ -67,9 +67,25 @@ class User(BaseModel):
     is_user: Union[bool] = Field(title="Пользователь?"),
     is_admin: Union[bool] = Field(title="Админ?")
 
+    reviews: List[Review]
+
     class Config:
         from_attributes = True
-        arbitrary_types_allowed = True  # Allow arbitrary types in the model
+
+
+class ReviewHomePage(BaseModel):
+    id: int
+    created_by: int
+    review_title: str
+    review_body: str
+    created: datetime
+    updated: datetime
+    user_name: str
+    book_name: str
+    author_name: str
+
+    class Config:
+        from_attributes = True
 
 
 class UserSignIn(BaseModel):

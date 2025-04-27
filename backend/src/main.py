@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.database.database import engine, Base
-from backend.src.database import models
+from backend.src.database import models, shema
 
 from backend.src.DAO.general_dao import GeneralDAO
 
@@ -55,8 +55,8 @@ app.include_router(authors_router)
 app.include_router(books_router)
 
 
-@app.get("/")
-@app.get("/home")
+@app.get("/", response_model=shema.Review)
+@app.get("/home", response_model=shema.Review)
 async def home_page(db: AsyncSession = Depends(get_db)):
     review = await GeneralDAO.get_last_record(db=db, item=models.Review)
     return review

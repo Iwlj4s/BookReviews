@@ -98,6 +98,7 @@ async def get_users_for_user(db: AsyncSession = Depends(get_db)):
             'is_active': user.is_active,
             'is_user': user.is_user,
             'is_admin': user.is_admin,
+            'reviews': user.reviews
 
         })
     return users_list

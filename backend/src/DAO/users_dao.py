@@ -1,6 +1,7 @@
 from sqlalchemy import select, update, delete, and_, func
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import load_only
 
 from backend.src.database.models import User
 
@@ -45,3 +46,13 @@ class UserDAO:
         users = await db.execute(query)
 
         return users.scalars().all()
+
+    @classmethod
+    async def get_simple_user(cls, db: AsyncSession, user_id: int):
+        query = select(User).where(User.id == user_id).options(load_only(
+            User.id,
+            User.name,
+            User.email,
+            User.is_active,
+            User.is_admin
+        ))

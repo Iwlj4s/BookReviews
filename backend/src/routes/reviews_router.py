@@ -53,12 +53,12 @@ async def delete_review(review_id: int,
     return await reviews_repository.delete_review(review_id=review_id, db=db, user=user)
 
 
-@reviews_router.get("/{review_id}", tags=["reviews"])
+@reviews_router.get("/{review_id}", tags=["reviews"], response_model=shema.Review)
 async def get_review(review_id: int, response: Response, db: AsyncSession = Depends(get_db)):
     return await fetch_review(review_id=review_id, response=response, db=db)
 
 
-@reviews_router.get("/filtered/", tags=["reviews"])
+@reviews_router.get("/filtered/", tags=["reviews"], response_model=List[shema.Review])
 async def get_filtered_review(response: Response,
                               book_name: str | None = None,
                               author_name: str | None = None,
