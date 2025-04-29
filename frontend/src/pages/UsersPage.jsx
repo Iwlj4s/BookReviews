@@ -81,7 +81,7 @@ function UsersPage() {
     const filteredUsers = users.filter(user => {
         if (!searchText) return true;
         return (
-             (user.user_name && user.user_name.toLowerCase().includes(searchText.toLowerCase()))
+             (user.name && user.name.toLowerCase().includes(searchText.toLowerCase()))
         );
     });
 

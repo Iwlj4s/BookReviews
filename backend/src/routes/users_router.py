@@ -82,7 +82,7 @@ async def get_other_user(user_id: int,
     return user
 
 
-@users_router.get("/users_list", status_code=200, tags=["users"], response_model=List[shema.User])
+@users_router.get("/users_list", status_code=200, tags=["users"], response_model=List[shema.SimpleUser])
 async def get_users_for_user(db: AsyncSession = Depends(get_db)):
     users = await GeneralDAO.get_all_items(db=db, item=models.User)
     CheckHTTP404NotFound(founding_item=users, text="Пользователи не найдены")

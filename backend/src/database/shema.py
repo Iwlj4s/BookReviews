@@ -33,9 +33,31 @@ class Book(BaseModel):
         return v
 
 
+class AddBook(BaseModel):
+    book_author_name: Union[str, None] = Field(default=None, title="Имя автора")
+    book_name: Union[str, None] = Field(default=None, title="Название книги")
+
+    @validator('book_name')
+    def capitalize_name(cls, v):
+        if v:
+            return v.capitalize()
+        return v
+
+
+class SimpleUser(BaseModel):
+    name: Union[str, None] = Field(min_length=3, title="Имя пользователя")
+    email: Union[str, None] = Field(title="Эл.почта пользователя")
+    registration_date: Union[datetime, None] = Field(title="Дата регистрации пользователя"),
+    warnings: Union[int] = Field(title="Предупреждения пользователя"),
+    is_active: Union[bool] = Field(title="Активен ли пользователь"),
+    is_user: Union[bool] = Field(title="Пользователь?"),
+    is_admin: Union[bool] = Field(title="Админ?")
+
+
 # Review #
 class Review(BaseModel):
     created_by: Union[int]
+    user: Union[SimpleUser]
     reviewed_book_id: Union[int]
     reviewed_book_author_id: Union[int]
 

@@ -120,6 +120,7 @@ async def get_all_reviews(db: AsyncSession = Depends(get_db)):
 
         reviews_list.append({
             'created_by': review.created_by,
+            'user': review.user,
             'reviewed_book_id': review.reviewed_book_id,
             'reviewed_book_name': book.book_name,
             'reviewed_book_author_id': review.reviewed_book_author_id,
@@ -130,6 +131,7 @@ async def get_all_reviews(db: AsyncSession = Depends(get_db)):
             'created': review.created,
             'updated': review.updated,
         })
+
     return reviews_list
 
 

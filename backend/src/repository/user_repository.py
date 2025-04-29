@@ -92,7 +92,9 @@ async def get_current_user(db: AsyncSession = Depends(get_db),
             'message': "Token not found",
             'status_code': 401,
         }
-    user = await UserDAO.get_simple_user(db=db, user_id=user_id)
+
+    # user = await UserDAO.get_simple_user(db=db, user_id=user_id)
+    user = await GeneralDAO.get_item_by_id(db=db, item_id=user_id, item=models.User)
 
     return user
 

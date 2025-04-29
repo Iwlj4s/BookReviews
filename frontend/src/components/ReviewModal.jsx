@@ -58,11 +58,23 @@ const ReviewModal = ({ visible, onClose, onSubmit }) => {
     };
 
     const handleSubmit = async () => {
-        const { reviewTitle, author, book, reviewBody } = formData;
+        const { reviewTitle, author, book, reviewBody, rating } = formData;
 
         setLoading(true);
         try {
-            await onSubmit(formData);
+            // Находим ID автора и книги
+            const selectedAuthor = authors.find(a => a.name === author);
+            const selectedBook = books.find(b => b.book_name === book);
+
+            const reviewData = {
+                review_title: reviewTitle,
+                reviewed_book_id: selectedBook.id,
+                reviewed_book_author_id: selectedAuthor.id,
+                review_body: reviewBody,
+                rating: rating // Добавляем оценку
+            };
+
+            await onSubmit(reviewData);
             onClose();
         } catch (error) {
             message.error('Ошибка при добавлении обзора.');

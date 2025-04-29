@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Space, Tree, Button, Input, message, Modal, Typography } from 'antd';
+import { Card, Space, Tree, Button, Input, message, Modal, Typography, Rate } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { updateReview } from '../utils/reviewsUtils.jsx'
 import ReactQuill from 'react-quill';
@@ -23,7 +23,8 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
 
     const [formData, setFormData] = useState({
         reviewTitle: reviews.review_title || null,
-        reviewBody: reviews.review_body || null
+        reviewBody: reviews.review_body || null,
+        rating: reviews.rating || 0
     });
 
     const [isExpanded, setIsExpanded] = useState(false);
@@ -66,41 +67,31 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
         });
     };
 
-    const handleSave = async () => {
+     const handleSave = async () => {
         const requestData = {
-                review_title: formData.reviewTitle || null,
-                review_body: formData.reviewBody || null
-            }
-
-        const review_id = reviews.id || reviews.review_id;
-
-        const token = localStorage.getItem('user_access_token')
-
-        if (!is401Error(navigate, "/reviews")) return;
-        console.log("Review id:", review_id)
-        console.log("User who edit: ", user)
+            review_title: formData.reviewTitle || null,
+            review_body: formData.reviewBody || null,
+            rating: formData.rating || 0
+        };
 
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/book_reviews/reviews/change_review/${review_id}`, requestData,
-             {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+            const response = await axios.put(
+                `http://127.0.0.1:8000/book_reviews/reviews/change_review/${reviews.id}`,
+                requestData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                    }
                 }
-            });
-
-            console.log("Requested review data in Review Card: ", requestData)
-            console.log("Rsponse status code in Review Card:", response.data.status_code)
+            );
 
             if (response.data.status_code === 200) {
-                console.log(response.data)
                 handleUpdateReview(reviews.id, requestData);
                 setIsEditing(false);
                 message.success('Обзор успешно обновлен');
             }
         } catch (error) {
-            if (!error.response.status === 401)
-            message.error(error.response.data.detail);
-            console.error('Ошибка при обновлении обзора:', error.response.data.detail);
+            message.error(error.response?.data?.detail || 'Ошибка при обновлении обзора');
         }
     };
 
@@ -170,11 +161,12 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                                 </div>
                             ) : null}
                             <div id="title-and-img">
-                                <img src={reviews.reviewed_book_cover || reviews.book_cover} alt='img' width="80" />
+                                <img src={reviews.book?.book_cover || reviews.reviewed_book_cover} alt='img' width="80" />
                                 <h1 id="text">{reviews.review_title}</h1>
                             </div>
                             <div id="book-info">
-                                <h3 id="text">{reviews.reviewed_book_author_name || reviews.author_name} || {reviews.reviewed_book_name || reviews.book_name}</h3>
+                                <h3 id="text">{reviews.book?.author?.name || reviews.reviewed_book_author_name}</h3>
+                                <p>{reviews.book?.book_name || reviews.reviewed_book_name}</p>
                                 <div className="tree-container" id="text">
                                     <Tree
                                         treeData={treeData}
@@ -184,14 +176,14 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                             </div>
                             <p>
                                 Автор обзора: <a
-                                    href={`user/${reviews.user?.id || user.id}`}
+                                    href={`/user/${reviews.user?.id || reviews.created_by_name}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    {reviews.user?.name || user.name}
+                                    {reviews.user?.name || reviews.created_by_name}
                                 </a>
                             </p>
-                            <p>Обзор обновлен: {reviews.updated}</p>
+                            <p>Обзор обновлен: {new Date(reviews.updated).toLocaleString()}</p>
                         </div>
                     }
                 >
@@ -203,6 +195,13 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                                     value={formData.reviewTitle}
                                     onChange={(e) => setFormData({ ...formData, reviewTitle: e.target.value })}
                                 />
+
+                                <div>
+                                    <Rate
+                                        value={formData.rating}
+                                        onChange={(value) => setFormData({...formData, rating: value})}
+                                    />
+                                </div>
 
                                 <ReactQuill
                                     value={formData.reviewBody}
@@ -216,10 +215,25 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                             <div>
                                 <div>
                                     {isExpanded ? (
-                                        renderReviewBody(reviews.review_body)
+                                        <>
+                                            {renderReviewBody(reviews.review_body)}
+                                            <Rate
+                                                value={formData.rating}
+                                                disabled
+                                                style={{ marginBottom: '10px' }}
+                                            />
+                                        </>
                                     ) : (
-                                        renderReviewBody(reviews.review_body.slice(0, MAX_LENGTH))
+                                        <>
+                                            {renderReviewBody(reviews.review_body.slice(0, MAX_LENGTH))}
+                                            <Rate
+                                                value={formData.rating}
+                                                disabled
+                                                style={{ marginBottom: '10px' }}
+                                            />
+                                        </>
                                     )}
+
                                     {reviews.review_body.length > MAX_LENGTH && (
                                         <Button type="link" onClick={() => setIsExpanded(!isExpanded)}>
                                             {isExpanded ? 'Свернуть' : 'Развернуть'}

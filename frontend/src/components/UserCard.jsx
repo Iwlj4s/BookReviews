@@ -27,10 +27,10 @@ function UserCard({ user, setUser }) {
                         <div id="book-info">
                             <h3 id="text">
                                    <a
-                                    href={`user/${user.id }`}
+                                    href={`/user/${user.id }`}
                                     target="_blank"
                                     rel="noopener noreferrer">
-                                    {user.user_name}
+                                    {user.name}
                                 </a>
                             </h3>
                         </div>

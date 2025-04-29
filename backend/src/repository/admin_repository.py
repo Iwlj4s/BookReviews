@@ -193,7 +193,7 @@ async def change_review(review_id: int,
 
 # --- BOOKS --- #
 async def add_book(response: Response,
-                   request: shema.Book,
+                   request: shema.AddBook,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
     author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name.title()))
