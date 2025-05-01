@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Input, Select, message, Spin } from 'antd';
+import { Modal, Input, Select, message, Spin, Rate } from 'antd';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
@@ -12,6 +12,7 @@ const ReviewModal = ({ visible, onClose, onSubmit }) => {
         author: '',
         book: '',
         reviewBody: ''
+        rating: 0
     });
     const [loading, setLoading] = useState(false);
     const [authors, setAuthors] = useState([]);
@@ -95,11 +96,18 @@ const ReviewModal = ({ visible, onClose, onSubmit }) => {
                 <Spin />
             ) : (
                 <>
+
+                    <Rate
+                        value={formData.rating}
+                        onChange={(value) => setFormData({...formData, rating: value})}
+                    />
+
                     <Input
                         placeholder="Заголовок обзора"
                         value={formData.reviewTitle}
                         onChange={(e) => setFormData({ ...formData, reviewTitle: e.target.value })}
                     />
+
                     <Select
                         placeholder="Выберите автора"
                         style={{ width: '100%', marginTop: '10px' }}

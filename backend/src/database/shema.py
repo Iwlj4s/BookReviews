@@ -58,6 +58,7 @@ class SimpleUser(BaseModel):
 class Review(BaseModel):
     created_by: Union[int]
     user: Union[SimpleUser]
+
     reviewed_book_id: Union[int]
     reviewed_book_author_id: Union[int]
 
@@ -65,6 +66,8 @@ class Review(BaseModel):
 
     reviewed_book_id: Union[int] = Field(default=None, title="Название книги, на которую написан обзор")
     reviewed_book_author_id: Union[int] = Field(default=None, title="Имя автора книги, на которую написан обзор")
+
+    rating: Optional[int] = Field(None, ge=1, le=5, title="Оценка книги (1-5)")
 
     review_title: Union[str] = Field(default=None, min_length=5, title="Заголовок обзора")
     review_body: Union[str] = Field(default=None, min_length=5, title="Обзор")
@@ -129,6 +132,7 @@ class FilteredReview(BaseModel):
 class ChangeReview(BaseModel):
     review_title: Union[str, None] = Field(default=None, min_length=5, title="Заголовок обзора")
     review_body: Union[str, None] = Field(default=None, min_length=5, title="Обзор")
+    rating: Optional[int] = Field(None, ge=1, le=5, title="Оценка книги (1-5)")
 
     class Config:
         from_attributes = True

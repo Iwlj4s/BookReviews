@@ -17,11 +17,19 @@ from backend.src.helpers.reviews_helper import check_data_for_add_review, check_
 
 from backend.parsing.get_data import get_book_info
 
+# TODO: Fix displaying book's rating in books/book/{book_id}
+# TODO: Do adding deleting review in DB DeletedReview
+
 
 async def create_review(request: shema.Review,
                         response: Response,
                         user: shema.User,
                         db: AsyncSession = Depends(get_db)):
+    if request.rating and (request.rating < 1 or request.rating > 5):
+        raise HTTPException(
+            status_code=400,
+            detail="Рейтинг должен быть от 1 до 5"
+        )
 
     book, author = await check_data_for_add_review(request=request, db=db)
     new_review = await ReviewDAO.create_review(request=request,
@@ -30,10 +38,16 @@ async def create_review(request: shema.Review,
                                                author=author,
                                                db=db)
 
+    # Refresh all related objects
     await db.refresh(new_review)
     await db.refresh(user)
     await db.refresh(author)
     await db.refresh(book)
+
+    # Ensure we have the latest data
+    book = await db.get(models.Book, book.id)
+    author = await db.get(models.Author, author.id)
+
     return {
         'message': "Обзор добавлен успешно",
         'status_code': 200,
@@ -44,6 +58,8 @@ async def create_review(request: shema.Review,
             'book_name': book.book_name,
             'book_id': new_review.reviewed_book_id,
             'book_description': book.book_description,
+            'rating': new_review.rating,
+            'book_average_rating': book.book_average_rating,
             'author_name': author.name,
             'author_id': new_review.reviewed_book_author_id,
             'review_title': new_review.review_title,
@@ -102,9 +118,7 @@ async def delete_review(review_id: int,
         'message': "success",
         'status_code': 200,
         'status': 'Success',
-        'data': {f"Review id:{review.id}",
-                 f" title:{review.review_title}",
-                 f" book_name:{review.reviewed_book_name} deleted!"
+        'data': {f"Review id:{review.id} deleted!"
         }
     }
 
@@ -123,6 +137,7 @@ async def get_all_reviews(db: AsyncSession = Depends(get_db)):
             'user': review.user,
             'reviewed_book_id': review.reviewed_book_id,
             'reviewed_book_name': book.book_name,
+            'rating': review.rating,
             'reviewed_book_author_id': review.reviewed_book_author_id,
             'reviewed_book_author_name': author.name,
             'reviewed_book_cover': review.reviewed_book_cover,

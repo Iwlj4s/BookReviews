@@ -2,6 +2,7 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.src.DAO.books_dao import BookDAO
 from backend.src.database import shema, models
 from backend.src.database.database import get_db
 
@@ -28,3 +29,10 @@ async def get_books(db: AsyncSession = Depends(get_db)):
     books = await GeneralDAO.get_all_items(db=db, item=models.Book)
     CheckHTTP404NotFound(founding_item=books, text="Книги не найдены")
     return books
+
+
+@books_router.get("/book/{book_id}/stats", tags=["books"])
+async def get_books_stats(book_id: int,
+                          db:AsyncSession = Depends(get_db)):
+    book_w_stats = await BookDAO.get_book_with_rating(db=db, book_id=book_id)
+    return book_w_stats

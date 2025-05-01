@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin as AntdSpin, Form, Typography } from 'antd';
+import { Card, Descriptions, Button, Spin, Input, message, Modal, Select, Spin as AntdSpin, Form, Typography, Rate } from 'antd';
 import { EditOutlined, MailOutlined, UserOutlined, LockOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -43,7 +43,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         reviewTitle: '',
         author: '',
         book: '',
-        reviewBody: ''
+        reviewBody: '',
+        rating: 0
     });
 
     const [books, setBooks] = useState([]);
@@ -55,7 +56,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         review_title: '',
         reviewed_book_name: '',
         reviewed_book_author_name: '',
-        review_body: ''
+        review_body: '',
+        rating: 0
     });
 
     const [loading, setLoading] = useState(false);
@@ -208,7 +210,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
             review_title: '',
             reviewed_book_name: '',
             reviewed_book_author_name: '',
-            review_body: ''
+            review_body: '',
+            rating: 0
         });
     };
 
@@ -242,6 +245,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                     review_body: response.data.data.review_body,
                     book_description: response.data.data.book_description,
                     created_by: response.data.data['Created by'],
+                    book_rating: response.data.rating,
                     updated: new Date().toISOString()
                 };
 
@@ -256,8 +260,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     };
 
     const handleEditBioClick = () => {
-                if (!isAuthenticated(navigate, "/sign_in")) return;
-                setIsEditingBio(true);
+        if (!isAuthenticated(navigate, "/sign_in")) return;
+        setIsEditingBio(true);
     };
 
     const handleCancelBio = () => {
@@ -412,10 +416,17 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                     ]}
                 >
                     <Form layout="vertical">
+
                         <Form.Item label="Заголовок обзора">
                             <Input
                                 value={reviewForm.review_title}
                                 onChange={(e) => setReviewForm({ ...reviewForm, review_title: e.target.value })}
+                            />
+                        </Form.Item>
+                        <Form.Item label="Оценка книги">
+                            <Rate
+                                value={reviewForm.rating}
+                                onChange={(value) => setReviewForm({...reviewForm, rating: value})}
                             />
                         </Form.Item>
                         <Form.Item label="Выбор автора">

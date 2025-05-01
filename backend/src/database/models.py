@@ -36,7 +36,7 @@ class User(Base):
     is_user: Mapped[bool] = mapped_column(default=True, server_default=text("True"), nullable=False)
     is_admin: Mapped[bool] = mapped_column(default=False, server_default=text("False"), nullable=False)
 
-    warnings: Mapped[int] = mapped_column(default=False, server_default=text("False"), nullable=False)
+    warnings: Mapped[int] = mapped_column(default=0, server_default=text("0"), nullable=False)
 
     reviews: Mapped[List["Review"]] = relationship("Review",
                                                    back_populates="user",
@@ -132,10 +132,12 @@ class Review(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+
     reviewed_book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), nullable=False, index=True)
     reviewed_book_author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False, index=True)
 
     reviewed_book_cover: Mapped[str] = mapped_column(ForeignKey("books.book_cover"), nullable=False, index=True)
+    rating: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     review_title: Mapped[str] = mapped_column(String, nullable=True, index=True, )
     review_body: Mapped[str] = mapped_column(Text, nullable=False, index=True, )

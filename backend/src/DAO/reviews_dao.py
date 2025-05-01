@@ -40,11 +40,16 @@ class ReviewDAO:
     async def change_review(cls, db: AsyncSession, review_id: int, data: dict):
         query = update(Review).where(Review.id == review_id).values(
             review_title=data["review_title"],
-            review_body=data["review_body"]
+            review_body=data["review_body"],
+            rating=data["rating"]
         )
 
         await db.execute(query)
         await db.commit()
+
+        review = await db.get(Review, review_id)
+        if review:
+            await cls.update_book_rating(db, review.reviewed_book_id)
 
     @classmethod
     async def create_review(cls, request: shema.Review, user, book, author, db: AsyncSession):
@@ -55,15 +60,16 @@ class ReviewDAO:
             reviewed_book_author_id=author.id,
             review_title=request.review_title,
             review_body=request.review_body,
+            rating=request.rating,
             created=func.now(),
             updated=func.now()
         )
 
-        print(new_review)
-
         db.add(new_review)
         await db.commit()
+        await db.refresh(new_review)
 
+        await cls.update_book_rating(db, book.id)
         return new_review
 
     @classmethod
@@ -90,4 +96,20 @@ class ReviewDAO:
     async def delete_review_by_user_id(cls, db: AsyncSession, user_id: int):
         query = delete(Review).options(selectinload(Review.user)).where(Review.created_by == int(user_id))
         await db.execute(query)
+        await db.commit()
+
+    @classmethod
+    async def update_book_rating(cls, db: AsyncSession, book_id: int):
+        found_avg_rating = await db.execute(
+            select(func.avg(Review.rating))
+            .where(Review.reviewed_book_id == book_id)
+            .where(Review.rating.isnot(None))
+        )
+        avg_rating = round(found_avg_rating.scalar() or 0, 2)
+
+        await db.execute(
+            update(models.Book)
+            .where(models.Book.id == book_id)
+            .values(book_average_rating=avg_rating)
+        )
         await db.commit()

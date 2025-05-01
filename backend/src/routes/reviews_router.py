@@ -30,7 +30,11 @@ async def create_review(response: Response,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user)):
     print("Request from back: ", request)
-    return await reviews_repository.create_review(request=request, response=response, user=user, db=db)
+    new_review = await reviews_repository.create_review(request=request,
+                                                        response=response,
+                                                        user=user,
+                                                        db=db)
+    return new_review
 
 
 @reviews_router.put("/change_review/{review_id}", tags=["reviews"])
@@ -38,7 +42,6 @@ async def change_review(review_id: int,
                         request: shema.ChangeReview,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user) or Depends(get_current_admin_user)):
-
     return await reviews_repository.change_review(review_id=int(review_id),
                                                   request=request,
                                                   db=db,
@@ -49,7 +52,6 @@ async def change_review(review_id: int,
 async def delete_review(review_id: int,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user)):
-
     return await reviews_repository.delete_review(review_id=review_id, db=db, user=user)
 
 
