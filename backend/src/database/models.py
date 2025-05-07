@@ -160,10 +160,13 @@ class Review(Base):
         lazy="selectin"
     )
 
-    deleted_review: Mapped[Optional["DeletedReview"]] = relationship("DeletedReview",
-                                                                     back_populates="review",
-                                                                     uselist=False,
-                                                                     lazy="selectin")
+    deleted_review: Mapped[Optional["DeletedReview"]] = relationship(
+        "DeletedReview",
+        back_populates="review",
+        uselist=False,
+        lazy="selectin",
+        cascade="all, delete-orphan"
+    )
 
 
 class AdminAction(Base):
@@ -216,8 +219,27 @@ class DeletedReview(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     deletion_date: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
     original_content: Mapped[str] = mapped_column(Text, nullable=False)
-    review_id: Mapped[int] = mapped_column(ForeignKey("reviews.id"), nullable=False)
+    reason: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
+    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), nullable=False)
+    book_name: Mapped[str] = mapped_column(String, nullable=False)
+    rating: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False)
+    author_name: Mapped[str] = mapped_column(String, nullable=False)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_name: Mapped[str] = mapped_column(String, nullable=False)
+
+    review_id: Mapped[int] = mapped_column(ForeignKey("reviews.id"), nullable=False, unique=True)
     admin_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    review: Mapped["Review"] = relationship("Review", back_populates="deleted_review")
-    admin: Mapped["User"] = relationship("User")
+    review: Mapped["Review"] = relationship(
+        "Review",
+        back_populates="deleted_review",
+        foreign_keys=[review_id]
+    )
+    admin: Mapped["User"] = relationship("User", foreign_keys=[admin_id])
+    book: Mapped["Book"] = relationship("Book", foreign_keys=[book_id])
+    author: Mapped["Author"] = relationship("Author", foreign_keys=[author_id])
+    user: Mapped["User"] = relationship("User", foreign_keys=[user_id])

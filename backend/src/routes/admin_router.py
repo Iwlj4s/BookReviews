@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, APIRouter, Response
+from fastapi import Depends, APIRouter, Response, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +23,7 @@ admin_router = APIRouter(
 )
 
 
+# --- USERS --- #
 @admin_router.get("/users/get_user/{user_id}", status_code=200, tags=["users"], response_model=shema.User)
 async def get_user(user_id: int,
                    admin: User = Depends(get_current_admin_user),
@@ -58,12 +59,13 @@ async def delete_user(user_id: int,
     return await admin_repository.delete_user(db=db, user_id=int(user_id))
 
 
-# Reviews #
+# --- REVIEWS --- #
 @admin_router.delete("/review/delete_review/{review_id}", tags=["review"])
 async def delete_review(review_id: int,
+                        reason: str = Query(default="Нарушение правил сообщества", description="Причина удаления"),
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    return await GeneralDAO.delete_item(db=db, item=models.Review, item_id=int(review_id))
+    return await admin_repository.delete_review(review_id=review_id, admin=admin, db=db, reason=reason)
 
 
 @admin_router.put("/review/change_review/{review_id}", tags=["review"])
@@ -80,7 +82,26 @@ async def admin_change_review(review_id: int,
                                                 admin=admin, db=db)
 
 
-# Authors #
+@admin_router.get("/deleted_reviews", tags=["deleted review"])
+async def get_deleted_reviews(admin: User = Depends(get_current_admin_user),
+                              db: AsyncSession = Depends(get_db)):
+    deleted_reviews = await GeneralDAO.get_all_items(db=db, item=models.DeletedReview)
+    CheckHTTP404NotFound(founding_item=deleted_reviews, text="Удаленные обзоры не найдены")
+
+    return deleted_reviews
+
+
+@admin_router.get("/deleted_reviews/{deleted_review_id}", tags=["deleted review"])
+async def get_deleted_review(deleted_review_id: int,
+                             admin: User = Depends(get_current_admin_user),
+                             db: AsyncSession = Depends(get_db)):
+    deleted_review = await GeneralDAO.get_item_by_id(db=db, item_id=deleted_review_id, item=models.DeletedReview)
+    CheckHTTP404NotFound(founding_item=deleted_review, text="Удаленный обзор не найдены")
+
+    return deleted_review
+
+
+# --- AUTHORS ---#
 @admin_router.post("/authors/add_author", tags=["author"])
 async def add_author(response: Response,
                      request: shema.Author,
@@ -112,10 +133,10 @@ async def change_author(response: Response,
                                                 db=db)
 
 
-# Books #
+# ---  BOOKS --- #
 @admin_router.post("/books/add_book", tags=["book"])
 async def add_book(response: Response,
-                   request: shema.AddBook,
+                   request: shema.Book,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
     return await admin_repository.add_book(response=response,
@@ -147,8 +168,9 @@ async def change_book(book_id: int,
     return await admin_repository.change_book(db=db, book_id=int(book_id), request=request, admin=admin)
 
 
+# --- NEWSLETTER --- #
 @admin_router.post("/mail/send_letter", tags=["send_email"])
-async def sending_letter(request: shema.NewsLetterForUser ,
+async def sending_letter(request: shema.NewsLetterForUser,
                          admin: User = Depends(get_current_admin_user),
                          db: AsyncSession = Depends(get_db)):
     return await admin_repository.send_email_func(request=request,

@@ -27,6 +27,9 @@ from backend.src.repository.user_repository import get_current_user
 from backend.email.send_email import send_email
 
 
+# TODO: Fix getting book description
+# TODO: Fix deleting review (it's putting in deleted but has some error and email doesn't sending)
+
 async def login_admin(request: shema.UserSignIn, response, db: AsyncSession = Depends(get_db)):
     user = await user_helper.take_access_token_for_user(db=db,
                                                         response=response,
@@ -83,6 +86,42 @@ async def delete_user(user_id: int,
         'status_code': 200,
         'data': f"user_id: {user.id}, user_name: {user.name}, user_email:{user.email} deleted!"
     }
+
+
+# --- REVIEW --- #
+async def delete_review(review_id: int,
+                        reason: str = "Нарушение правил сообщества",
+                        admin: User = Depends(get_current_admin_user),
+                        db: AsyncSession = Depends(get_db)):
+    try:
+        review = await ReviewDAO.load_review_with_relations(db, review_id)
+        CheckHTTP404NotFound(review, "Обзор не найден")
+
+        # TODO: Fix clones reviews id's in models
+        deleted_review = await ReviewDAO.create_deleted_review_record(
+            db, review, admin, reason
+        )
+
+        await db.delete(review)
+        await db.commit()
+
+        # TODO: Fix that with celery or something like that
+        # await ReviewDAO.send_deletion_email(user=review.user,
+        #                                     review=review,
+        #                                     book=review.book,
+        #                                     author=review.author,
+        #                                     reason=reason)
+
+        return {
+            'message': 'Обзор удален успешно, письмо отправлено',
+            'status_code': 200,
+            'data': deleted_review
+        }
+
+    except Exception as e:
+        await db.rollback()
+        print(f"Ошибка при удалении отзыва: {e}")
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
 # --- AUTHORS --- #
@@ -193,7 +232,7 @@ async def change_review(review_id: int,
 
 # --- BOOKS --- #
 async def add_book(response: Response,
-                   request: shema.AddBook,
+                   request: shema.Book,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
     author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name.title()))
@@ -211,8 +250,10 @@ async def add_book(response: Response,
             'status_code': 404
         }
 
-    book_cover, book_desc = await get_book_info(book_name=request.book_name.capitalize(), author_name=author.name.title())
-    print(book_cover)
+    book_cover, book_desc = await get_book_info(book_name=request.book_name.capitalize(),
+                                                author_name=author.name.title())
+    print(f"Обложка: {book_cover}")
+    print(f"Описание: {book_desc}")
 
     if book_cover is None:
         return {
@@ -304,7 +345,6 @@ async def change_book(book_id: int,
 # --- SENDING MAIL --- #
 async def send_email_func(request: shema.NewsLetterForUser,
                           db: AsyncSession = Depends(get_db)):
- 
     try:
         await send_email(mail_body=request.mail_body,
                          mail_theme=request.mail_theme,

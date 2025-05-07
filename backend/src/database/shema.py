@@ -138,6 +138,28 @@ class ChangeReview(BaseModel):
         from_attributes = True
 
 
+class DeletedReview(BaseModel):
+    review_id: int
+    original_content: str
+    reason: str
+    deletion_date: datetime
+
+    book_id: int
+    book_name: str
+
+    author_id: int
+    author_name: str
+
+    user_id: int
+    user_name: str
+
+    admin_id: int
+    admin_name: str
+
+    class Config:
+        from_attributes = True
+
+
 # Newsletter for all users #
 class NewsletterForAllUsers(BaseModel):
     mail_theme: Union[str, None] = Field(default=None, title="Тема письма")

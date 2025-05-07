@@ -1,10 +1,13 @@
+from typing import Optional
+
 from sqlalchemy import select, update, delete, and_, func
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from backend.email.send_email import send_email
 from backend.src.database import shema, models
-from backend.src.database.models import Review
+from backend.src.database.models import Review, User
 
 
 class ReviewDAO:
@@ -21,6 +24,100 @@ class ReviewDAO:
         review = await db.execute(query)
 
         return review.scalars().all()
+
+    # --- DELETED REVIEWS --- #
+    @classmethod
+    async def send_deletion_email(cls,
+                                  user: User,
+                                  review: models.Review,
+                                  book: models.Book,
+                                  author: models.Author,
+                                  reason: str):
+        mail_theme = "Ваш обзор был удален"
+        mail_body = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                    <h2 style="color: #d9534f;">Уведомление об удалении обзора</h2>
+                    <p>Здравствуйте, {user.name}!</p>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #d9534f; margin: 15px 0;">
+                        <p>Ваш обзор на книгу <strong>"{book.book_name}"</strong> автора <strong>{author.name}</strong> был удален.</p>
+                        <p><strong>Причина:</strong> {reason}</p>
+                    </div>
+                    <h3>Содержание удаленного обзора:</h3>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+                        <h4>{review.review_title}</h4>
+                        <p>{review.review_body}</p>
+                    </div>
+                    <p style="margin-top: 20px;">Дата написания: {review.created.strftime('%d.%m.%Y')}</p>
+                    <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <p>Если это ошибка, свяжитесь с поддержкой.</p>
+                        <p>С уважением,<br><strong>Команда BookReviews</strong></p>
+                    </div>
+                </div>
+            </body>
+        </html>
+        """
+
+        await send_email(mail_theme=mail_theme, mail_body=mail_body, receiver_email=user.email)
+
+    @classmethod
+    async def create_deleted_review_record(cls,
+                                           db: AsyncSession,
+                                           review: Review,
+                                           admin: User,
+                                           reason: str) -> models.DeletedReview:
+        # Получаем все связанные объекты
+        book = await db.get(models.Book, review.reviewed_book_id)
+        author = await db.get(models.Author, review.reviewed_book_author_id)
+        user = await db.get(models.User, review.created_by)
+
+        if not all([book, author, user]):
+            raise ValueError("Не удалось найти связанные объекты для удаленного обзора")
+
+        deleted_review = models.DeletedReview(
+            user_id=user.id,
+            user_name=user.name,
+            book_id=book.id,
+            book_name=book.book_name,
+            author_id=author.id,
+            author_name=author.name,
+            original_content=f"{review.review_title}\n{review.review_body}",
+            rating=review.rating,
+            reason=reason,
+            admin_id=admin.id,
+            review_id=review.id
+        )
+        db.add(deleted_review)
+        await db.flush()
+        return deleted_review
+
+    @classmethod
+    async def load_review_with_relations(cls,
+                                         db: AsyncSession,
+                                         review_id: int) -> Optional[models.Review]:
+        result = await db.execute(
+            select(models.Review)
+            .options(
+                selectinload(models.Review.user),
+                selectinload(models.Review.book),
+                selectinload(models.Review.author)
+            )
+            .where(models.Review.id == review_id)
+        )
+        return result.scalar_one_or_none()
+
+    @classmethod
+    async def notify_user_about_deletion(cls,
+                                         user: User,
+                                         review: models.Review,
+                                         book: models.Book,
+                                         author: models.Author,
+                                         reason: str):
+        try:
+            await cls.send_deletion_email(user, review, book, author, reason)
+        except Exception as e:
+            print(f"Ошибка при отправке email: {e}")
 
     @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,
