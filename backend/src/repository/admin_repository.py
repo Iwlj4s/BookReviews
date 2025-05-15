@@ -26,6 +26,8 @@ from backend.src.repository.user_repository import get_current_user
 
 from backend.email.send_email import send_email
 
+from backend.celery.tasks import send_email_task
+
 
 # TODO: Fix getting book description
 # TODO: Fix deleting review (it's putting in deleted but has some error and email doesn't sending)
@@ -93,25 +95,44 @@ async def delete_review(review_id: int,
                         reason: str = "Нарушение правил сообщества",
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
+
+    """
+    :param review_id: deleting review's id
+    :param reason: deleting reason
+    :param admin: is user admin
+    :param db: database
+    :return: deleted review + message successfully sent email
+
+    Loading deleting review
+    Saving needed data before deleting review
+    Creating deleted review in table deleted_review
+    Delete review from reviews table
+    Send notify user about deleted review
+    """
     try:
         review = await ReviewDAO.load_review_with_relations(db, review_id)
         CheckHTTP404NotFound(review, "Обзор не найден")
 
-        # TODO: Fix clones reviews id's in models
+        user_email = review.user.email
+        user_name = review.user.name
+        book_name = review.book.book_name
+        author_name = review.author.name
+        review_title = review.review_title
+        review_body = review.review_body
+        created_date = review.created
+
         deleted_review = await ReviewDAO.create_deleted_review_record(
             db, review, admin, reason
         )
 
-        await db.delete(review)
-        await db.commit()
-
-        # TODO: Fix that with celery or something like that
-        # await ReviewDAO.send_deletion_email(user=review.user,
-        #                                     review=review,
-        #                                     book=review.book,
-        #                                     author=review.author,
-        #                                     reason=reason)
-
+        await ReviewDAO.notify_user_about_deletion(user_name=user_name,
+                                                   user_email=user_email,
+                                                   review_title=review_title,
+                                                   review_body=review_body,
+                                                   created_date=created_date,
+                                                   book_name=book_name,
+                                                   author_name=author_name,
+                                                   reason=reason)
         return {
             'message': 'Обзор удален успешно, письмо отправлено',
             'status_code': 200,

@@ -9,6 +9,8 @@ from backend.email.send_email import send_email
 from backend.src.database import shema, models
 from backend.src.database.models import Review, User
 
+from backend.celery.tasks import send_email_task
+
 
 class ReviewDAO:
     @classmethod
@@ -66,14 +68,10 @@ class ReviewDAO:
                                            db: AsyncSession,
                                            review: Review,
                                            admin: User,
-                                           reason: str) -> models.DeletedReview:
-        # Получаем все связанные объекты
-        book = await db.get(models.Book, review.reviewed_book_id)
-        author = await db.get(models.Author, review.reviewed_book_author_id)
-        user = await db.get(models.User, review.created_by)
-
-        if not all([book, author, user]):
-            raise ValueError("Не удалось найти связанные объекты для удаленного обзора")
+                                           reason: str):
+        book = review.book
+        author = review.author
+        user = review.user
 
         deleted_review = models.DeletedReview(
             user_id=user.id,
@@ -89,7 +87,9 @@ class ReviewDAO:
             review_id=review.id
         )
         db.add(deleted_review)
-        await db.flush()
+        await db.commit()
+        await db.refresh(deleted_review)
+
         return deleted_review
 
     @classmethod
@@ -109,15 +109,41 @@ class ReviewDAO:
 
     @classmethod
     async def notify_user_about_deletion(cls,
-                                         user: User,
-                                         review: models.Review,
-                                         book: models.Book,
-                                         author: models.Author,
+                                         user_name: str,
+                                         user_email: str,
+                                         review_title: str,
+                                         review_body: str,
+                                         created_date: str,
+                                         book_name:str,
+                                         author_name: str,
                                          reason: str):
-        try:
-            await cls.send_deletion_email(user, review, book, author, reason)
-        except Exception as e:
-            print(f"Ошибка при отправке email: {e}")
+        mail_theme = "Ваш обзор был удален"
+        mail_body = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                    <h2 style="color: #d9534f;">Уведомление об удалении обзора</h2>
+                    <p>Здравствуйте, {user_name}!</p>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #d9534f; margin: 15px 0;">
+                        <p>Ваш обзор на книгу <strong>"{book_name}"</strong> автора <strong>{author_name}</strong> был удален.</p>
+                        <p><strong>Причина:</strong> {reason}</p>
+                    </div>
+                    <h3>Содержание удаленного обзора:</h3>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+                        <h4>{review_title}</h4>
+                        <p>{review_body}</p>
+                    </div>
+                    <p style="margin-top: 20px;">Дата написания: {created_date}</p>
+                    <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <p>Если это ошибка, свяжитесь с поддержкой.</p>
+                        <p>С уважением,<br><strong>Команда BookReviews</strong></p>
+                    </div>
+                </div>
+            </body>
+        </html>
+        """
+
+        send_email_task.delay(mail_body, mail_theme, user_email)
 
     @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,

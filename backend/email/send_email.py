@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import smtplib
 
 load_dotenv()
@@ -11,24 +13,21 @@ async def send_email(mail_body: str, mail_theme: str, receiver_email: str):
     sender_login = Settings.LOGIN
     password = Settings.PASSWORD
 
-    print(f"Sender Login: {sender_login}")
-    print(f"Password: {password}")
-    print(f"Receiver Email: {receiver_email}")
-
     if sender_login is None or password is None or receiver_email is None:
         return "Error: One of the required fields is None"
 
-    subject = mail_theme
-    message = f"Subject: {subject}\n\n{mail_body}".encode('utf-8')
+    # Создаем MIME-сообщение
+    msg = MIMEMultipart()
+    msg['From'] = sender_login
+    msg['To'] = receiver_email
+    msg['Subject'] = mail_theme
 
-    server = smtplib.SMTP("smtp.mail.ru", 587)
-    server.starttls()
+    # Добавляем HTML-часть
+    msg.attach(MIMEText(mail_body, 'html'))
 
-    try:
+    with smtplib.SMTP("smtp.mail.ru", 587) as server:
+        server.starttls()
         server.login(sender_login, password)
-        server.sendmail(sender_login, receiver_email, message)
-        return "Message sent"
+        server.send_message(msg)  # Используем send_message вместо sendmail
 
-    except Exception as e:
-        print(f"Error: {e}")
-        return str(e)
+    return "Message sent"

@@ -7,3 +7,13 @@ python-dotenv
 aiohttp
 beautifulsoup4
 alembic
+celery
+bcrypt
+flower
+pydantic
+python-jose
+redis
+selenium
+uvicorn
+yarl
+eventlet
