@@ -1,9 +1,7 @@
 import asyncio
 import logging
 import aiohttp
-
 from bs4 import BeautifulSoup
-
 import re
 
 logging.basicConfig(level=logging.INFO)
@@ -15,10 +13,8 @@ class ParsSettings:
         self.base_url = "https://www.bookvoed.ru"
         self.book_name = ""
         self.author_name = ""
-
         self.search_query = ""
         self.search_url = ""
-
         self.response = None
         self.html = None
         self.soup = None
@@ -39,6 +35,7 @@ class Parser(GetData, ParsSettings):
     async def get_html_page_with_book_cover(self, book_name: str, author_name: str):
         async with aiohttp.ClientSession() as session:
             await self.get_data(book_name=book_name, author_name=author_name)
+            logger.info(f"Search URL: {self.search_url}")
             async with session.get(self.search_url) as response:
                 if response.status != 200:
                     logger.error(f"Failed to fetch data: {response.status}")
@@ -50,6 +47,7 @@ class Parser(GetData, ParsSettings):
 
     async def get_book_details(self, book_href: str):
         async with aiohttp.ClientSession() as session:
+            logger.info(f"Book details URL: {book_href}")
             async with session.get(book_href) as response:
                 self.response = response
                 self.html = await response.text()
@@ -65,13 +63,17 @@ class GetBookInfo(Parser, ParsSettings):
             return None
 
         book_link = self.soup.find('a', attrs={'href': re.compile(r'/product/')})
+        logger.info(f"Book link found: {book_link['href'] if book_link else 'None'}")
         if book_link:
             book_href = f"{self.base_url}{book_link['href']}"
             details_soup = await self.get_book_details(book_href)
-
+            # Логируем наличие нужного блока
             description_tag = details_soup.find('div', class_='product-annotation-full__text')
+            logger.info(f"Description tag found: {bool(description_tag)}")
             if description_tag:
-                description = ' '.join([p.get_text(strip=True) for p in description_tag.find_all('p')])
+                logger.info(f"Description tag HTML: {description_tag.prettify()}")
+                description = description_tag.get_text(separator=' ', strip=True)
+                logger.info(f"Description text: {description[:200]}")
                 if not description:
                     description = "Описание отсутствует"
             else:
@@ -79,6 +81,7 @@ class GetBookInfo(Parser, ParsSettings):
 
             image_tag = details_soup.find('img', class_='product-preview__big-img')
             image_src = image_tag['src'] if image_tag else None
+            logger.info(f"Image src: {image_src}")
 
             return {
                 'book_href': book_href,
@@ -87,7 +90,6 @@ class GetBookInfo(Parser, ParsSettings):
             }
         else:
             logger.error("Could not find book link.")
-
 
 # async def main():
 #     book_name = "письма к милене"
@@ -102,8 +104,5 @@ class GetBookInfo(Parser, ParsSettings):
 #     else:
 #         print("Failed to retrieve book information.")
 #
-#
 # if __name__ == '__main__':
-#     import asyncio
-#
 #     asyncio.run(main())
