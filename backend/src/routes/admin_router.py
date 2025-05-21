@@ -136,7 +136,7 @@ async def change_author(response: Response,
 # ---  BOOKS --- #
 @admin_router.post("/books/add_book", tags=["book"])
 async def add_book(response: Response,
-                   request: shema.Book,
+                   request: shema.AddBook,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
     return await admin_repository.add_book(response=response,

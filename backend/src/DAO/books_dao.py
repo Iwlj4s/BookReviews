@@ -36,7 +36,7 @@ class BookDAO:
         return book.scalars().first()
 
     @classmethod
-    async def add_book(cls, request: shema.Book, book_cover, book_desc, author, db: AsyncSession):
+    async def add_book(cls, request: shema.AddBook, book_cover, book_desc, author, db: AsyncSession):
         new_book = models.Book(
             book_cover=book_cover,
             book_name=request.book_name,
