@@ -20,9 +20,11 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade():
     # Adding new columns to the reviews table
-    op.add_column('deleted_reviews', sa.Column('rating', sa.Integer(), nullable=True))
+    # op.add_column('deleted_reviews', sa.Column('rating', sa.Integer(), nullable=True))
+    pass
 
 
 def downgrade():
     # Dropping the columns if we need to rollback
-    op.drop_column('deleted_reviews', 'rating')
+    # op.drop_column('deleted_reviews', 'rating')
+    pass

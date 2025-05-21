@@ -69,6 +69,14 @@ class ReviewDAO:
                                            review: Review,
                                            admin: User,
                                            reason: str):
+        # Проверка на уникальность review_id
+        from sqlalchemy import select
+        from fastapi import HTTPException
+        existing = await db.execute(
+            select(models.DeletedReview).where(models.DeletedReview.review_id == review.id)
+        )
+        if existing.scalars().first():
+            raise HTTPException(status_code=400, detail="Этот обзор уже был удалён ранее.")
         book = review.book
         author = review.author
         user = review.user
@@ -175,7 +183,7 @@ class ReviewDAO:
             await cls.update_book_rating(db, review.reviewed_book_id)
 
     @classmethod
-    async def create_review(cls, request: shema.Review, user, book, author, db: AsyncSession):
+    async def create_review(cls, request, user, book, author, db: AsyncSession):
         new_review = models.Review(
             created_by=user.id,
             reviewed_book_id=book.id,

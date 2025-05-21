@@ -106,13 +106,26 @@ function OtherUserProfile({ userId, currentUser }) {
         <>
             {/* User Info */}
             <div className="profile-header">
-                <h1 id="title">{user.user_name || 'Не указано'}</h1>
+                <h1 id="title">{user.name || 'Не указано'}</h1>
 
             </div>
             <div id="user-info-container">
                 <div id="user-info">
-                      {user.bio && (
-                         <div style={{ textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: user.bio }}></div>
+                    {user.bio ? (
+                        <div style={{ textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: user.bio }}></div>
+                    ) : (
+                        <div style={{
+                            textAlign: 'center',
+                            color: '#888',
+                            fontStyle: 'italic',
+                            background: '#f5f5f5',
+                            borderRadius: '8px',
+                            padding: '16px',
+                            margin: '16px 0',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                        }}>
+                            Пользователь пока что не добавил биографию
+                        </div>
                     )}
                     <Descriptions layout="vertical">
                         {user.is_admin && (

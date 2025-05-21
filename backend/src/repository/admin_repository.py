@@ -95,7 +95,6 @@ async def delete_review(review_id: int,
                         reason: str = "Нарушение правил сообщества",
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-
     """
     :param review_id: deleting review's id
     :param reason: deleting reason
@@ -113,6 +112,7 @@ async def delete_review(review_id: int,
         review = await ReviewDAO.load_review_with_relations(db, review_id)
         CheckHTTP404NotFound(review, "Обзор не найден")
 
+        review_id = review.id
         user_email = review.user.email
         user_name = review.user.name
         book_name = review.book.book_name
@@ -124,6 +124,8 @@ async def delete_review(review_id: int,
         deleted_review = await ReviewDAO.create_deleted_review_record(
             db, review, admin, reason
         )
+
+        print("Обзор удален")
 
         await ReviewDAO.notify_user_about_deletion(user_name=user_name,
                                                    user_email=user_email,

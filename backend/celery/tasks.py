@@ -6,7 +6,6 @@ import asyncio
 @app.task(bind=True, max_retries=3, default_retry_delay=60)
 def send_email_task(self, mail_body: str, mail_theme: str, receiver_email: str):
     try:
-        # Создаем новую event loop для асинхронного выполнения
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
@@ -18,13 +17,3 @@ def send_email_task(self, mail_body: str, mail_theme: str, receiver_email: str):
         print(f"Error sending email to {receiver_email}: {e}")
         raise self.retry(exc=e)
 
-
-# @app.task(bind=True, max_retries=3, default_retry_delay=60)
-# def send_email_task(self, mail_body: str, mail_theme: str, receiver_email: str):
-#     loop = asyncio.get_event_loop()
-#     try:
-#         # Здесь можно вызвать метод вашего DAO для отправки email
-#         return loop.run_until_complete(ReviewDAO.notify_user_about_deletion(mail_body, mail_theme, receiver_email))
-#     except Exception as e:
-#         print(f"Error sending email to {receiver_email}: {e}")
-#         raise self.retry(exc=e)

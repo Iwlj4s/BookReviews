@@ -11,9 +11,8 @@ class CeleryConfig:
     enable_utc = True
     broker_connection_retry_on_startup = True
 
-    worker_pool = "solo"  # Add this for Windows
-    worker_concurrency = 1  # Add this for Windows
+    worker_pool = "solo"
+    worker_concurrency = 1
 
-    # Для отправки email'ов
     email_login = Settings.LOGIN
     email_password = Settings.PASSWORD

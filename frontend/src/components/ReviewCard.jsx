@@ -14,6 +14,7 @@ import { isAuthenticated, is401Error } from '../utils/authUtils';
 const { Paragraph } = Typography;
 
 function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
+    console.log('ReviewCard reviews:', reviews); // Для отладки структуры
     const navigate = useNavigate();
     const bookDescription = reviews?.book?.book_description || reviews?.book_description || "Описание отсутствует";
 
@@ -29,6 +30,9 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
 
     const [isExpanded, setIsExpanded] = useState(false);
     const MAX_LENGTH = 100;
+
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [deleteReason, setDeleteReason] = useState('Нарушение правил сообщества');
 
      useEffect(() => {
       const data = [
@@ -96,9 +100,12 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
     };
 
     const handleDelete = async () => {
-
-        const token = localStorage.getItem('user_access_token')
         if (!is401Error(navigate, "/reviews")) return;
+        if (user?.is_admin) {
+            setDeleteModalVisible(true);
+            return;
+        }
+        // Обычное удаление для пользователя
         Modal.confirm({
             title: 'Подтверждение удаления',
             content: 'Вы уверены, что хотите удалить этот обзор?',
@@ -112,7 +119,6 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                             'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                         }
                     });
-
                     if (response.data.status_code === 200) {
                         message.success('Обзор успешно удален');
                         setReviews((prevReviews) => prevReviews.filter((r) => r.id !== reviews.id));
@@ -149,8 +155,8 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                     title={
                         <div id='card-title'>
                             {console.log("User is admin?", user)}
-                            {localStorage.getItem('user_access_token') && user?.is_admin ||
-                             (isProfilePage && reviews.created_by === user?.id) ? (
+                            { (localStorage.getItem('user_access_token') && (user?.is_admin ||
+                                (isProfilePage && (reviews.user_id === user?.id || reviews.created_by === user?.id)))) ? (
                                 <div id="card-update">
                                     <Button
                                         type="link"
@@ -244,6 +250,38 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                         )}
                     </div>
                 </Card>
+                {/* Модалка для удаления с причиной (только для админа) */}
+                <Modal
+                    title="Удалить обзор"
+                    visible={deleteModalVisible}
+                    onOk={async () => {
+                        try {
+                            const response = await axios.delete(`http://127.0.0.1:8000/book_reviews/admin/review/delete_review/${reviews.id}?reason=${encodeURIComponent(deleteReason)}`, {
+                                headers: {
+                                    'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                                }
+                            });
+                            if (response.data.status_code === 200) {
+                                message.success('Обзор успешно удален');
+                                setReviews((prevReviews) => prevReviews.filter((r) => r.id !== reviews.id));
+                            }
+                        } catch (error) {
+                            message.error('Ошибка при удалении обзора');
+                            console.error('Ошибка при удалении обзора:', error.response ? error.response.data : error.message);
+                        } finally {
+                            setDeleteModalVisible(false);
+                            setDeleteReason('Нарушение правил сообщества');
+                        }
+                    }}
+                    onCancel={() => setDeleteModalVisible(false)}
+                >
+                    <Input.TextArea
+                        value={deleteReason}
+                        onChange={e => setDeleteReason(e.target.value)}
+                        rows={3}
+                        placeholder="Укажите причину удаления"
+                    />
+                </Modal>
             </div>
         );
     };

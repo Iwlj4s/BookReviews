@@ -7,6 +7,7 @@ from typing import Union, Optional, List
 
 # Author #
 class Author(BaseModel):
+    id: int
     name: Union[str, None] = Field(default=None, title="Имя автора")
 
     @validator('name')
@@ -22,6 +23,7 @@ class Author(BaseModel):
 
 # Book #
 class Book(BaseModel):
+    id: int
     book_author_name: Union[str, None] = Field(default=None, title="Имя автора")
     book_name: Union[str, None] = Field(default=None, title="Название книги")
     book_description: Union[str, None] = Field(default=None, title="Описание книги")
@@ -45,6 +47,7 @@ class AddBook(BaseModel):
 
 
 class SimpleUser(BaseModel):
+    id: int
     name: Union[str, None] = Field(min_length=3, title="Имя пользователя")
     email: Union[str, None] = Field(title="Эл.почта пользователя")
     registration_date: Union[datetime, None] = Field(title="Дата регистрации пользователя"),
@@ -56,6 +59,7 @@ class SimpleUser(BaseModel):
 
 # Review #
 class Review(BaseModel):
+    id: int
     created_by: Union[int]
     user: Union[SimpleUser]
 
@@ -82,6 +86,7 @@ class Review(BaseModel):
 
 # User #
 class User(BaseModel):
+    id: int
     name: Union[str, None] = Field(min_length=3, title="Имя пользователя")
     email: Union[str, None] = Field(title="Эл.почта пользователя")
     bio: Union[str, None] = Field(title="Биография пользователя"),
@@ -96,7 +101,6 @@ class User(BaseModel):
 
     class Config:
         from_attributes = True
-
 
 class ReviewHomePage(BaseModel):
     id: int
@@ -181,3 +185,65 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: Union[str, None] = None
     id: int
+
+
+# --- Pydantic схемы для вывода (response) --- #
+class ReviewOut(BaseModel):
+    id: int
+    review_title: str
+    review_body: Optional[str]
+    rating: Optional[int]
+    reviewed_book_id: Optional[int]
+    reviewed_book_name: Optional[str]
+    reviewed_book_author_id: Optional[int]
+    reviewed_book_author_name: Optional[str]
+    updated: Optional[datetime]
+    created: Optional[datetime]
+    # Только имя пользователя, не весь объект
+    user_id: Optional[int]
+    user_name: Optional[str]
+
+    class Config:
+        orm_mode = True
+
+
+class BookOut(BaseModel):
+    id: int
+    book_name: str
+    book_description: Optional[str]
+    book_cover: Optional[str]
+    author_id: int
+    author_name: Optional[str]
+    book_average_rating: Optional[float]
+
+    class Config:
+        orm_mode = True
+
+
+class AuthorOut(BaseModel):
+    id: int
+    name: str
+    biography: Optional[str]
+
+    class Config:
+        orm_mode = True
+
+
+class UserOut(BaseModel):
+    id: int
+    name: str
+    email: str
+    is_admin: bool
+    bio: Optional[str]
+    reviews: List[ReviewOut] = []
+
+    class Config:
+        orm_mode = True
+
+
+class ReviewCreate(BaseModel):
+    reviewed_book_id: int
+    reviewed_book_author_id: int
+    review_title: str
+    review_body: str
+    rating: Optional[int] = Field(None, ge=1, le=5)

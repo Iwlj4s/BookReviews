@@ -54,10 +54,10 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [reviewForm, setReviewForm] = useState({
         review_title: '',
-        reviewed_book_name: '',
-        reviewed_book_author_name: '',
         review_body: '',
-        rating: 0
+        rating: 0,
+        reviewed_book_id: null,
+        reviewed_book_author_id: null
     });
 
     const [loading, setLoading] = useState(false);
@@ -89,7 +89,9 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         }
     };
 
-    const filteredBooks = selectedAuthor ? books.filter(book => book.author.name === selectedAuthor) : books;
+    const filteredBooks = selectedAuthor
+        ? books.filter(book => book.author.id === selectedAuthor)
+        : books;
 
 
     const fetchUserData = async () => {
@@ -208,24 +210,30 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         setIsModalVisible(false);
         setReviewForm({
             review_title: '',
-            reviewed_book_name: '',
-            reviewed_book_author_name: '',
             review_body: '',
-            rating: 0
+            rating: 0,
+            reviewed_book_id: null,
+            reviewed_book_author_id: null
         });
     };
 
     const handleAddReview = async () => {
         if (!isAuthenticated(navigate, "/sign_in")) return;
-        const { review_title, reviewed_book_name, reviewed_book_author_name, review_body } = reviewForm;
+        const { review_title, review_body, reviewed_book_id, reviewed_book_author_id, rating } = reviewForm;
 
-        if (!review_title || !reviewed_book_name || !reviewed_book_author_name || !review_body) {
+        if (!review_title || !review_body || !reviewed_book_id || !reviewed_book_author_id) {
             message.error('Пожалуйста, заполните все поля.');
             return;
         }
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/book_reviews/reviews/create_review/', reviewForm, {
+            const response = await axios.post('http://127.0.0.1:8000/book_reviews/reviews/create_review/', {
+                review_title,
+                review_body,
+                rating,
+                reviewed_book_id,
+                reviewed_book_author_id
+            }, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`,
                     'Content-Type': 'application/json'
@@ -233,25 +241,11 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
             });
 
             if (response.data.status_code === 200) {
-                console.log("Response: ", response.data)
                 message.success('Обзор добавлен успешно!');
-                const newReview = {
-                    review_id: response.data.data.review_id,
-                    id: response.data.data.id,
-                    book_cover: response.data.data.book_cover,
-                    book_name: response.data.data.book_name,
-                    author_name: response.data.data.author_name,
-                    review_title: response.data.data.review_title,
-                    review_body: response.data.data.review_body,
-                    book_description: response.data.data.book_description,
-                    created_by: response.data.data['Created by'],
-                    book_rating: response.data.rating,
-                    updated: new Date().toISOString()
-                };
-
-                setReviews((prev) => [...prev, newReview]);
                 handleCancelModal();
-                handleCancel();
+                // Получаем обновлённые данные пользователя и обновляем обзоры
+                const updatedUser = await fetchUserData();
+                setReviews(updatedUser.reviews || []);
             }
         } catch (error) {
             message.error('Ошибка при добавлении обзора.');
@@ -433,13 +427,14 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                             <Select
                                 showSearch
                                 onChange={(value) => {
-                                    setReviewForm({ ...reviewForm, reviewed_book_author_name: value });
+                                    setReviewForm({ ...reviewForm, reviewed_book_author_id: value });
                                     setSelectedAuthor(value);
                                 }}
                                 placeholder="Выберите автора"
+                                value={reviewForm.reviewed_book_author_id}
                             >
                                 {authors.map(author => (
-                                    <Option key={author.id} value={author.name}>
+                                    <Option key={author.id} value={author.id}>
                                         {author.name}
                                     </Option>
                                 ))}
@@ -449,11 +444,12 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                         <Form.Item label="Выбор книги">
                             <Select
                                 showSearch
-                                onChange={(value) => setReviewForm({ ...reviewForm, reviewed_book_name: value })}
+                                onChange={(value) => setReviewForm({ ...reviewForm, reviewed_book_id: value })}
                                 placeholder="Выберите книгу"
+                                value={reviewForm.reviewed_book_id}
                             >
                                 {filteredBooks.map(book => (
-                                    <Option key={book.id} value={book.book_name}>
+                                    <Option key={book.id} value={book.id}>
                                         {book.book_name}
                                     </Option>
                                 ))}
@@ -485,9 +481,9 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
                 {reviews.length === 0 ? (
                     <div>У вас пока нет обзоров</div>
                 ) : filteredReviews.length > 0 ? (
-                    filteredReviews.map((userReviews, index) => (
-                        <ReviewCard key={index}
-                                    reviews={userReviews}
+                    filteredReviews.map((review, index) => (
+                        <ReviewCard key={review.id || index}
+                                    reviews={review}
                                     user={user}
                                     isProfilePage={true}
                                     setReviews={setReviews}/>

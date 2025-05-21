@@ -21,7 +21,7 @@ from backend.parsing.get_data import get_book_info
 # TODO: Do adding deleting review in DB DeletedReview
 
 
-async def create_review(request: shema.Review,
+async def create_review(request: shema.ReviewCreate,
                         response: Response,
                         user: shema.User,
                         db: AsyncSession = Depends(get_db)):
@@ -133,6 +133,7 @@ async def get_all_reviews(db: AsyncSession = Depends(get_db)):
         author = review.author
 
         reviews_list.append({
+            'id': review.id,
             'created_by': review.created_by,
             'user': review.user,
             'reviewed_book_id': review.reviewed_book_id,

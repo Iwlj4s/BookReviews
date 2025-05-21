@@ -5,7 +5,7 @@ from fastapi import Depends, APIRouter, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.database.database import get_db
-from backend.src.database.shema import User
+from backend.src.database.shema import User, ReviewCreate
 from backend.src.database import shema, models
 from backend.src.repository.admin_repository import get_current_admin_user
 
@@ -26,7 +26,7 @@ async def get_reviews(db: AsyncSession = Depends(get_db)):
 
 @reviews_router.post("/create_review/", tags=["reviews"])
 async def create_review(response: Response,
-                        request: shema.Review,
+                        request: ReviewCreate,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user)):
     print("Request from back: ", request)
