@@ -128,25 +128,9 @@ async def get_all_reviews(db: AsyncSession = Depends(get_db)):
     CheckHTTP404NotFound(founding_item=reviews, text="Обзоры не найдены")
 
     reviews_list = []
+    from backend.src.routes.users_router import review_to_out
     for review in reviews:
-        book = review.book
-        author = review.author
-
-        reviews_list.append({
-            'id': review.id,
-            'created_by': review.created_by,
-            'user': review.user,
-            'reviewed_book_id': review.reviewed_book_id,
-            'reviewed_book_name': book.book_name,
-            'rating': review.rating,
-            'reviewed_book_author_id': review.reviewed_book_author_id,
-            'reviewed_book_author_name': author.name,
-            'reviewed_book_cover': review.reviewed_book_cover,
-            'review_title': review.review_title,
-            'review_body': review.review_body,
-            'created': review.created,
-            'updated': review.updated,
-        })
+        reviews_list.append(await review_to_out(review, db=db))
 
     return reviews_list
 
@@ -156,7 +140,8 @@ async def fetch_review(review_id: int, response: Response, db: AsyncSession = De
 
     CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
 
-    return review
+    from backend.src.routes.users_router import review_to_out
+    return await review_to_out(review, db=db)
 
 
 async def fetch_filtered_review(request: shema.FilteredReview,
@@ -168,4 +153,6 @@ async def fetch_filtered_review(request: shema.FilteredReview,
 
     CheckHTTP404NotFound(founding_item=reviews, text="Обзоры не найден")
 
-    return reviews
+    from backend.src.routes.users_router import review_to_out
+    reviews_list = [await review_to_out(r, db=db) for r in reviews]
+    return reviews_list

@@ -116,7 +116,7 @@ class ReviewDAO:
         return result.scalar_one_or_none()
 
     @classmethod
-    async def notify_user_about_deletion(cls,
+    def notify_user_about_deletion(cls,
                                          user_name: str,
                                          user_email: str,
                                          review_title: str,
@@ -151,8 +151,7 @@ class ReviewDAO:
         </html>
         """
 
-        send_email_task.delay(mail_body, mail_theme, user_email)
-
+        send_email_task.delay(mail_body, mail_theme, user_email)  # <-- только так!
     @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,
                                    book_name: str | None = None,
@@ -244,3 +243,12 @@ class ReviewDAO:
             .values(book_average_rating=avg_rating)
         )
         await db.commit()
+
+    @classmethod
+    async def is_review_deleted(cls, db: AsyncSession, review_id: int) -> bool:
+        from backend.src.database import models
+        from sqlalchemy import select
+        existing = await db.execute(
+            select(models.DeletedReview).where(models.DeletedReview.review_id == review_id)
+        )
+        return existing.scalars().first() is not None

@@ -104,7 +104,7 @@ async def get_deleted_review(deleted_review_id: int,
 # --- AUTHORS ---#
 @admin_router.post("/authors/add_author", tags=["author"])
 async def add_author(response: Response,
-                     request: shema.Author,
+                     request: shema.AuthorCreate,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
     return await admin_repository.add_author(response=response,
@@ -136,7 +136,7 @@ async def change_author(response: Response,
 # ---  BOOKS --- #
 @admin_router.post("/books/add_book", tags=["book"])
 async def add_book(response: Response,
-                   request: shema.Book,
+                   request: shema.BookCreate,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
     return await admin_repository.add_book(response=response,

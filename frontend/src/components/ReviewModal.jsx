@@ -11,7 +11,7 @@ const ReviewModal = ({ visible, onClose, onSubmit }) => {
         reviewTitle: '',
         author: '',
         book: '',
-        reviewBody: ''
+        reviewBody: '',
         rating: 0
     });
     const [loading, setLoading] = useState(false);
@@ -60,6 +60,11 @@ const ReviewModal = ({ visible, onClose, onSubmit }) => {
 
     const handleSubmit = async () => {
         const { reviewTitle, author, book, reviewBody, rating } = formData;
+
+        if (!rating || rating <= 0) {
+            message.error('Пожалуйста, выставьте рейтинг книге!');
+            return;
+        }
 
         setLoading(true);
         try {

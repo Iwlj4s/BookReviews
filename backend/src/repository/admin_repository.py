@@ -28,6 +28,8 @@ from backend.email.send_email import send_email
 
 from backend.celery.tasks import send_email_task
 
+from backend.src.database.shema import DeletedReview as DeletedReviewSchema
+
 
 # TODO: Fix getting book description
 # TODO: Fix deleting review (it's putting in deleted but has some error and email doesn't sending)
@@ -95,50 +97,46 @@ async def delete_review(review_id: int,
                         reason: str = "Нарушение правил сообщества",
                         admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    """
-    :param review_id: deleting review's id
-    :param reason: deleting reason
-    :param admin: is user admin
-    :param db: database
-    :return: deleted review + message successfully sent email
-
-    Loading deleting review
-    Saving needed data before deleting review
-    Creating deleted review in table deleted_review
-    Delete review from reviews table
-    Send notify user about deleted review
-    """
     try:
         review = await ReviewDAO.load_review_with_relations(db, review_id)
         CheckHTTP404NotFound(review, "Обзор не найден")
 
-        review_id = review.id
-        user_email = review.user.email
-        user_name = review.user.name
-        book_name = review.book.book_name
-        author_name = review.author.name
-        review_title = review.review_title
-        review_body = review.review_body
-        created_date = review.created
+        if await ReviewDAO.is_review_deleted(db, review.id):
+            raise HTTPException(status_code=400, detail="Этот обзор уже был удалён ранее.")
 
+        old_review_user_email = review.user.email
+        old_review_user_name = review.user.name
+        old_review_book_name = review.book.book_name
+        old_review_author_name = review.author.name
+        old_review_review_title = review.review_title
+        old_review_review_body = review.review_body
+        old_review_created_date = review.created
+
+        # 1. Создаём запись в deleted_reviews
         deleted_review = await ReviewDAO.create_deleted_review_record(
             db, review, admin, reason
         )
 
-        print("Обзор удален")
+        # 2. Удаляем обзор из reviews
+        await db.delete(review)
+        await db.commit()
 
-        await ReviewDAO.notify_user_about_deletion(user_name=user_name,
-                                                   user_email=user_email,
-                                                   review_title=review_title,
-                                                   review_body=review_body,
-                                                   created_date=created_date,
-                                                   book_name=book_name,
-                                                   author_name=author_name,
-                                                   reason=reason)
+        # 3. Отправляем письмо (через Celery, без await)
+        ReviewDAO.notify_user_about_deletion(
+            user_name=old_review_user_name,
+            user_email=old_review_user_email,
+            review_title=old_review_review_title,
+            review_body=old_review_review_body,
+            created_date=old_review_created_date,
+            book_name=old_review_book_name,
+            author_name=old_review_author_name,
+            reason=reason
+        )
+
         return {
             'message': 'Обзор удален успешно, письмо отправлено',
             'status_code': 200,
-            'data': deleted_review
+            'data': DeletedReviewSchema.from_orm(deleted_review)
         }
 
     except Exception as e:
@@ -149,7 +147,7 @@ async def delete_review(review_id: int,
 
 # --- AUTHORS --- #
 async def add_author(response: Response,
-                     request: shema.Author,
+                     request: shema.AuthorCreate,
                      admin: User = Depends(get_current_admin_user),
                      db: AsyncSession = Depends(get_db)):
     author_already_in_db = await AuthorDAO.author_by_name(db=db, author_name=str(request.name.title()))
@@ -255,7 +253,7 @@ async def change_review(review_id: int,
 
 # --- BOOKS --- #
 async def add_book(response: Response,
-                   request: shema.Book,
+                   request: shema.BookCreate,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
     author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name.title()))

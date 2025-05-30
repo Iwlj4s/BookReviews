@@ -247,3 +247,13 @@ class ReviewCreate(BaseModel):
     review_title: str
     review_body: str
     rating: Optional[int] = Field(None, ge=1, le=5)
+
+
+class AuthorCreate(BaseModel):
+    name: str
+
+
+class BookCreate(BaseModel):
+    book_author_name: str
+    book_name: str
+    book_description: str
