@@ -40,16 +40,13 @@ function HomePage() {
                <p id="explore-title-subtitle">Мы рады видеть вас в нашем сообществе читателей и надеемся, что вы найдете здесь вдохновение для новых литературных открытий!</p>
            </div>
 
-            {reviews ? (
-               <div id="card-container">
-                   <ReviewCard reviews={reviews} />
-               </div>
-
-                ): (
-                     <div id="card-container">
-                        Пока что обзоров нет
-                     </div>
-            )}
+            <div id="card-container">
+                {reviews ? (
+                  <ReviewCard reviews={reviews} />
+                ) : (
+                  <div>Пока что обзоров нет</div>
+                )}
+          </div>
        </>
    );
 }

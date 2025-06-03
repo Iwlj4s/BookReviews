@@ -61,7 +61,7 @@ class ReviewDAO:
         </html>
         """
 
-        await send_email(mail_theme=mail_theme, mail_body=mail_body, receiver_email=user.email)
+        send_email_task.delay(mail_body, mail_theme, user.email)
 
     @classmethod
     async def create_deleted_review_record(cls,
@@ -69,14 +69,6 @@ class ReviewDAO:
                                            review: Review,
                                            admin: User,
                                            reason: str):
-        # Проверка на уникальность review_id
-        from sqlalchemy import select
-        from fastapi import HTTPException
-        existing = await db.execute(
-            select(models.DeletedReview).where(models.DeletedReview.review_id == review.id)
-        )
-        if existing.scalars().first():
-            raise HTTPException(status_code=400, detail="Этот обзор уже был удалён ранее.")
         book = review.book
         author = review.author
         user = review.user
@@ -95,6 +87,7 @@ class ReviewDAO:
             review_id=review.id
         )
         db.add(deleted_review)
+        await db.delete(review)
         await db.commit()
         await db.refresh(deleted_review)
 
@@ -116,7 +109,7 @@ class ReviewDAO:
         return result.scalar_one_or_none()
 
     @classmethod
-    def notify_user_about_deletion(cls,
+    async def notify_user_about_deletion(cls,
                                          user_name: str,
                                          user_email: str,
                                          review_title: str,
@@ -151,7 +144,8 @@ class ReviewDAO:
         </html>
         """
 
-        send_email_task.delay(mail_body, mail_theme, user_email)  # <-- только так!
+        send_email_task.delay(mail_body, mail_theme, user_email)
+
     @classmethod
     async def get_filtered_reviews(cls, db: AsyncSession,
                                    book_name: str | None = None,

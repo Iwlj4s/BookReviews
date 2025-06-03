@@ -14,6 +14,9 @@ import { isAuthenticated, is401Error } from '../utils/authUtils';
 const { Paragraph } = Typography;
 
 function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
+    if (!reviews || reviews.message) {
+        return <div>Пока что обзоров нет</div>;
+    }
     console.log('ReviewCard reviews:', reviews); // Для отладки структуры
     const navigate = useNavigate();
     const bookDescription = reviews?.book?.book_description || reviews?.book_description || "Описание отсутствует";
@@ -182,11 +185,11 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                             </div>
                             <p>
                                 Автор обзора: <a
-                                    href={`/user/${reviews.user?.id || reviews.created_by_name}`}
+                                    href={`/user/${reviews.user?.id || reviews.user_id}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    {reviews.user?.name || reviews.created_by_name}
+                                    {reviews.user?.name || reviews.created_by_name || reviews.user_name}
                                 </a>
                             </p>
                             <p>Обзор обновлен: {new Date(reviews.updated).toLocaleString()}</p>

@@ -198,7 +198,7 @@ class ReviewOut(BaseModel):
     reviewed_book_author_id: Optional[int]
     reviewed_book_author_name: Optional[str]
     updated: Optional[datetime]
-    created: Optional[datetime]
+    created_by: Optional[datetime]
     # Только имя пользователя, не весь объект
     user_id: Optional[int]
     user_name: Optional[str]

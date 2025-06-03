@@ -11,11 +11,14 @@ from backend.src.DAO.reviews_dao import ReviewDAO
 
 from backend.src.database.database import get_db
 from backend.src.database import models, shema
+from backend.src.database.shema import User
 from backend.src.helpers.general_helper import CheckHTTP404NotFound
 
 from backend.src.helpers.reviews_helper import check_data_for_add_review, check_data_for_change_review
 
 from backend.parsing.get_data import get_book_info
+from backend.src.repository.admin_repository import get_current_admin_user
+
 
 # TODO: Fix displaying book's rating in books/book/{book_id}
 # TODO: Do adding deleting review in DB DeletedReview
@@ -103,24 +106,59 @@ async def change_review(review_id: int,
 
 
 async def delete_review(review_id: int,
-                        user: shema.User,
+                        reason: str = "Нарушение правил сообщества",
+                        admin: User = Depends(get_current_admin_user),
                         db: AsyncSession = Depends(get_db)):
-    review = await GeneralDAO.get_item_by_id(db=db, item=models.Review, item_id=review_id)
-    CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
+    """
+    :param review_id: deleting review's id
+    :param reason: deleting reason
+    :param admin: is user admin
+    :param db: database
+    :return: deleted review + message successfully sent email
 
-    if not user.is_admin:
-        if review.created_by != user.id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="У вас нет прав для удаления этого обзора")
+    Loading deleting review
+    Saving needed data before deleting review
+    Creating deleted review in table deleted_review
+    Delete review from reviews table
+    Send notify user about deleted review
+    """
+    try:
+        review = await ReviewDAO.load_review_with_relations(db, review_id)
+        CheckHTTP404NotFound(review, "Обзор не найден")
 
-    await GeneralDAO.delete_item(db=db, item=models.Review, item_id=int(review_id))
+        review_id = review.id
+        user_email = review.user.email
+        user_name = review.user.name
+        book_name = review.book.book_name
+        author_name = review.author.name
+        review_title = review.review_title
+        review_body = review.review_body
+        created_date = review.created
 
-    return {
-        'message': "success",
-        'status_code': 200,
-        'status': 'Success',
-        'data': {f"Review id:{review.id} deleted!"
+        deleted_review = await ReviewDAO.create_deleted_review_record(
+            db, review, admin, reason
+        )
+
+        print("Обзор удален")
+
+        ReviewDAO.notify_user_about_deletion(user_name=user_name,
+                                                   user_email=user_email,
+                                                   review_title=review_title,
+                                                   review_body=review_body,
+                                                   created_date=created_date,
+                                                   book_name=book_name,
+                                                   author_name=author_name,
+                                                   reason=reason)
+        return {
+            'message': 'Обзор удален успешно, письмо отправлено',
+            'status_code': 200,
+            'data': deleted_review
         }
-    }
+
+    except Exception as e:
+        await db.rollback()
+        print(f"Ошибка при удалении отзыва: {e}")
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
 async def get_all_reviews(db: AsyncSession = Depends(get_db)):
@@ -130,7 +168,7 @@ async def get_all_reviews(db: AsyncSession = Depends(get_db)):
     reviews_list = []
     from backend.src.routes.users_router import review_to_out
     for review in reviews:
-        reviews_list.append(await review_to_out(review, db=db))
+        reviews_list.append(await review_to_out(review))
 
     return reviews_list
 
@@ -141,7 +179,7 @@ async def fetch_review(review_id: int, response: Response, db: AsyncSession = De
     CheckHTTP404NotFound(founding_item=review, text="Обзор не найден")
 
     from backend.src.routes.users_router import review_to_out
-    return await review_to_out(review, db=db)
+    return await review_to_out(review)
 
 
 async def fetch_filtered_review(request: shema.FilteredReview,
@@ -154,5 +192,5 @@ async def fetch_filtered_review(request: shema.FilteredReview,
     CheckHTTP404NotFound(founding_item=reviews, text="Обзоры не найден")
 
     from backend.src.routes.users_router import review_to_out
-    reviews_list = [await review_to_out(r, db=db) for r in reviews]
+    reviews_list = [await review_to_out(r) for r in reviews]
     return reviews_list

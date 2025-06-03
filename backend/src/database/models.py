@@ -160,14 +160,6 @@ class Review(Base):
         lazy="selectin"
     )
 
-    deleted_review: Mapped[Optional["DeletedReview"]] = relationship(
-        "DeletedReview",
-        back_populates="review",
-        uselist=False,
-        lazy="selectin",
-        cascade="all, delete-orphan"
-    )
-
 
 class AdminAction(Base):
     __tablename__ = 'admin_actions'
@@ -236,7 +228,6 @@ class DeletedReview(Base):
 
     review: Mapped["Review"] = relationship(
         "Review",
-        back_populates="deleted_review",
         foreign_keys=[review_id]
     )
     admin: Mapped["User"] = relationship("User", foreign_keys=[admin_id])

@@ -52,8 +52,6 @@ function ReviewsPage(){
            const fetchReviews = async () => {
                const response = await axios.get('http://127.0.0.1:8000/book_reviews/reviews/');
                setReviews(response.data);
-
-               console.log("Reviews: ", response.data)
            };
 
            fetchReviews();

@@ -53,6 +53,5 @@ class GeneralDAO:
         """
         query = select(item).order_by(desc(item.id))
         last_record = await db.execute(query)
-
         return last_record.scalars().first()
 

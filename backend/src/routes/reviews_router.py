@@ -19,7 +19,7 @@ reviews_router = APIRouter(
 )
 
 
-@reviews_router.get("/", tags=["reviews"], response_model=List[shema.Review])
+@reviews_router.get("/", tags=["reviews"], response_model=List[shema.ReviewOut])
 async def get_reviews(db: AsyncSession = Depends(get_db)):
     return await get_all_reviews(db=db)
 
@@ -52,7 +52,7 @@ async def change_review(review_id: int,
 async def delete_review(review_id: int,
                         db: AsyncSession = Depends(get_db),
                         user: User = Depends(get_current_user)):
-    return await reviews_repository.delete_review(review_id=review_id, db=db, user=user)
+    return await reviews_repository.delete_review(review_id=review_id, db=db)
 
 
 @reviews_router.get("/{review_id}", tags=["reviews"], response_model=shema.Review)

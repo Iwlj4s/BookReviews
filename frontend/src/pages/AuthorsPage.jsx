@@ -16,6 +16,11 @@ function AuthorsPage() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    if (!authors) {
+       return <div >Пока что авторов нет </div>;
+    }
+
+
     useEffect(() => {
         const token = localStorage.getItem('user_access_token');
         if (!token) {
@@ -73,11 +78,6 @@ function AuthorsPage() {
     if (error) {
         return <div>{error}</div>;
     }
-
-    if (!authors) {
-       return <div >Пока что авторов нет </div>;
-    }
-
     const handleSearchChange = (e) => {
         setSearchText(e.target.value);
     };

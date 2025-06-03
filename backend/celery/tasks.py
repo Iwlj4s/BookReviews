@@ -1,11 +1,13 @@
+import asyncio
+
 from backend.celery.celery_app import app
 from backend.email.send_email import send_email
-import asyncio
 
 
 @app.task(bind=True, max_retries=3, default_retry_delay=60)
 def send_email_task(self, mail_body: str, mail_theme: str, receiver_email: str):
     try:
+        # Создаем новую event loop для асинхронного выполнения
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
