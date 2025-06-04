@@ -12,7 +12,8 @@ function AuthorCard({ authors, user, setAuthors }) {
     const [isEditing, setIsEditing] = useState(false);
 
     const [formData, setFormData] = useState({
-        authorName: authors.name || '',
+        id: authors.id,
+        authorName: authors.name || ''
     });
 
     const handleEditClick = () => {
@@ -30,6 +31,7 @@ function AuthorCard({ authors, user, setAuthors }) {
     const handleSave = async () => {
         if (!is401Error(navigate, "/authors_list")) return;
         const requestData = {
+            id: formData.id,
             name: formData.authorName,
         };
 

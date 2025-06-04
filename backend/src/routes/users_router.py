@@ -51,7 +51,8 @@ async def review_to_out(review):
         "reviewed_book_name": review.book.book_name if getattr(review, 'book', None) else None,
         "reviewed_book_author_id": review.reviewed_book_author_id,
         "reviewed_book_author_name": review.author.name if getattr(review, 'author', None) else None,
-        "reviewed_book_cover": review.book.book_cover if getattr(review, 'book', None) else None,
+        "reviewed_book_cover": review.book.book_cover if getattr(review, 'book', None) else review.reviewed_book_cover,
+        "reviewed_book_description": review.book.book_description,
         "updated": review.updated,
         "created": review.created,
         "user_id": review.user.id if getattr(review, 'user', None) else None,
@@ -67,7 +68,8 @@ async def review_to_out(review):
         "reviewed_book_name": review.book.book_name if getattr(review, 'book', None) else None,
         "reviewed_book_author_id": review.reviewed_book_author_id,
         "reviewed_book_author_name": review.author.name if getattr(review, 'author', None) else None,
-        "reviewed_book_cover": review.book.book_cover if getattr(review, 'book', None) else None,
+        "reviewed_book_cover": review.book.book_cover if getattr(review, 'book', None) else review.reviewed_book_cover,
+        "reviewed_book_description": review.book.book_description,
         "updated": review.updated,
         "created": review.created,
         "user_id": review.user.id if getattr(review, 'user', None) else None,
@@ -90,9 +92,9 @@ async def get_me(response: Response, user_data: User = Depends(get_current_user)
 
 @users_router.put("/change_me/", tags=["users"])
 async def change_me(response: Response,
-                    request: shema.User,
+                    request: shema.ChangeUser,
                     db: AsyncSession = Depends(get_db),
-                    user_data: User = Depends(get_current_user)):
+                    user_data: shema.ChangeUser = Depends(get_current_user)):
     return await user_repository.change_current_user(request, db, response, user_data)
 
 

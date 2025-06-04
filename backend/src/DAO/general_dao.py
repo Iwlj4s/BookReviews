@@ -1,6 +1,9 @@
 from sqlalchemy import select, update, delete, and_, func, desc
+from sqlalchemy.orm import selectinload
 
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.src.database import models
 
 
 class GeneralDAO:
@@ -55,3 +58,16 @@ class GeneralDAO:
         last_record = await db.execute(query)
         return last_record.scalars().first()
 
+    @classmethod
+    async def get_last_review_with_relations(cls, db: AsyncSession):
+        query = (
+            select(models.Review)
+            .options(
+                selectinload(models.Review.book),  # assuming relation Review.book
+                selectinload(models.Review.author),  # assuming relation Review.author
+                selectinload(models.Review.user)  # assuming relation Review.user
+            )
+            .order_by(desc(models.Review.id))
+        )
+        result = await db.execute(query)
+        return result.scalars().first()

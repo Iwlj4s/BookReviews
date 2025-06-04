@@ -31,6 +31,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
 
     const [formData, setFormData] = useState({
+        id: user?.id,
         name: user?.name || null,
         email: user?.email || null,
         bio: user?.bio || null,
@@ -67,6 +68,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     useEffect(() => {
         if (user) {
             setFormData({
+                id: user.id,
                 name: user.name,
                 email: user.email,
                 password: ''
@@ -139,6 +141,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         setError('');
 
         const requestData = {
+            id: user.id || null,
             name: formData.name || null,
             email: formData.email || null,
             bio: formData.bio || null,

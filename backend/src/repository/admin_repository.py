@@ -92,6 +92,8 @@ async def delete_user(user_id: int,
     }
 
 
+# TODO: Fix duplicate id error when deleting review cant be deleting 'cause that id already in deleted_review table  #
+# Mb i should do id deleted review == deleting review id #
 # --- REVIEW --- #
 async def delete_review(review_id: int,
                         reason: str = "Нарушение правил сообщества",
@@ -189,8 +191,6 @@ async def change_author(response: Response,
 
     author_data, review_data = check_data_for_change_author(request=request, author=old_author_name, reviews=reviews)
     await AuthorDAO.change_author(db=db, author_id=author_id, data=author_data)
-    await ReviewDAO.change_reviewed_book_author_name(db=db, old_author_name=old_author_name, r_data=review_data)
-
     await db.refresh(author)
     for review in reviews:
         await db.refresh(review)
@@ -342,13 +342,11 @@ async def change_book(book_id: int,
 
     reviews = await ReviewDAO.get_review_by_book_id(db=db, book_id=int(book.id))
 
-    book_data, review_data = check_data_for_change_book(request=request, book=book, reviews=reviews)
+    book_data = check_data_for_change_book(request=request, book=book)
+    print(f"Book Data:\n {book_data}")
 
     await BookDAO.change_book(db=db, book_id=int(book.id),
                               new_data=book_data)
-    await ReviewDAO.change_reviewed_book_name(db=db,
-                                              old_book_name=old_book_name,
-                                              r_data=review_data)
 
     await db.refresh(book)
     for review in reviews:

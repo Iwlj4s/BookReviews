@@ -19,7 +19,7 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
     }
     console.log('ReviewCard reviews:', reviews); // Для отладки структуры
     const navigate = useNavigate();
-    const bookDescription = reviews?.book?.book_description || reviews?.book_description || "Описание отсутствует";
+    const bookDescription = reviews?.book?.book_description || reviews?.book_description || reviews.reviewed_book_description || "Описание отсутствует";
 
     const [treeData, setTreeData] = useState([])
 

@@ -102,6 +102,15 @@ class User(BaseModel):
     class Config:
         from_attributes = True
 
+
+class ChangeUser(BaseModel):
+    id: int
+    name: Union[str, None] = Field(min_length=3, title="Имя пользователя")
+    email: Union[str, None] = Field(title="Эл.почта пользователя")
+    bio: Union[str, None] = Field(title="Биография пользователя"),
+    password: Union[str] = Field(default=None, min_length=4, title="Пароль пользователя")
+
+
 class ReviewHomePage(BaseModel):
     id: int
     created_by: int
@@ -195,6 +204,8 @@ class ReviewOut(BaseModel):
     rating: Optional[int]
     reviewed_book_id: Optional[int]
     reviewed_book_name: Optional[str]
+    reviewed_book_cover: Optional[str]  # Add this
+    reviewed_book_description: Optional[str]  # Add this
     reviewed_book_author_id: Optional[int]
     reviewed_book_author_name: Optional[str]
     updated: Optional[datetime]

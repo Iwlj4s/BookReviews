@@ -128,10 +128,10 @@ async def delete_current_user(user: shema.User,
     }
 
 
-async def change_current_user(request: shema.User,
+async def change_current_user(request: shema.ChangeUser,
                               db: AsyncSession,
                               response: Response,
-                              user: shema.User):
+                              user: shema.ChangeUser):
     new_data = check_data_for_change_user(request=request, user=user)
     pass_changed = False
 

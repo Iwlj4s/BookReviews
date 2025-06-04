@@ -14,6 +14,7 @@ function BookCard({ books, user, setBooks }) {
     const [treeData, setTreeData] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
+        id: books.id,
         bookName: books.book_name || '',
         bookDescription: books.book_description || '',
     });
@@ -52,6 +53,7 @@ function BookCard({ books, user, setBooks }) {
     const handleSave = async () => {
         if (!is401Error(navigate, "/books_list")) return;
         const requestData = {
+            id: formData.id,
             book_name: formData.bookName,
             book_description: formData.bookDescription,
         };

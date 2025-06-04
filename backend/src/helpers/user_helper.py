@@ -49,7 +49,7 @@ async def take_access_token_for_user(db: AsyncSession, response: Response, reque
     }
 
 
-def check_data_for_change_user(request: shema.User, user):
+def check_data_for_change_user(request: shema.ChangeUser, user):
     data = {}
 
     if request.name is None:

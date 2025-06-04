@@ -58,8 +58,8 @@ app.include_router(authors_router)
 app.include_router(books_router)
 
 
-@app.get("/", response_model=Optional[shema.Review])
-@app.get("/home", response_model=Optional[shema.Review])
+@app.get("/", response_model=Optional[shema.ReviewOut])
+@app.get("/home", response_model=Optional[shema.ReviewOut])
 async def home_page(db: AsyncSession = Depends(get_db)):
-    review = await GeneralDAO.get_last_record(db=db, item=models.Review)
-    return review  # может быть None, и это теперь разрешено
+    review = await GeneralDAO.get_last_review_with_relations(db=db)
+    return review
