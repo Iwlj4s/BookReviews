@@ -17,8 +17,8 @@ class Author(BaseModel):
         return v
 
     class Config:
-        from_attributes = True
         arbitrary_types_allowed = True  # Allow arbitrary types in the model
+        orm_mode = True
 
 
 # Book #
@@ -34,6 +34,9 @@ class Book(BaseModel):
             return v.capitalize()
         return v
 
+    class Config:
+        orm_mode = True
+
 
 class AddBook(BaseModel):
     book_author_name: Union[str, None] = Field(default=None, title="Имя автора")
@@ -45,16 +48,22 @@ class AddBook(BaseModel):
             return v.capitalize()
         return v
 
+    class Config:
+        orm_mode = True
+
 
 class SimpleUser(BaseModel):
     id: int
-    name: Union[str, None] = Field(min_length=3, title="Имя пользователя")
-    email: Union[str, None] = Field(title="Эл.почта пользователя")
-    registration_date: Union[datetime, None] = Field(title="Дата регистрации пользователя"),
-    warnings: Union[int] = Field(title="Предупреждения пользователя"),
-    is_active: Union[bool] = Field(title="Активен ли пользователь"),
-    is_user: Union[bool] = Field(title="Пользователь?"),
-    is_admin: Union[bool] = Field(title="Админ?")
+    name: Optional[str] = Field(min_length=3, title="Имя пользователя")
+    email: Optional[str] = Field(title="Эл.почта пользователя")
+    registration_date: Optional[datetime] = Field(title="Дата регистрации пользователя")
+    warnings: int = Field(title="Предупреждения пользователя")
+    is_active: bool = Field(title="Активен ли пользователь")
+    is_user: bool = Field(title="Пользователь?")
+    is_admin: bool = Field(title="Админ?")
+
+    class Config:
+        orm_mode = True
 
 
 # Review #
@@ -80,35 +89,37 @@ class Review(BaseModel):
     updated: Union[datetime]
 
     class Config:
-        from_attributes = True
         arbitrary_types_allowed = True
+        orm_mode = True
 
 
 # User #
 class User(BaseModel):
     id: int
-    name: Union[str, None] = Field(min_length=3, title="Имя пользователя")
-    email: Union[str, None] = Field(title="Эл.почта пользователя")
-    bio: Union[str, None] = Field(title="Биография пользователя"),
-    profile_picture: Union[str, None] = Field(title="Аватарка пользователя"),
-    registration_date: Union[datetime, None] = Field(title="Дата регистрации пользователя"),
-    warnings: Union[int] = Field(title="Предупреждения пользователя"),
-    is_active: Union[bool] = Field(title="Активен ли пользователь"),
-    is_user: Union[bool] = Field(title="Пользователь?"),
-    is_admin: Union[bool] = Field(title="Админ?")
+    name: Optional[str] = Field(min_length=3, title="Имя пользователя")
+    email: Optional[str] = Field(title="Эл.почта пользователя")
+    bio: Optional[str] = Field(title="Биография пользователя")
+    profile_picture: Optional[str] = Field(title="Аватарка пользователя")
+    registration_date: Optional[datetime] = Field(title="Дата регистрации пользователя")
+    warnings: int = Field(title="Предупреждения пользователя")
+    is_active: bool = Field(title="Активен ли пользователь")
+    is_user: bool = Field(title="Пользователь?")
+    is_admin: bool = Field(title="Админ?")
 
-    reviews: List[Review]
+    reviews: List[Review] = Field(default_factory=list)
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class ChangeUser(BaseModel):
-    id: int
-    name: Union[str, None] = Field(min_length=3, title="Имя пользователя")
-    email: Union[str, None] = Field(title="Эл.почта пользователя")
-    bio: Union[str, None] = Field(title="Биография пользователя"),
-    password: Union[str] = Field(default=None, min_length=4, title="Пароль пользователя")
+    name: Optional[str] = Field(min_length=3, title="Имя пользователя")
+    email: Optional[str] = Field(title="Эл.почта пользователя")
+    bio: Optional[str] = Field(title="Биография пользователя")
+    password: Optional[str] = Field(min_length=4, title="Пароль пользователя")
+
+    class Config:
+        orm_mode = True
 
 
 class ReviewHomePage(BaseModel):
@@ -123,12 +134,15 @@ class ReviewHomePage(BaseModel):
     author_name: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class UserSignIn(BaseModel):
     email: Union[str] = Field(default=None, title="Эл.почта пользователя")
     password: Union[str] = Field(default=None, min_length=4, title="Пароль пользователя")
+
+    class Config:
+        orm_mode = True
 
 
 class UserSignUp(BaseModel):
@@ -136,10 +150,16 @@ class UserSignUp(BaseModel):
     email: Union[str] = Field(default=None, title="Эл.почта пользователя")
     password: Union[str] = Field(default=None, min_length=4, title="Пароль пользователя")
 
+    class Config:
+        orm_mode = True
+
 
 class FilteredReview(BaseModel):
     reviewed_book_name: Union[str, None] = Field(default=None, title="Название книги")
     reviewed_author_name: Union[str, None] = Field(default=None, title="Имя автора")
+
+    class Config:
+        orm_mode = True
 
 
 class ChangeReview(BaseModel):
@@ -148,7 +168,7 @@ class ChangeReview(BaseModel):
     rating: Optional[int] = Field(None, ge=1, le=5, title="Оценка книги (1-5)")
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class DeletedReview(BaseModel):
@@ -170,7 +190,7 @@ class DeletedReview(BaseModel):
     admin_name: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Newsletter for all users #
@@ -178,11 +198,17 @@ class NewsletterForAllUsers(BaseModel):
     mail_theme: Union[str, None] = Field(default=None, title="Тема письма")
     mail_body: Union[str, None] = Field(default=None, title="Тело письма")
 
+    class Config:
+        orm_mode = True
+
 
 class NewsLetterForUser(BaseModel):
     receiver_email: Union[str, None] = Field(default=None, title="Id пользователя, которому отправляется письмо")
     mail_theme: Union[str, None] = Field(default=None, title="Тема письма")
     mail_body: Union[str, None] = Field(default=None, title="Тело письма")
+
+    class Config:
+        orm_mode = True
 
 
 # Token #
@@ -209,7 +235,8 @@ class ReviewOut(BaseModel):
     reviewed_book_author_id: Optional[int]
     reviewed_book_author_name: Optional[str]
     updated: Optional[datetime]
-    created_by: Optional[datetime]
+    created: Optional[datetime]  # добавьте поле created, если нужно
+    created_by: Optional[int]  # исправлено с datetime на int
     # Только имя пользователя, не весь объект
     user_id: Optional[int]
     user_name: Optional[str]
@@ -259,12 +286,21 @@ class ReviewCreate(BaseModel):
     review_body: str
     rating: Optional[int] = Field(None, ge=1, le=5)
 
+    class Config:
+        orm_mode = True
+
 
 class AuthorCreate(BaseModel):
     name: str
+
+    class Config:
+        orm_mode = True
 
 
 class BookCreate(BaseModel):
     book_author_name: str
     book_name: str
     book_description: str
+
+    class Config:
+        orm_mode = True
