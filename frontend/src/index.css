@@ -1,98 +1,92 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-}
-
-::selection {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    --mobile-breakpoint: 768px;
+  }
+  
+  ::selection {
     background: #E6F4FF;
-}
-
-#navbar {
+  }
+  
+  /* Основные стили для десктопа */
+  #navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-}
-
-#navbar-ul {
+  }
+  
+  #navbar-ul {
     display: flex;
     list-style-type: none;
     margin: 0;
     flex-grow: 1;
     justify-content: center;
-}
-
-#right-side-items {
+  }
+  
+  #right-side-items {
     display: flex;
     margin-right: 20px;
-}
-
-li{
+  }
+  
+  li {
     text-decoration: none;
     color: black;
     border-bottom: none;
-}
-
-#navbar-container{
+  }
+  
+  #navbar-container {
     display: flex;
     justify-content: center;
     width: 100%;
     height: auto;
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
-}
-
-
-#navbar-item {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  
+  #navbar-item {
     display: inline;
     margin: 10px;
     font-weight: 700;
     text-decoration: none;
     color: black;
     transition: border-bottom 0.1s ease;
-}
-
-#navbar-item:hover {
+  }
+  
+  #navbar-item:hover {
     border-bottom: 2px solid black;
-}
-
-#navbar-item a {
+  }
+  
+  #navbar-item a {
     color: black;
     text-decoration: none;
-}
-
-#spin {
+  }
+  
+  #spin {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-}
-
-
-#card {
+  }
+  
+  #card {
     width: auto;
     height: auto;
-
     max-width: 570px;
     min-width: 570px;
-
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
-
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     margin: 10px;
-
     word-wrap: break-word;
     word-break: normal;
-}
-
-
-#card-update{
+  }
+  
+  #card-update {
     display: flex;
     justify-content: right;
     padding-top: 5px;
-}
-
-#cards-container{
+  }
+  
+  #cards-container {
     word-wrap: break-word;
     word-break: normal;
     display: grid;
@@ -100,97 +94,92 @@ li{
     gap: 10px;
     justify-content: center;
     align-items: center;
-}
-
-
-#card-container {
+  }
+  
+  #card-container {
     word-wrap: break-word;
     word-break: normal;
     display: flex;
-
     align-items: center;
     align-content: center;
     justify-content: center;
-}
-
-#card-content{
+  }
+  
+  #card-content {
     font-size: 18px;
-}
-
-.edit-review-container {
+  }
+  
+  .edit-review-container {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Устанавливаем отступы между элементами */
-}
-
-#title-and-img{
+    gap: 10px;
+  }
+  
+  #title-and-img {
     margin-top: 15px;
     display: flex;
     align-items: center;
     gap: 3vh;
     font-size: 13px;
-}
-
-#text {
+  }
+  
+  #text {
     overflow-wrap: break-word;
     word-break: normal;
     white-space: normal;
-}
-
-.tree-container {
-  position: relative;
-  justify-content: center;
-
-  gap: 10px;
-
-}
-
-#card-books{
+  }
+  
+  .tree-container {
+    position: relative;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  #card-books {
     margin: 10px;
     width: 500px;
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
-}
-
-#book-info {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  
+  #book-info {
     word-break: break-all;
     white-space: normal;
     padding: 20px;
-}
-
-
-#last-record-title{
+  }
+  
+  #last-record-title {
     text-align: center;
-}
-
-#explore-title{
+  }
+  
+  #explore-title {
     text-align: center;
-}
-
-#explore-title-subtitle{
+  }
+  
+  #explore-title-subtitle {
     font-size: 18px;
-}
-
-#user-features{
+  }
+  
+  #user-features {
     text-align: center;
-}
-
-#user-features-ul{
-  display: inline-block
-}
-
-#user-features-item{
-    text-align: left
-}
-
-#title {
+  }
+  
+  #user-features-ul {
+    display: inline-block;
+  }
+  
+  #user-features-item {
+    text-align: left;
+  }
+  
+  #title {
     text-align: center;
     padding: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-#user-reviews-search {
+  }
+  
+  #user-reviews-search {
     margin-top: 10px;
     margin-bottom: 20px;
     width: 30%;
@@ -198,153 +187,288 @@ li{
     justify-content: center;
     margin-left: auto;
     margin-right: auto;
-}
-
-#user-info-container {
+  }
+  
+  #user-info-container {
     width: 650px;
     padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
-}
-
-
-
-#profile-content {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  
+  #profile-content {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-}
-
-.profile-header {
+  }
+  
+  .profile-header {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-}
-
-#logout_button {
-    margin-left: 20px; /* Установите желаемый отступ */
-}
-
-#new-review-btn{
+  }
+  
+  #logout_button {
     margin-left: 20px;
-}
-
-.user-info-header {
+  }
+  
+  #new-review-btn {
+    margin-left: 20px;
+  }
+  
+  .user-info-header {
     padding: 15px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.user-info-header h2 {
+  }
+  
+  .user-info-header h2 {
     margin: 0;
     text-align: center;
-
-}
-
-#user-info{
+  }
+  
+  #user-info {
     text-align: center;
-}
-
-#change-user-data{
+  }
+  
+  #change-user-data {
     padding: 5px;
-    * {
-        margin: 3px;
-    }
-}
-#sign-in-form-error-alert{
+  }
+  
+  #change-user-data * {
+    margin: 3px;
+  }
+  
+  #sign-in-form-error-alert {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
     width: 350px;
     height: auto;
-
-}
-
-#sign-in-form-container{
+  }
+  
+  #sign-in-form-container {
     width: 400px;
     height: auto;
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     margin-left: auto;
     margin-right: auto;
-
     margin-top: 10%;
-
-}
-
-
-#sign-in-form{
+  }
+  
+  #sign-in-form {
     padding: 10px;
-}
-
-#register-now-link{
+  }
+  
+  #register-now-link {
     display: flex;
     padding-top: 15px;
-}
-
-#sign-up-form-container{
+  }
+  
+  #sign-up-form-container {
     width: 400px;
     height: auto;
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     margin-left: auto;
     margin-right: auto;
-
     margin-top: 10%;
-
-}
-
-
-#sign-up-form{
+  }
+  
+  #sign-up-form {
     padding: 10px;
-}
-
-#log-in-now-link{
+  }
+  
+  #log-in-now-link {
     display: flex;
     padding-top: 15px;
-}
-
-#sign-up-form-error-alert{
+  }
+  
+  #sign-up-form-error-alert {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
     width: 350px;
     height: auto;
-}
-
-#admin-stuff-container{
+  }
+  
+  #admin-stuff-container {
     width: auto;
     height: auto;
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     margin-left: auto;
     margin-right: auto;
-
     margin-top: 30px;
     padding: 20px;
-}
-
-#admin-func-title{
+  }
+  
+  #admin-func-title {
     margin-bottom: 20px;
-}
-
-#card-authors{
+  }
+  
+  #card-authors {
     margin: 10px;
     width: 300px;
-    box-shadow: 0 3px 10px rgb(0,0,0,0.2);
-}
-
-#cards-authors-container{
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  
+  #cards-authors-container {
     display: grid;
     grid-template-columns: repeat(5, 0fr);
-
     justify-content: center;
     align-items: center;
-
     margin-left: 0;
     margin-right: 0;
-}
+  }
+
+  #mobile-menu-button {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1001;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+  }
+  
+  #mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 1000;
+    padding: 70px 20px 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  
+  #mobile-menu.active {
+    display: block;
+  }
+  
+  #mobile-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  #mobile-menu li {
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  #mobile-menu a {
+    text-decoration: none;
+    color: black;
+    font-weight: 700;
+    display: block;
+    font-size: 18px;
+  }
+  
+  
+  /* Мобильные стили (только для экранов меньше 768px) */
+  @media (max-width: 768px) {
+    /* Бургер меню */
+    #mobile-menu-button {
+        display: block;
+      }
+      
+      #navbar-ul, #right-side-items {
+        display: none;
+      }
+      
+      #navbar {
+        padding: 10px 15px;
+        position: relative;
+        min-height: 50px;
+      }
+      
+      #navbar-container {
+        position: relative;
+      }
+  
+    /* Адаптация карточек */
+    #cards-container {
+      grid-template-columns: 1fr;
+      padding: 0 10px;
+    }
+  
+    #cards-authors-container {
+      grid-template-columns: repeat(2, 1fr);
+      padding: 0 10px;
+    }
+  
+    #card, #card-books, #card-authors {
+      min-width: unset;
+      max-width: 100%;
+      width: 100%;
+      margin: 10px 0;
+    }
+  
+    /* Адаптация других элементов */
+    #title-and-img {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  
+    #user-reviews-search {
+      width: 90%;
+    }
+  
+    #user-info-container {
+      width: 90%;
+    }
+  
+    .profile-header {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    #logout_button, #new-review-btn {
+      margin-left: 0;
+    }
+  
+    /* Формы */
+    #sign-in-form-container,
+    #sign-up-form-container {
+      width: 90%;
+      margin-top: 20px;
+    }
+  
+    /* Модальные окна */
+    .ant-modal {
+      width: 90% !important;
+      max-width: 90% !important;
+    }
+  }
+  
+  /* Дополнительные адаптации для очень маленьких экранов */
+  @media (max-width: 480px) {
+    #mobile-menu li {
+        padding: 12px 0;
+      }
+
+    #cards-authors-container {
+      grid-template-columns: 1fr;
+    }
+  
+    #title-and-img img {
+      width: 60px;
+    }
+  
+    #title h1 {
+      font-size: 1.5rem;
+    }
+  }

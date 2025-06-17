@@ -237,9 +237,24 @@ class ReviewOut(BaseModel):
     updated: Optional[datetime]
     created: Optional[datetime]  # добавьте поле created, если нужно
     created_by: Optional[int]  # исправлено с datetime на int
-    # Только имя пользователя, не весь объект
     user_id: Optional[int]
     user_name: Optional[str]
+
+    class Config:
+        orm_mode = True
+
+
+class ReviewWithRelationsOut(BaseModel):
+    id: int
+    review_title: str
+    review_body: Optional[str]
+    rating: Optional[int]
+    reviewed_book_name: str
+    reviewed_book_description: str
+    reviewed_book_author_name: str
+    user_name: str
+    created: datetime
+    updated: datetime
 
     class Config:
         orm_mode = True
