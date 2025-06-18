@@ -47,7 +47,7 @@ function OtherUserProfile({ userId, currentUser }) {
 
     const handleSendEmail = async () => {
         const emailData = {
-            receiver_email: user.user_email,
+            receiver_email: user.email,
             mail_theme: emailTheme,
             mail_body: emailBody
         };

@@ -319,3 +319,7 @@ class BookCreate(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class AddAdminRequest(BaseModel):
+    user_id: int

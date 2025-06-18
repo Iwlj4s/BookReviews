@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, APIRouter, Response, Query
+from fastapi import Depends, APIRouter, HTTPException, Response, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -57,6 +57,17 @@ async def delete_user(user_id: int,
                       admin: User = Depends(get_current_admin_user),
                       db: AsyncSession = Depends(get_db)):
     return await admin_repository.delete_user(db=db, user_id=int(user_id))
+
+
+@admin_router.post("/users/add_admin")
+async def add_admin(request: shema.AddAdminRequest,  # Просто принимаем user_id как параметр
+                    admin: User = Depends(get_current_admin_user),
+                    db: AsyncSession = Depends(get_db)):
+    
+    if request.user_id == admin.id:
+        raise HTTPException(400, "Нельзя назначить себя админом")
+    
+    return await admin_repository.add_admin(request.user_id, db)
 
 
 # --- REVIEWS --- #

@@ -9,7 +9,10 @@ const { Option } = Select;
 function AdminStuff({ user }) {
     const [form] = Form.useForm();
     const [authors, setAuthors] = useState([]);
+    const [users, setUsers] = useState([]);
+
     const [loading, setLoading] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     const [authorName, setAuthorName] = useState('');
 
@@ -23,6 +26,7 @@ function AdminStuff({ user }) {
 
     useEffect(() => {
         fetchAuthors();
+        fetchUsers();
     }, []);
 
     const fetchAuthors = async () => {
@@ -35,7 +39,58 @@ function AdminStuff({ user }) {
         }
     };
 
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/users_list', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                }
+            });
+            setUsers(response.data);
+        } catch (error) {
+            message.error('Ошибка при загрузке пользователей');
+            console.error(error);
+        }
+    };
+
+    const addAdmin = async () => {
+        if (!selectedUserId) {
+            message.error('Выберите пользователя');
+            return;
+        }
+        
+        setLoading(true);
+        try {
+            const response = await axios.post(
+                'http://127.0.0.1:8000/book_reviews/admin/users/add_admin',
+                { user_id: selectedUserId },  // Send as request body
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
+                    }
+                }
+            );
+        
+            if (response.data.status === 'success') {
+                message.success('Пользователь стал администратором');
+                fetchUsers(); // Обновляем список
+            }
+        } catch (error) {
+            message.error(error.response?.data?.detail || 'Ошибка');
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     const AddAuthor = async () => {
+        if (authorName.length < 5) {
+            message.error('Имя автора должно содержать минимум 5 символов');
+            return;
+        }
+
         setLoading(true);
         const values = { name: authorName };
         try {
@@ -50,6 +105,7 @@ function AdminStuff({ user }) {
             } else if (response.data.status_code === 200) {
                 message.success(response.data.message);
                 form.resetFields();
+                setAuthorName('');
                 fetchAuthors();
             }
         } catch (error) {
@@ -118,6 +174,46 @@ function AdminStuff({ user }) {
     const adminFuncs = [
         {
             key: '1',
+            label: 'Добавить администратора',
+            children: (
+                <Form layout="vertical">
+                    <Form.Item
+                        label="Выберите пользователя"
+                        rules={[{ required: true, message: 'Пожалуйста, выберите пользователя!' }]}
+                    >
+                        <Select
+                            showSearch
+                            placeholder="Поиск пользователя"
+                            optionFilterProp="children"
+                            onChange={(value) => setSelectedUserId(value)}
+                            filterOption={(input, option) => {
+                                // Получаем текст опции (имя пользователя и email)
+                                const text = option.children.join(' ').toLowerCase();
+                                return text.includes(input.toLowerCase());
+                            }}
+                        >
+                            {users.map(user => (
+                                <Option key={user.id} value={user.id}>
+                                    {user.name} ({user.email})
+                                </Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button 
+                            type="primary" 
+                            onClick={addAdmin} 
+                            loading={loading}
+                            disabled={!selectedUserId}
+                        >
+                            Назначить администратором
+                        </Button>
+                    </Form.Item>
+                </Form>
+            )
+        },
+        {
+            key: '2',
             label: 'Добавить автора',
             children: (
                 <Form layout="vertical">
@@ -132,7 +228,12 @@ function AdminStuff({ user }) {
                         />
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" onClick={AddAuthor} loading={loading}>
+                        <Button 
+                            type="primary" 
+                            onClick={AddAuthor} 
+                            loading={loading}
+                            disabled={authorName.length < 5} 
+                        >
                             Добавить автора
                         </Button>
                     </Form.Item>
@@ -140,7 +241,7 @@ function AdminStuff({ user }) {
             )
         },
         {
-            key: '2',
+            key: '3',
             label: 'Добавить книгу',
             children: (
                 <Form layout="vertical">
@@ -174,7 +275,12 @@ function AdminStuff({ user }) {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" onClick={AddBook} loading={loading}>
+                        <Button 
+                            type="primary" 
+                            onClick={AddBook} 
+                            loading={loading}
+                            disabled={!selectedAuthor || !bookName} 
+                            >
                             Добавить книгу
                         </Button>
                     </Form.Item>
@@ -182,7 +288,7 @@ function AdminStuff({ user }) {
             )
         },
         {
-            key: '3',
+            key: '4',
             label: 'Отправить рассылку',
             children: (
                 <Form layout="vertical">
@@ -209,7 +315,12 @@ function AdminStuff({ user }) {
 
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" onClick={sendNewsletter} loading={loading}>
+                        <Button 
+                            type="primary" 
+                            onClick={sendNewsletter} 
+                            loading={loading}
+                            disabled={!mailTheme || !mailBody} 
+                            >
                             Отправить рассылку
                         </Button>
                     </Form.Item>
@@ -223,7 +334,7 @@ function AdminStuff({ user }) {
             title: 'Информация',
             content: (
                 <div>
-                    <p>Прямо с вашей страницы вы можете добавить автора или книгу, а также сделать рассылку информации всем пользователям.</p>
+                    <p>Прямо с вашей страницы вы можете добавить автора или книгу, добавить администратора, а также сделать рассылку информации всем пользователям.</p>
                     <p>Для изменения/удаления автора перейдите в раздел <a href="/authors">"Авторы"</a>, с помощью поиска найдите нужного автора и измените/удалите его.</p>
                     <p>Для изменения/удаления книги перейдите в раздел <a href="/books_list">"Книги"</a>, с помощью поиска найдите нужную книгу и измените/удалите ее.</p>
                     <p>Для изменения/удаления обзора перейдите в раздел <a href="/reviews">"Обзоры"</a>, с помощью поиска найдите нужный обзор и измените/удалите его.</p>

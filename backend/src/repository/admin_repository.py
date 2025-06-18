@@ -92,6 +92,27 @@ async def delete_user(user_id: int,
     }
 
 
+async def add_admin(user_id: int, db: AsyncSession):
+    user = await UserDAO.get_user_by_id(db=db, user_id=int(user_id))
+    if not user:
+        raise HTTPException(404, "Пользователь не найден")
+    
+    if user.is_admin:
+        raise HTTPException(400, "Пользователь уже администратор")
+    
+    user_name = user.name
+    user_email = user.email
+
+    await UserDAO.add_admin(user_id, db)
+
+    await UserDAO.notify_user_about_new_rights(user_name=str(user_name), user_email=str(user_email))
+   
+    
+    return {
+        "status": "success",
+        "user_id": user_id}
+
+
 # TODO: Fix duplicate id error when deleting review cant be deleting 'cause that id already in deleted_review table  #
 # Mb i should do id deleted review == deleting review id #
 # --- REVIEW --- #
@@ -368,15 +389,37 @@ async def change_book(book_id: int,
 async def send_email_func(request: shema.NewsLetterForUser,
                           db: AsyncSession = Depends(get_db)):
     try:
-        send_email_task.delay(request.mail_body, request.mail_theme, request.receiver_email)
+        print(f"Searching for user with email: {request.receiver_email}")
+        user = await UserDAO.get_user_by_email(email=request.receiver_email, db=db)
+        if user is None:
+            return {
+                'message': 'Пользователь не найден!',
+                'status_code': 404
+            }
+
+        print(f"User data \n name:{user.name} \n email:{user.email}")
+        mail_theme = f"{request.mail_theme}"
+        mail_body = f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                        <h2 style="color: #dce055;">{mail_theme}</h2>
+                        <p>Здравствуйте, {user.name}!</p>
+                        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #dce055; margin: 15px 0;">
+                            <p><strong>Сообщаем Вам следующее: </strong></p>
+                            <p>{request.mail_body}</p>
+                        </div>
+                        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <p>С уважением,<br><strong>Команда BookReviews</strong></p>
+                        </div>
+                    </div>
+                </body>
+            </html>
+            """
+        send_email_task.delay(mail_theme=mail_theme, mail_body=mail_body, receiver_email=request.receiver_email)
         return {
             'message': 'Письмо отправлено!',
-            'status_code': 200,
-            'data': {
-                'mail_theme': request.mail_theme,
-                'mail_body': request.mail_body,
-                'mail_receiver': request.receiver_email
-            }
+            'status_code': 200
         }
 
     except Exception as e:
@@ -397,10 +440,29 @@ async def send_newsletter_to_all_users(request: shema.NewsletterForAllUsers,
     users = await GeneralDAO.get_all_items(db=db, item=models.User)
     errors = []
 
+    mail_theme = f"{request.mail_theme}"
+ 
     for user in users:
         try:
             print(f'Getting user: {user.email}')
-            send_email_task.delay(request.mail_theme, request.mail_body, user.email)
+            mail_body = f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                        <h2 style="color: #74d94f;">{mail_theme}</h2>
+                        <p>Здравствуйте, {user.name}!</p>
+                        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #74d94f; margin: 15px 0;">
+                            <p><strong>Сообщаем Вам следующее: </strong></p>
+                            <p>{request.mail_body}</p>
+                        </div>
+                        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <p>С уважением,<br><strong>Команда BookReviews</strong></p>
+                        </div>
+                    </div>
+                </body>
+            </html>
+            """
+            send_email_task.delay(mail_theme=mail_theme, mail_body=mail_body, receiver_email =user.email)
         except Exception as e:
             print(f"Error sending email to {user.email}: {e}")
             errors.append(user.email)
