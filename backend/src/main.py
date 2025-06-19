@@ -53,8 +53,6 @@ async def create_tables():
 async def startup_event():
     await create_tables()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 app.include_router(admin_router, prefix="/api/admin")
 app.include_router(users_router, prefix="/api/users")
 app.include_router(reviews_router, prefix="/api/reviews")
