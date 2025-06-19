@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Spin, Input, message } from 'antd';
+import { Spin, Input, message, Select, Row, Col } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -13,6 +13,8 @@ import { isAuthenticated, is401Error } from '../utils/authUtils';
 function ReviewsPage(){
     const navigate = useNavigate();
     const [searchText, setSearchText] = useState('');
+    const [ratingFilter, setRatingFilter] = useState(null);
+    const [userFilter, setUserFilter] = useState('');
     const [user, setUser] = useState(null);
     const [reviews, setReviews] = useState([]);
 
@@ -73,13 +75,21 @@ function ReviewsPage(){
         setSearchText(e.target.value);
     };
 
+    const handleRatingFilterChange = (value) => {
+        setRatingFilter(value);
+    };
+
+    const handleUserFilterChange = (e) => {
+        setUserFilter(e.target.value);
+    };
+
     const filteredReviews = reviews.filter(review => {
         if (!searchText) return true;
         return (
             (review.reviewed_book_author_name && review.reviewed_book_author_name.toLowerCase().includes(searchText.toLowerCase())) ||
             (review.reviewed_book_name && review.reviewed_book_name.toLowerCase().includes(searchText.toLowerCase())) ||
             (review.review_title && review.review_title.toLowerCase().includes(searchText.toLowerCase())) ||
-            (review.user && review.user.name && review.user.name.toLowerCase().includes(searchText.toLowerCase()))
+            (review.user_name && review.user_name.toLowerCase().includes(searchText.toLowerCase()))
         );
     });
 

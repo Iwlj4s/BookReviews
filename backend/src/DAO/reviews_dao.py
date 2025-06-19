@@ -26,6 +26,14 @@ class ReviewDAO:
         review = await db.execute(query)
 
         return review.scalars().all()
+    
+    @classmethod
+    async def get_reviews_desc(cls, db: AsyncSession):
+        query = select(Review).order_by(models.Review.created.desc())
+
+        result = await db.execute(query)
+
+        return result.scalars().all()
 
     # --- DELETED REVIEWS --- #
     @classmethod

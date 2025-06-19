@@ -162,7 +162,7 @@ async def delete_review(review_id: int,
 
 
 async def get_all_reviews(db: AsyncSession = Depends(get_db)):
-    reviews = await GeneralDAO.get_all_items(db=db, item=models.Review)
+    reviews = await ReviewDAO.get_reviews_desc(db=db)
     CheckHTTP404NotFound(founding_item=reviews, text="Обзоры не найдены")
 
     reviews_list = []
