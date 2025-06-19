@@ -8,8 +8,8 @@ services:
     container_name: backend
     networks:
       - dev
-    expose:
-      - 8000
+    ports:
+      - "8000:8000"   
     env_file:
       - .env
 
