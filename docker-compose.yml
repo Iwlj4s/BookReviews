@@ -10,25 +10,13 @@ services:
     depends_on:
       - backend
       - frontend
-    networks:
-      - dev
 
   backend:
-    build: 
-      context: ./backend
+    build: ./backend
     ports:
-      - "8000:8000"
-    networks:
-      - dev
-    command: python main.py  
+      - "8000:8000"  # Добавьте порт для тестирования
 
   frontend:
-    build: 
-      context: ./frontend
+    build: ./frontend
     ports:
-      - "3000:3000"
-    networks:
-      - dev
-
-networks:
-  dev:
+      - "3000:3000"  # Добавьте порт для тестирования
