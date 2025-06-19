@@ -78,7 +78,9 @@ async def review_to_out(review):
 
 
 @users_router.get("/me/", status_code=200, tags=["users"], response_model=UserOut)
-async def get_me(response: Response, user_data: User = Depends(get_current_user)):
+async def get_me(response: Response, 
+                 user_data: User = Depends(get_current_user)):
+    
     reviews = [await review_to_out(r) for r in user_data.reviews]
     return {
         "id": user_data.id,

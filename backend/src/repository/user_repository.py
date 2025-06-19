@@ -88,13 +88,13 @@ async def get_current_user(db: AsyncSession = Depends(get_db),
     user_id = verify_token(token=token)
     print("user_id in get current user: ", user_id)
     if not user_id:
-        return {
-            'message': "Token not found",
-            'status_code': 401,
-        }
+        raise HTTPException(status_code=401, detail="Token not found")
+
 
     # user = await UserDAO.get_simple_user(db=db, user_id=user_id)
     user = await GeneralDAO.get_item_by_id(db=db, item_id=user_id, item=models.User)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
 
     return user
 
