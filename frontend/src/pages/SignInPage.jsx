@@ -23,7 +23,7 @@ const SignInPage = () => {
             };
             console.log('Отправляемые данные from sign in page:', requestData);
             try {
-                const response = await axios.post('https://87.228.10.180/api/users/sign_in', requestData, {
+                const response = await axios.post('http://87.228.10.180/api/users/sign_in', requestData, {
                     headers: {
                         'Content-Type': 'application/json'
                     }

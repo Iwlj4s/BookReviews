@@ -83,7 +83,7 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
 
         try {
             const response = await axios.put(
-                `https://87.228.10.180/api/reviews/change_review/${reviews.id}`,
+                `http://87.228.10.180/api/reviews/change_review/${reviews.id}`,
                 requestData,
                 {
                     headers: {
@@ -117,7 +117,7 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
             cancelText: 'Нет',
             onOk: async () => {
                 try {
-                    const response = await axios.delete(`https://87.228.10.180/api/reviews/delete_review/${reviews.id}`, {
+                    const response = await axios.delete(`http://87.228.10.180/api/reviews/delete_review/${reviews.id}`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                         }
@@ -259,7 +259,7 @@ function ReviewCard({ reviews, user, isProfilePage, setReviews}) {
                     visible={deleteModalVisible}
                     onOk={async () => {
                         try {
-                            const response = await axios.delete(`https://127.0.0.1:8000/book_reviews/admin/review/delete_review/${reviews.id}?reason=${encodeURIComponent(deleteReason)}`, {
+                            const response = await axios.delete(`http://127.0.0.1:8000/book_reviews/admin/review/delete_review/${reviews.id}?reason=${encodeURIComponent(deleteReason)}`, {
                                 headers: {
                                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                                 }

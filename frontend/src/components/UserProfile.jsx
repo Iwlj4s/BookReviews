@@ -80,8 +80,8 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
 
     const fetchBooksAndAuthors = async () => {
         try {
-            const booksResponse = await axios.get('https://87.228.10.180/api/books/books_list/');
-            const authorsResponse = await axios.get('https://87.228.10.180/api/authors/authors_list/');
+            const booksResponse = await axios.get('http://87.228.10.180/api/books/books_list/');
+            const authorsResponse = await axios.get('http://87.228.10.180/api/authors/authors_list/');
             setBooks(booksResponse.data);
             setAuthors(authorsResponse.data);
             console.log("Fetched books", booksResponse.data);
@@ -99,7 +99,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
     const fetchUserData = async () => {
         try {
             if (!isAuthenticated(navigate, "/sign_in")) return;
-            const response = await axios.get('https://87.228.10.180/api/users/me/', {
+            const response = await axios.get('http://87.228.10.180/api/users/me/', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                 }
@@ -149,7 +149,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         };
 
         try {
-            const response = await axios.put('https://87.228.10.180/api/users/change_me/', requestData, {
+            const response = await axios.put('http://87.228.10.180/api/users/change_me/', requestData, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
@@ -230,7 +230,7 @@ function UserProfile({ user, onLogout, onUpdateUserData }) {
         }
 
         try {
-            const response = await axios.post('https://87.228.10.180/api/reviews/create_review/', {
+            const response = await axios.post('http://87.228.10.180/api/reviews/create_review/', {
                 review_title,
                 review_body,
                 rating,

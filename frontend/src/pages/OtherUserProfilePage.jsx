@@ -24,7 +24,7 @@ const OtherUserProfilePage = () => {
                     return;
                 }
                 
-                const response = await axios.get('https://87.228.10.180/api/users/me/', {
+                const response = await axios.get('http://87.228.10.180/api/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

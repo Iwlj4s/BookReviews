@@ -24,7 +24,7 @@ const SignUpPage = () => {
         };
         console.log('Отправляемые данные from sign up page:', requestData);
         try {
-            const response = await axios.post('https://87.228.10.180/api/users/sign_up', requestData, {
+            const response = await axios.post('http://87.228.10.180/api/users/sign_up', requestData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

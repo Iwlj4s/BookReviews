@@ -49,7 +49,7 @@ function UsersPage() {
     useEffect(() => {
         const fetchUsers= async () => {
             try {
-                const response = await axios.get('https://87.228.10.180/api/users/users_list');
+                const response = await axios.get('http://87.228.10.180/api/users/users_list');
                 console.log("User  ", response.data);
                 setUsers(response.data);
                 setLoading(false);
