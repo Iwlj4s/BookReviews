@@ -3,7 +3,7 @@ from sqlalchemy.orm import selectinload
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.database import models
+from src.database import models
 
 
 class GeneralDAO:

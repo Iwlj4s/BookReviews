@@ -6,19 +6,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
-from backend.src.database.database import engine, Base
-from backend.src.database import models, shema
+from src.database.database import engine, Base
+from src.database import models, shema
 
-from backend.src.DAO.general_dao import GeneralDAO
+from src.DAO.general_dao import GeneralDAO
 
-from backend.src.database.database import get_db
-from backend.src.repository.reviews_repository import get_all_reviews
+from src.database.database import get_db
+from src.repository.reviews_repository import get_all_reviews
 
-from backend.src.routes.admin_router import admin_router
-from backend.src.routes.users_router import users_router
-from backend.src.routes.books_router import books_router
-from backend.src.routes.authors_router import authors_router
-from backend.src.routes.reviews_router import reviews_router
+from src.routes.admin_router import admin_router
+from src.routes.users_router import users_router
+from src.routes.books_router import books_router
+from src.routes.authors_router import authors_router
+from src.routes.reviews_router import reviews_router
 
 
 app = FastAPI()

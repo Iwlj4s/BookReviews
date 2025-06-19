@@ -1,4 +1,4 @@
-from backend.parsing.main_pars import GetBookInfo
+from parsing.main_pars import GetBookInfo
 
 
 async def get_book_info(book_name: str, author_name: str):

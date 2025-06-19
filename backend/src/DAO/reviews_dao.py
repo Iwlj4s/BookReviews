@@ -5,11 +5,11 @@ from sqlalchemy import select, update, delete, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.email.send_email import send_email
-from backend.src.database import shema, models
-from backend.src.database.models import Review, User
+from email.send_email import send_email
+from src.database import shema, models
+from src.database.models import Review, User
 
-from backend.celery.tasks import send_email_task
+from celery.tasks import send_email_task
 
 
 class ReviewDAO:

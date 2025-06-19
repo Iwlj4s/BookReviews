@@ -1,7 +1,7 @@
 import asyncio
 
-from backend.celery.celery_app import app
-from backend.email.send_email import send_email
+from celery.celery_app import app
+from email.send_email import send_email
 
 
 @app.task(bind=True, max_retries=3, default_retry_delay=60)

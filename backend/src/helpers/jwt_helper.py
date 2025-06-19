@@ -1,6 +1,6 @@
 from jose import jwt
 from datetime import datetime, timedelta, timezone
-from backend.config import get_auth_data
+from config import get_auth_data
 
 
 def create_access_token(data: dict):

@@ -4,7 +4,7 @@ from enum import Enum
 from sqlalchemy import Column, String, Text, text, Integer, Boolean, ForeignKey, DateTime, func, Float
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from backend.src.database.database import Base
+from src.database.database import Base
 
 
 class ActionType(str, Enum):

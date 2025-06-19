@@ -4,14 +4,14 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.database.database import get_db
-from backend.src.database.shema import User, ReviewCreate
-from backend.src.database import shema, models
-from backend.src.repository.admin_repository import get_current_admin_user
+from src.database.database import get_db
+from src.database.shema import User, ReviewCreate
+from src.database import shema, models
+from src.repository.admin_repository import get_current_admin_user
 
-from backend.src.repository.user_repository import get_current_user
-from backend.src.repository import reviews_repository
-from backend.src.repository.reviews_repository import get_all_reviews, fetch_review, fetch_filtered_review
+from src.repository.user_repository import get_current_user
+from src.repository import reviews_repository
+from src.repository.reviews_repository import get_all_reviews, fetch_review, fetch_filtered_review
 
 reviews_router = APIRouter(
     prefix="/api/reviews",

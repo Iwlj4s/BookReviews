@@ -2,12 +2,12 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.database import shema, models
-from backend.src.database.database import get_db
+from src.database import shema, models
+from src.database.database import get_db
 
-from backend.src.helpers.general_helper import CheckHTTP404NotFound
+from src.helpers.general_helper import CheckHTTP404NotFound
 
-from backend.src.DAO.general_dao import GeneralDAO
+from src.DAO.general_dao import GeneralDAO
 
 authors_router = APIRouter(
     prefix="/api/authors",

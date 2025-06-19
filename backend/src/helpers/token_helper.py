@@ -3,7 +3,7 @@ from fastapi import Response
 
 from jose import jwt, JWTError
 from datetime import datetime, timezone
-from backend.config import get_auth_data
+from config import get_auth_data
 
 
 def get_token(request: Request, response: Response):

@@ -2,13 +2,13 @@ from fastapi import Depends, APIRouter, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.DAO.books_dao import BookDAO
-from backend.src.database import shema, models
-from backend.src.database.database import get_db
+from src.DAO.books_dao import BookDAO
+from src.database import shema, models
+from src.database.database import get_db
 
-from backend.src.helpers.general_helper import CheckHTTP404NotFound
+from src.helpers.general_helper import CheckHTTP404NotFound
 
-from backend.src.DAO.general_dao import GeneralDAO
+from src.DAO.general_dao import GeneralDAO
 
 books_router = APIRouter(
     prefix="/api/books",

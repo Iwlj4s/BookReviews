@@ -1,4 +1,4 @@
-from backend.src.database import shema
+from src.database import shema
 
 
 def check_data_for_change_author(request: shema.Author, author, reviews):

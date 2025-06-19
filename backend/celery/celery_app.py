@@ -1,5 +1,5 @@
 from celery import Celery
-from backend.celery.celery_config import CeleryConfig
+from celery.celery_config import CeleryConfig
 
 app = Celery("book_reviews")
 app.config_from_object(CeleryConfig)

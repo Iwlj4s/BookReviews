@@ -3,9 +3,9 @@ from sqlalchemy import select, update, delete, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import load_only
 
-from backend.celery.tasks import send_email_task
-from backend.src.database import models
-from backend.src.database.models import User
+from celery.tasks import send_email_task
+from src.database import models
+from src.database.models import User
 
 
 class UserDAO:

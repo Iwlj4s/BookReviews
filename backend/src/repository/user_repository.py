@@ -5,18 +5,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
-from backend.src.database.database import get_db
-from backend.src.database import models, shema
+from src.database.database import get_db
+from src.database import models, shema
 
-from backend.src.helpers import password_helper, user_helper
-from backend.src.helpers.general_helper import CheckHTTP404NotFound, CheckHTTP401Unauthorized
-from backend.src.helpers.token_helper import get_token, verify_token
+from src.helpers import password_helper, user_helper
+from src.helpers.general_helper import CheckHTTP404NotFound, CheckHTTP401Unauthorized
+from src.helpers.token_helper import get_token, verify_token
 
-from backend.src.DAO.general_dao import GeneralDAO
-from backend.src.DAO.users_dao import UserDAO
-from backend.src.helpers.user_helper import check_data_for_change_user
+from src.DAO.general_dao import GeneralDAO
+from src.DAO.users_dao import UserDAO
+from src.helpers.user_helper import check_data_for_change_user
 
-from backend.src.helpers import password_helper
+from src.helpers import password_helper
 
 
 async def sign_up(request: shema.UserSignUp, response, db: AsyncSession):

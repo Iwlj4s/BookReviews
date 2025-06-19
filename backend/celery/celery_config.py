@@ -1,4 +1,4 @@
-from backend.config import Settings
+from config import Settings
 
 
 class CeleryConfig:

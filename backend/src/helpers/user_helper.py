@@ -3,10 +3,10 @@ from starlette.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from backend.src.DAO.users_dao import UserDAO
-from backend.src.database import shema
-from backend.src.helpers import password_helper
-from backend.src.helpers.jwt_helper import create_access_token
+from src.DAO.users_dao import UserDAO
+from src.database import shema
+from src.helpers import password_helper
+from src.helpers.jwt_helper import create_access_token
 
 
 async def take_access_token_for_user(db: AsyncSession, response: Response, request: shema.UserSignIn, admin_check: bool):

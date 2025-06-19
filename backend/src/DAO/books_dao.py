@@ -4,8 +4,8 @@ from sqlalchemy import select, update, delete, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from backend.src.database import shema, models
-from backend.src.database.models import Book
+from src.database import shema, models
+from src.database.models import Book
 
 
 class BookDAO:

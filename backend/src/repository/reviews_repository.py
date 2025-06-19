@@ -6,18 +6,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
-from backend.src.DAO.general_dao import GeneralDAO
+from src.DAO.general_dao import GeneralDAO
 from backend.src.DAO.reviews_dao import ReviewDAO
 
-from backend.src.database.database import get_db
-from backend.src.database import models, shema
-from backend.src.database.shema import User
-from backend.src.helpers.general_helper import CheckHTTP404NotFound
+from src.database.database import get_db
+from src.database import models, shema
+from src.database.shema import User
+from src.helpers.general_helper import CheckHTTP404NotFound
 
-from backend.src.helpers.reviews_helper import check_data_for_add_review, check_data_for_change_review
+from src.helpers.reviews_helper import check_data_for_add_review, check_data_for_change_review
 
-from backend.parsing.get_data import get_book_info
-from backend.src.repository.admin_repository import get_current_admin_user
+from parsing.get_data import get_book_info
+from src.repository.admin_repository import get_current_admin_user
 
 
 # TODO: Fix displaying book's rating in books/book/{book_id}

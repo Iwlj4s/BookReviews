@@ -4,18 +4,18 @@ from fastapi import Depends, APIRouter, HTTPException, Response, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.DAO.general_dao import GeneralDAO
+from src.DAO.general_dao import GeneralDAO
 
-from backend.src.database.database import get_db
+from src.database.database import get_db
 
-from backend.src.repository import admin_repository
-from backend.src.repository.admin_repository import get_current_admin_user
+from src.repository import admin_repository
+from src.repository.admin_repository import get_current_admin_user
 
-from backend.src.database.shema import User
+from src.database.shema import User
 
-from backend.src.database import models, shema
+from src.database import models, shema
 
-from backend.src.helpers.general_helper import CheckHTTP404NotFound
+from src.helpers.general_helper import CheckHTTP404NotFound
 
 admin_router = APIRouter(
     prefix="/api/admin",

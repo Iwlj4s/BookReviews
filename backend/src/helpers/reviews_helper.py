@@ -4,10 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlette import status
 
-from backend.src.database import shema
-from backend.src.DAO.reviews_dao import ReviewDAO
-from backend.src.DAO.books_dao import BookDAO
-from backend.src.DAO.authors_dao import AuthorDAO
+from src.database import shema
+from src.DAO.reviews_dao import ReviewDAO
+from src.DAO.books_dao import BookDAO
+from src.DAO.authors_dao import AuthorDAO
 
 
 async def check_data_for_add_review(request: shema.Review, db: AsyncSession):
