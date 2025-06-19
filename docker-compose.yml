@@ -4,7 +4,8 @@ networks:
 
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     container_name: backend
     networks:
       - dev
