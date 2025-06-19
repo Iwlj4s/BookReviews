@@ -9,6 +9,8 @@ services:
 
     volumes:
       - './nginx.conf:/etc/nginx/nginx.conf'
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./frontend/dist:/usr/share/nginx/html
 
     depends_on:
       - backend
@@ -18,9 +20,7 @@ services:
       - dev
 
   backend:
-    build: 
-     context: .
-     dockerfile: ./backend/Dockerfile
+    build: ./backend
     networks:
       - dev
   
