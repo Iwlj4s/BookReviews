@@ -7,7 +7,7 @@ from starlette import status
 from starlette.responses import Response
 
 from src.DAO.general_dao import GeneralDAO
-from backend.src.DAO.reviews_dao import ReviewDAO
+from src.DAO.reviews_dao import ReviewDAO
 
 from src.database.database import get_db
 from src.database import models, shema
