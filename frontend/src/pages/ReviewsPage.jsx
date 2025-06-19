@@ -26,7 +26,7 @@ function ReviewsPage(){
         const token = localStorage.getItem('user_access_token');
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
+                const response = await axios.get('http://87.228.10.180/book_reviews/api/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -52,7 +52,7 @@ function ReviewsPage(){
 
     useEffect(() => {
            const fetchReviews = async () => {
-               const response = await axios.get('http://127.0.0.1:8000/book_reviews/reviews/');
+               const response = await axios.get('http://87.228.10.180/book_reviews/api/reviews/');
                setReviews(response.data);
            };
 

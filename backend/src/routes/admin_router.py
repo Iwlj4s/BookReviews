@@ -18,7 +18,7 @@ from backend.src.database import models, shema
 from backend.src.helpers.general_helper import CheckHTTP404NotFound
 
 admin_router = APIRouter(
-    prefix="/book_reviews/admin",
+    prefix="/book_reviews/api/admin",
     tags=["admin"]
 )
 

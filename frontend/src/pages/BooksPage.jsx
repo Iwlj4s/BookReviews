@@ -23,7 +23,7 @@ function BooksPage (){
         }
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/book_reviews/users/me/', {
+                const response = await axios.get('http://87.228.10.180/book_reviews/api/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -47,7 +47,7 @@ function BooksPage (){
 
     useEffect(() => {
        const fetchBooks = async () => {
-           const response = await axios.get('http://127.0.0.1:8000/book_reviews/books/books_list');
+           const response = await axios.get('http://87.228.10.180/book_reviews/api/books/books_list');
            setBooks(response.data);
        };
 
