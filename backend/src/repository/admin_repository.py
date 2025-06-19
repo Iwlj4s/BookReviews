@@ -26,7 +26,7 @@ from src.repository.user_repository import get_current_user
 
 from email.send_email import send_email
 
-from celery_app.tasks import send_email_task
+from celery_tasks.tasks import send_email_task
 
 from src.database.shema import DeletedReview as DeletedReviewSchema
 

@@ -3,7 +3,7 @@ from sqlalchemy import select, update, delete, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import load_only
 
-from celery_app.tasks import send_email_task
+from celery_tasks.tasks import send_email_task
 from src.database import models
 from src.database.models import User
 
