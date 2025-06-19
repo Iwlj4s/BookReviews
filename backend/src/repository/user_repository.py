@@ -40,9 +40,18 @@ async def sign_up(request: shema.UserSignUp, response, db: AsyncSession):
             'status_code': 409,
             'error': "CONFLICT"
         }
+    
+    users_count = await UserDAO.get_users_count(db)
+    if users_count == 0:
+            is_admin = True
+    else:
+        is_admin = False
 
     hash_password = password_helper.hash_password(request.password)
-    new_user = models.User(name=request.name, email=request.email, password=hash_password)
+    new_user = models.User(name=request.name, 
+                           email=request.email, 
+                           password=hash_password,
+                           is_admin=is_admin)
     db.add(new_user)
 
     await db.commit()
@@ -56,7 +65,8 @@ async def sign_up(request: shema.UserSignUp, response, db: AsyncSession):
             'id': new_user.id,
             'name': new_user.name,
             'email': new_user.email,
-            'registration_date': new_user.registration_date
+            'registration_date': new_user.registration_date,
+            'is_admin': new_user.is_admin
         }
     }
 

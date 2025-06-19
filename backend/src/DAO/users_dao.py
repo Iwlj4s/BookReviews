@@ -125,3 +125,14 @@ class UserDAO:
         """
 
         send_email_task.delay(mail_body, mail_theme, user_email)
+
+    @classmethod
+    async def get_users_count(cls, db: AsyncSession) -> int:
+        result = await db.execute(select(func.count()).select_from(User))
+        return result.scalar_one()
+    
+
+    @classmethod
+    async def get_users_count(cls, db: AsyncSession) -> int:
+        result = await db.execute(select(func.count()).select_from(User))
+        return result.scalar_one()
