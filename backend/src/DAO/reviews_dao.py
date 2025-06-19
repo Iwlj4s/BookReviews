@@ -5,8 +5,7 @@ from sqlalchemy import select, update, delete, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from email.send_email import send_email
-from src.database import shema, models
+from src.database import models
 from src.database.models import Review, User
 
 from celery.tasks import send_email_task
