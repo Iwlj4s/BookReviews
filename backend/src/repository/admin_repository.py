@@ -24,11 +24,10 @@ from src.helpers.reviews_helper import check_data_for_change_review
 from src.helpers.user_helper import check_data_for_change_user
 from src.repository.user_repository import get_current_user
 
-from send_email.send_email import send_email
 
-from backend.celery.tasks import send_email_task
+from celery_tasks.tasks import send_email_task
 
-from backend.src.database.shema import DeletedReview as DeletedReviewSchema
+from src.database.shema import DeletedReview as DeletedReviewSchema
 
 
 # TODO: Fix getting book description
