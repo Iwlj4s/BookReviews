@@ -18,8 +18,9 @@ class AuthorDAO:
 
     @classmethod
     async def get_author_by_name(cls, db: AsyncSession, author_name: str):
-        query = select(Author).where(Author.name == author_name)
+        query = select(Author).where(Author.name == author_name.title())
         author = await db.execute(query)
+
         return author.scalars().first()
 
     @classmethod
@@ -35,7 +36,7 @@ class AuthorDAO:
     @classmethod
     async def add_author(cls, request: shema.Author, db: AsyncSession):
         new_author = models.Author(
-            name=request.name
+            name=request.name.title()
         )
 
         db.add(new_author)
@@ -60,6 +61,6 @@ class AuthorDAO:
 
     @classmethod
     async def author_by_name(cls, db: AsyncSession, author_name: str):
-        query = select(Author).where(Author.name == str(author_name))
+        query = select(Author).where(Author.name == str(author_name.title()))
         author = await db.execute(query)
         return author.scalars().first()

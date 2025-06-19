@@ -287,14 +287,14 @@ async def add_book(response: Response,
             'status_code': 404
         }
 
-    if await BookDAO.get_book_by_book_name(book_name=str(request.book_name.capitalize()),
+    if await BookDAO.get_book_by_book_name(book_name=str(request.book_name.title()),
                                            author_id=int(author.id), db=db):
         return {
             'message': "Такая книга уже добавлена",
             'status_code': 404
         }
 
-    book_cover, book_desc = await get_book_info(book_name=request.book_name.capitalize(),
+    book_cover, book_desc = await get_book_info(book_name=request.book_name.title(),
                                                 author_name=author.name.title())
     print(f"Обложка: {book_cover}")
     print(f"Описание: {book_desc}")
@@ -330,6 +330,7 @@ async def add_book(response: Response,
             'book_description': book_desc
         }
     }
+
 
 
 async def delete_book(book_id: int,

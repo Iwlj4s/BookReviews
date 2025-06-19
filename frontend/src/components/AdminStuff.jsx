@@ -86,11 +86,6 @@ function AdminStuff({ user }) {
 
 
     const AddAuthor = async () => {
-        if (authorName.length < 5) {
-            message.error('Имя автора должно содержать минимум 5 символов');
-            return;
-        }
-
         setLoading(true);
         const values = { name: authorName };
         try {
@@ -105,7 +100,6 @@ function AdminStuff({ user }) {
             } else if (response.data.status_code === 200) {
                 message.success(response.data.message);
                 form.resetFields();
-                setAuthorName('');
                 fetchAuthors();
             }
         } catch (error) {
@@ -136,7 +130,12 @@ function AdminStuff({ user }) {
                 message.error(response.data.message);
             } else if (response.data.status_code === 200) {
                 message.success(response.data.message);
-                form.resetFields();
+                // Сбрасываем форму
+                setBookName('');
+                setBookDescription('');
+                setSelectedAuthor('');
+                // Обновляем список авторов
+                await fetchAuthors();
             }
         } catch (error) {
             message.error(error.response?.data?.message || 'Произошла ошибка при добавлении книги');
@@ -267,7 +266,7 @@ function AdminStuff({ user }) {
                         label="Название книги"
                         rules={[{ required: true, message: 'Пожалуйста, введите название книги!' }]}
                     >
-                        <Input
+                         <Input
                             placeholder="Введите название книги"
                             value={bookName}
                             onChange={(e) => setBookName(e.target.value)}
