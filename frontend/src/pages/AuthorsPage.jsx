@@ -16,7 +16,7 @@ function AuthorsPage() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    if (!authors) {
+    if (!authors || authors.length === 0) {
        return <div >Пока что авторов нет </div>;
     }
 
@@ -78,6 +78,12 @@ function AuthorsPage() {
     if (error) {
         return <div>{error}</div>;
     }
+    
+    if (!authors || authors.length === 0) {
+        return <div>Пока что авторов нет</div>;
+    }
+
+
     const handleSearchChange = (e) => {
         setSearchText(e.target.value);
     };
