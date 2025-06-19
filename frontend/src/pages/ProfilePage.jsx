@@ -24,7 +24,7 @@ const ProfilePage = () => {
                     return;
                 }
 
-                const response = await axios.get('http://87.228.10.180/book_reviews/api/users/me/', {
+                const response = await axios.get('http://87.228.10.180/api/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                     }
@@ -58,7 +58,7 @@ const ProfilePage = () => {
 
     const handleLogout = async () => {
         try {
-            await axios.post('http://87.228.10.180/book_reviews/api/users/logout', {}, {
+            await axios.post('http://87.228.10.180/api/users/logout', {}, {
                 withCredentials: true
             });
             localStorage.removeItem('user_access_token'); // Очищаем localStorage

@@ -29,7 +29,7 @@ function AuthorsPage() {
         }
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://87.228.10.180/book_reviews/api/users/me/', {
+                const response = await axios.get('http://87.228.10.180/api/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -58,7 +58,7 @@ function AuthorsPage() {
     useEffect(() => {
         const fetchAuthors = async () => {
             try {
-                const response = await axios.get('http://87.228.10.180/book_reviews/api/authors/authors_list');
+                const response = await axios.get('http://87.228.10.180/api/authors/authors_list');
                 console.log("Authors: ", response.data)
                 setAuthors(response.data);
                 setLoading(false);

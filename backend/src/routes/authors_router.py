@@ -10,7 +10,7 @@ from backend.src.helpers.general_helper import CheckHTTP404NotFound
 from backend.src.DAO.general_dao import GeneralDAO
 
 authors_router = APIRouter(
-    prefix="/book_reviews/api/authors",
+    prefix="/api/authors",
     tags=["authors"]
 )
 

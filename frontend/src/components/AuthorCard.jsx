@@ -36,7 +36,7 @@ function AuthorCard({ authors, user, setAuthors }) {
         };
 
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/book_reviews/admin/authors/change_author/${authors.id}`, requestData, {
+            const response = await axios.put(`http://87.228.10.180/api/authors/change_author/${authors.id}`, requestData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`,
                 },
@@ -64,7 +64,7 @@ function AuthorCard({ authors, user, setAuthors }) {
             cancelText: 'Нет',
             onOk: async () => {
                 try {
-                    const response = await axios.delete(`http://127.0.0.1:8000/book_reviews/admin/authors/delete_author/${authors.id}`, {
+                    const response = await axios.delete(`http://87.228.10.180/api/admin/authors/delete_author/${authors.id}`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`,
                         },

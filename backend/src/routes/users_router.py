@@ -15,7 +15,7 @@ from backend.src.repository import user_repository
 from backend.src.DAO.general_dao import GeneralDAO
 
 users_router = APIRouter(
-    prefix="/book_reviews/api/users",
+    prefix="/api/users",
     tags=["users"]
 )
 

@@ -29,8 +29,8 @@ const ReviewModal = ({ visible, onClose, onSubmit }) => {
     const fetchAuthorsAndBooks = async () => {
         setLoading(true);
         try {
-            const authorsResponse = await axios.get('http://127.0.0.1:8000/book_reviews/authors/authors_list');
-            const booksResponse = await axios.get('http://127.0.0.1:8000/book_reviews/books/books_list');
+            const authorsResponse = await axios.get('http://87.228.10.180/api/authors/authors_list');
+            const booksResponse = await axios.get('http://87.228.10.180/api/books/books_list');
             setAuthors(authorsResponse.data);
             setBooks(booksResponse.data);
         } catch (error) {

@@ -14,7 +14,7 @@ from backend.src.repository import reviews_repository
 from backend.src.repository.reviews_repository import get_all_reviews, fetch_review, fetch_filtered_review
 
 reviews_router = APIRouter(
-    prefix="/book_reviews/api/reviews",
+    prefix="/api/reviews",
     tags=["reviews"]
 )
 

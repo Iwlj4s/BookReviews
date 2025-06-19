@@ -52,15 +52,14 @@ async def startup_event():
     await create_tables()
 
 
-app.include_router(admin_router)
-app.include_router(users_router)
-app.include_router(reviews_router)
-app.include_router(authors_router)
-app.include_router(books_router)
+app.include_router(admin_router, prefix="/api/admin")
+app.include_router(users_router, prefix="/api/users")
+app.include_router(reviews_router, prefix="/api/reviews")
+app.include_router(authors_router, prefix="/api/authors")
+app.include_router(books_router, prefix="/api/books")
 
 
-@app.get("/", response_model=Optional[shema.ReviewOut])
-@app.get("/home", response_model=Optional[shema.ReviewOut])
+@app.get("/api/", response_model=Optional[shema.ReviewOut])
 async def home_page(db: AsyncSession = Depends(get_db)):
     review = await GeneralDAO.get_last_review_with_relations(db=db)
     return review
