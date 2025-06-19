@@ -52,7 +52,7 @@ function ReviewsPage(){
 
     useEffect(() => {
            const fetchReviews = async () => {
-               const response = await axios.get('/api/reviews/');
+               const response = await axios.get('/api/reviews');
                setReviews(response.data);
            };
 
