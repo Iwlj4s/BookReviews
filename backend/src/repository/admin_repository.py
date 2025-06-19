@@ -5,26 +5,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
-from backend.parsing.get_data import get_book_info
-from backend.src.helpers.admin_helper import check_data_for_change_author, check_data_for_change_book
-from backend.src.database.database import get_db
-from backend.src.database import shema, models
-from backend.src.database.models import User
+from parsing.get_data import get_book_info
+from src.helpers.admin_helper import check_data_for_change_author, check_data_for_change_book
+from src.database.database import get_db
+from src.database import shema, models
+from src.database.models import User
 
-from backend.src.helpers import user_helper
-from backend.src.helpers.general_helper import CheckHTTP404NotFound
+from src.helpers import user_helper
+from src.helpers.general_helper import CheckHTTP404NotFound
 
-from backend.src.DAO.general_dao import GeneralDAO
-from backend.src.DAO.reviews_dao import ReviewDAO
-from backend.src.DAO.users_dao import UserDAO
-from backend.src.DAO.authors_dao import AuthorDAO
-from backend.src.DAO.books_dao import BookDAO
+from src.DAO.general_dao import GeneralDAO
+from src.DAO.reviews_dao import ReviewDAO
+from src.DAO.users_dao import UserDAO
+from src.DAO.authors_dao import AuthorDAO
+from src.DAO.books_dao import BookDAO
 
-from backend.src.helpers.reviews_helper import check_data_for_change_review
-from backend.src.helpers.user_helper import check_data_for_change_user
-from backend.src.repository.user_repository import get_current_user
+from src.helpers.reviews_helper import check_data_for_change_review
+from src.helpers.user_helper import check_data_for_change_user
+from src.repository.user_repository import get_current_user
 
-from backend.email.send_email import send_email
+from send_email.send_email import send_email
 
 from backend.celery.tasks import send_email_task
 
