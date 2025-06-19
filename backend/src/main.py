@@ -63,3 +63,8 @@ app.include_router(books_router)
 async def home_page(db: AsyncSession = Depends(get_db)):
     review = await GeneralDAO.get_last_review_with_relations(db=db)
     return review
+
+
+# uvicorn backend.src.main:app --reload
+# cd frontend then npm run dev
+# Download redis, start redis server then celery -A backend.celery.celery_app worker --loglevel=info
