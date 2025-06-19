@@ -31,7 +31,7 @@ function AdminStuff({ user }) {
 
     const fetchAuthors = async () => {
         try {
-            const response = await axios.get('http://87.228.10.180/api/authors/authors_list/');
+            const response = await axios.get('https://87.228.10.180/api/authors/authors_list/');
             setAuthors(response.data);
         } catch (error) {
             message.error('Ошибка при загрузке авторов');
@@ -41,7 +41,7 @@ function AdminStuff({ user }) {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('http://87.228.10.180/api/users/users_list', {
+            const response = await axios.get('https://87.228.10.180/api/users/users_list', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
                 }
@@ -62,7 +62,7 @@ function AdminStuff({ user }) {
         setLoading(true);
         try {
             const response = await axios.post(
-                'http://87.228.10.180/api/admin/users/add_admin',
+                'https://87.228.10.180/api/admin/users/add_admin',
                 { user_id: selectedUserId },  // Send as request body
                 {
                     headers: {
@@ -94,7 +94,7 @@ function AdminStuff({ user }) {
         setLoading(true);
         const values = { name: authorName };
         try {
-            const response = await axios.post('http://87.228.10.180/api/admin/authors/add_author', values, {
+            const response = await axios.post('https://87.228.10.180/api/admin/authors/add_author', values, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
@@ -124,7 +124,7 @@ function AdminStuff({ user }) {
         };
         console.log("Add book requestData: ", requestData)
         try {
-            const response = await axios.post('http://87.228.10.180/api/admin/books/add_book', requestData, {
+            const response = await axios.post('https://87.228.10.180/api/admin/books/add_book', requestData, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`
@@ -148,7 +148,7 @@ function AdminStuff({ user }) {
     const sendNewsletter = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://87.228.10.180/api/admin/mail/send_newsletter', {
+            const response = await axios.post('https://87.228.10.180/api/admin/mail/send_newsletter', {
                 mail_theme: mailTheme,
                 mail_body: mailBody
             }, {

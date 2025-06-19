@@ -3,6 +3,5 @@ env
 __pycache__/
 *.pyc
 migrations
-BookReviews.db
 bookreviews.pub
 bookreviews

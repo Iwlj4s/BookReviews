@@ -12,7 +12,7 @@ function HomePage() {
 
    useEffect(() => {
        const fetchReviews = async () => {
-           const response = await axios.get('http://87.228.10.180/api');
+           const response = await axios.get('https://87.228.10.180/api');
            setReviews(response.data);
        };
 

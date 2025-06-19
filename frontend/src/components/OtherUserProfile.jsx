@@ -29,7 +29,7 @@ function OtherUserProfile({ userId, currentUser }) {
    useEffect(() => {
     const fetchUserData = async () => {
         try {
-            const response = await axios.get(`http://87.228.10.180/api/users/user/${userId}`);
+            const response = await axios.get(`https://87.228.10.180/api/users/user/${userId}`);
             console.log(response.data);
             setUser (response.data);
             setReviews(response.data.reviews || []);
@@ -54,7 +54,7 @@ function OtherUserProfile({ userId, currentUser }) {
 
 
         try {
-            const response = await axios.post(`http://87.228.10.180/api/admin/mail/send_letter`, emailData, {
+            const response = await axios.post(`https://87.228.10.180/api/admin/mail/send_letter`, emailData, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`

@@ -59,7 +59,7 @@ function BookCard({ books, user, setBooks }) {
         };
 
         try {
-            const response = await axios.put(`http://87.228.10.180/api/admin/book/change_book/${books.id}`, requestData, {
+            const response = await axios.put(`https://87.228.10.180/api/admin/book/change_book/${books.id}`, requestData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`,
                 },
@@ -86,7 +86,7 @@ function BookCard({ books, user, setBooks }) {
             cancelText: 'Нет',
             onOk: async () => {
                 try {
-                    const response = await axios.delete(`http://87.228.10.180/api/admin/books/delete_book/${books.id}`, {
+                    const response = await axios.delete(`https://87.228.10.180/api/admin/books/delete_book/${books.id}`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('user_access_token')}`,
                         },
