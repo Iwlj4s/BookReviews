@@ -118,7 +118,7 @@ function AdminStuff({ user }) {
     const AddBook = async () => {
         setLoading(true);
         const requestData = {
-            book_author_name: selectedAuthor,
+            book_author_id: selectedAuthor,
             book_name: bookName,
             book_description: bookDescription
         };
@@ -256,7 +256,7 @@ function AdminStuff({ user }) {
                             onFocus={fetchAuthors}
                         >
                             {authors.map(author => (
-                                <Option key={author.id} value={author.name}>
+                                <Option key={author.id} value={author.id}>
                                     {author.name}
                                 </Option>
                             ))}

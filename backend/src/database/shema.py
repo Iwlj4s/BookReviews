@@ -313,7 +313,7 @@ class AuthorCreate(BaseModel):
 
 
 class BookCreate(BaseModel):
-    book_author_name: str
+    book_author_id: int
     book_name: str
     book_description: str
 

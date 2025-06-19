@@ -280,7 +280,7 @@ async def add_book(response: Response,
                    request: shema.BookCreate,
                    admin: User = Depends(get_current_admin_user),
                    db: AsyncSession = Depends(get_db)):
-    author = await AuthorDAO.get_author_by_name(db=db, author_name=str(request.book_author_name.title()))
+    author = await AuthorDAO.get_author_by_id(db=db, author_id=request.book_author_id)
     print(f"Author in back: {author}")
     if not author:
         return {
