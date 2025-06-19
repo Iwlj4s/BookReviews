@@ -6,7 +6,7 @@ import smtplib
 
 load_dotenv()
 
-from backend.config import Settings
+from config import Settings
 
 
 async def send_email(mail_body: str, mail_theme: str, receiver_email: str):
