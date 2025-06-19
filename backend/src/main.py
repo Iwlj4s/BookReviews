@@ -43,7 +43,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],  # Разрешить все методы
     allow_headers=["*"],  # Разрешить все заголовки
-    origins = ["*"]
 )
 
 
