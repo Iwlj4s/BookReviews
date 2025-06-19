@@ -24,7 +24,7 @@ from src.helpers.reviews_helper import check_data_for_change_review
 from src.helpers.user_helper import check_data_for_change_user
 from src.repository.user_repository import get_current_user
 
-from email.send_email import send_email
+from send_email.send_email import send_email
 
 from celery_tasks.tasks import send_email_task
 
