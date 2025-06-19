@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
@@ -52,6 +53,7 @@ async def create_tables():
 async def startup_event():
     await create_tables()
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(admin_router, prefix="/api/admin")
 app.include_router(users_router, prefix="/api/users")
@@ -60,7 +62,7 @@ app.include_router(authors_router, prefix="/api/authors")
 app.include_router(books_router, prefix="/api/books")
 
 
-@app.get("/api/", response_model=Optional[shema.ReviewOut])
+@app.get("/api", response_model=Optional[shema.ReviewOut])
 async def home_page(db: AsyncSession = Depends(get_db)):
     review = await GeneralDAO.get_last_review_with_relations(db=db)
     return review
