@@ -1,6 +1,6 @@
 import asyncio
 
-from celery_app.celery_app import app
+from celery.celery_app import app
 from email.send_email import send_email
 
 

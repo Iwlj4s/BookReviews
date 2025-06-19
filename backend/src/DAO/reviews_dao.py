@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 from src.database import models
 from src.database.models import Review, User
 
-from celery.tasks import send_email_task
+from celery_app.tasks import send_email_task
 
 
 class ReviewDAO:
