@@ -65,3 +65,5 @@ app.include_router(books_router)
 @app.get("/api/", response_model=Optional[shema.ReviewOut])
 async def home_page(db: AsyncSession = Depends(get_db)):
     review = await GeneralDAO.get_last_review_with_relations(db=db)
+
+    return review
