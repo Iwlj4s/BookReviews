@@ -39,7 +39,7 @@ class BookDAO:
     async def add_book(cls, request: shema.Book, book_cover, book_desc, author, db: AsyncSession):
         new_book = models.Book(
             book_cover=book_cover,
-            book_name=request.book_name,
+            book_name=request.book_name.title(),
             author_id=author.id,
             book_description=book_desc
         )
