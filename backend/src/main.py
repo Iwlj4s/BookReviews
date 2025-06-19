@@ -32,7 +32,9 @@ origins = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
     "http://87.228.10.180",
-    "http://87.228.10.180:80"
+    "http://87.228.10.180:80",
+    "http://0.0.0.0",
+    "http://0.0.0.0:80"
 ]
 
 app.add_middleware(
@@ -41,6 +43,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],  # Разрешить все методы
     allow_headers=["*"],  # Разрешить все заголовки
+    origins = ["*"]
 )
 
 
