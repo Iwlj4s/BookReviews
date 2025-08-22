@@ -16,6 +16,7 @@ class AuthorDAO:
 
         return author.scalars().first()
 
+
     @classmethod
     async def get_author_by_name(cls, db: AsyncSession, author_name: str):
         query = select(Author).where(Author.name == author_name.title())
