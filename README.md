@@ -82,7 +82,7 @@ BookReviews/
 #### Installation & Setup
 1. **Clone the repository and checkout on stable local version:**
    ```bash
-   git clone <https://github.com/Iwlj4s/BookReviews.git>
+   git clone https://github.com/Iwlj4s/BookReviews.git
    cd BookReviews
    git fetch origin
    git checkout -t origin/local-stable-version
