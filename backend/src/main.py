@@ -66,8 +66,8 @@ async def home_page(db: AsyncSession = Depends(get_db)):
 
 
 # uvicorn backend.src.main:app --reload
-# cd frontend then npm run dev
 # Download redis, start redis server then celery -A backend.celery.celery_app worker --loglevel=info
+# cd frontend then npm run dev
 
 # git fetch origin
 # git checkout -t origin/local-stable-version
