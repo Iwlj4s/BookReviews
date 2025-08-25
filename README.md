@@ -34,6 +34,7 @@ This project was developed for educational purposes as a final assignment in the
   - Mobile-(kind of)friendly interface
   - Clean, modern UI
 
+---
 
 ### 📧 Email Configuration
 For email functionality to work properly, configure an SMTP provider:
@@ -49,6 +50,8 @@ For email functionality to work properly, configure an SMTP provider:
 2. Generate an app password at [Google App Passwords](https://myaccount.google.com/apppasswords).
 3. Use the generated password in your `.env` file.
 4. Update `MAIL_SERVER` to `smtp.gmail.com`.
+
+---
 
 ### 🗂️ Project Structure
 ```
@@ -70,6 +73,8 @@ BookReviews/
 ├── requirements.txt             # Python dependencies
 └── README.md                    # This file
 ```
+
+---
 
 ### 🚀 Quick Start
 
@@ -176,6 +181,7 @@ Open your browser and navigate to:
 - **Backend:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
 - **Frontend:** [http://localhost:5173](http://localhost:5173)
 
+---
 
 ### 🛠️ Troubleshooting
 #### Common Issues
