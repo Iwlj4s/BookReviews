@@ -34,6 +34,7 @@ This project was developed for educational purposes as a final assignment in the
   - Mobile-(kind of)friendly interface
   - Clean, modern UI
 
+---
 
 ### 📧 Email Configuration
 For email functionality to work properly, configure an SMTP provider:
@@ -70,6 +71,8 @@ BookReviews/
 ├── requirements.txt             # Python dependencies
 └── README.md                    # This file
 ```
+
+---
 
 ### 🚀 Quick Start
 
@@ -176,12 +179,44 @@ Open your browser and navigate to:
 - **Backend:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
 - **Frontend:** [http://localhost:5173](http://localhost:5173)
 
+---
 
 ### 🛠️ Troubleshooting
 #### Common Issues
 - **Celery authentication errors:** Ensure you're using an app password, not your regular email password. Verify SMTP settings in your `.env` file.
 - **Redis connection issues:** Make sure Redis server is running: `redis-cli ping` should return "PONG".
 
+---
+
 ### 📝 License
 This project is developed as part of a college curriculum. Please check with the authors for usage permissions.
 
+---
+
+### &#x1F4D6; Preview
+
+#### Register Page
+
+
+#### Login Page
+
+
+#### Profile Page
+
+
+#### Home Page
+
+
+#### Reviews Page
+
+
+#### Books Page
+
+
+#### Authors Page
+
+
+#### Users Page
+
+
+#### User Page
