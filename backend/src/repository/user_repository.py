@@ -85,7 +85,7 @@ async def login(request: shema.UserSignIn,
 
 async def get_current_user(db: AsyncSession = Depends(get_db),
                            token: str = Depends(get_token)):
-    user_id = verify_token(token=token)
+    user_id = int(verify_token(token=token))
     print("user_id in get current user: ", user_id)
     if not user_id:
         return {

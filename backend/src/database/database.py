@@ -6,9 +6,20 @@ from backend.config import settings
 
 load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
+# SQLITE #
+# SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+# PostgreSQL #
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL_POSTGRE
+
+engine = create_async_engine(
+    SQLALCHEMY_DATABASE_URL,
+    echo=True,  
+    future=True,
+    pool_pre_ping=True,  
+    pool_recycle=300,
+)
+
 SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

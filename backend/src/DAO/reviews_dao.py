@@ -74,6 +74,7 @@ class ReviewDAO:
         user = review.user
 
         deleted_review = models.DeletedReview(
+            id=review.id,
             user_id=user.id,
             user_name=user.name,
             book_id=book.id,
@@ -84,12 +85,13 @@ class ReviewDAO:
             rating=review.rating,
             reason=reason,
             admin_id=admin.id,
-            review_id=review.id
         )
         db.add(deleted_review)
-        await db.delete(review)
         await db.commit()
         await db.refresh(deleted_review)
+
+        await db.delete(review)
+        await db.commit()
 
         return deleted_review
 

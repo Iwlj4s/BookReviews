@@ -72,7 +72,7 @@ class Book(Base):
     __tablename__ = 'books'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
-    book_cover: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    book_cover: Mapped[str] = mapped_column(String, nullable=False, index=True, unique=True)
     book_name: Mapped[str] = mapped_column(String, nullable=False, index=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False, index=True)
     book_description: Mapped[str] = mapped_column(Text, nullable=False, index=True)
@@ -183,7 +183,7 @@ class Warning(Base):
     severity: Mapped[str] = mapped_column(String, nullable=False)
     message: Mapped[str] = mapped_column(String, nullable=False)
     expiration_date: Mapped[Optional[DateTime]] = mapped_column(DateTime, nullable=True)
-    is_deleted: Mapped[bool] = mapped_column(Boolean, server_default=text("0"))
+    is_deleted: Mapped[bool] = mapped_column(Boolean, server_default=text("FALSE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     admin_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
@@ -197,7 +197,7 @@ class BlockedUser(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     block_start: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
     block_end: Mapped[Optional[DateTime]] = mapped_column(DateTime, nullable=True)
-    is_permanent: Mapped[bool] = mapped_column(Boolean, server_default=text("0"))
+    is_permanent: Mapped[bool] = mapped_column(Boolean, server_default=text("FALSE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     admin_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
@@ -208,7 +208,7 @@ class BlockedUser(Base):
 class DeletedReview(Base):
     __tablename__ = 'deleted_reviews'
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False, index=True)
     deletion_date: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
     original_content: Mapped[str] = mapped_column(Text, nullable=False)
     reason: Mapped[Optional[str]] = mapped_column(String, nullable=True)
@@ -223,13 +223,8 @@ class DeletedReview(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     user_name: Mapped[str] = mapped_column(String, nullable=False)
 
-    review_id: Mapped[int] = mapped_column(ForeignKey("reviews.id"), nullable=False, unique=True)
     admin_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    review: Mapped["Review"] = relationship(
-        "Review",
-        foreign_keys=[review_id]
-    )
     admin: Mapped["User"] = relationship("User", foreign_keys=[admin_id])
     book: Mapped["Book"] = relationship("Book", foreign_keys=[book_id])
     author: Mapped["Author"] = relationship("Author", foreign_keys=[author_id])
